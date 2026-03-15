@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --cream: #faf8f4;
+  --dark: #1a1612;
+  --warm: #c4956a;
+  --warm-light: #f0e6d8;
+  --muted: #8a7f74;
+  --border: #e8e2d9;
+  --tag-bg: #eee8e0;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: "DM Sans", sans-serif;
+  background: var(--cream);
+  color: var(--dark);
+}

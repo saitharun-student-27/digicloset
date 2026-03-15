@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.env
+venv/
+.venv/
+*.db
+
+# Node
+node_modules/
+dist/
+.DS_Store
+
+# Uploads (don't commit user data)
+server/uploads/*
+!server/uploads/.gitkeep
+
+# Env files
+.env
+.env.local
+.env.production
