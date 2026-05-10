@@ -1,0 +1,67 @@
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.orm import Session
+
+from app.db.database import get_db
+from app.schemas.clothing_item import (
+    ClothingItemCreate,
+    ClothingItemRead,
+    ClothingItemUpdate,
+)
+from app.services import wardrobe_service
+
+
+router = APIRouter(prefix="/clothing", tags=["Clothing"])
+
+
+@router.post(
+    "",
+    response_model=ClothingItemRead,
+    status_code=status.HTTP_201_CREATED,
+)
+def create_clothing_item(
+    item_in: ClothingItemCreate,
+    db: Session = Depends(get_db),
+):
+    return wardrobe_service.create_clothing_item(db, item_in)
+
+
+@router.get("", response_model=list[ClothingItemRead])
+def list_clothing_items(db: Session = Depends(get_db)):
+    return wardrobe_service.list_clothing_items(db)
+
+
+@router.get("/{item_id}", response_model=ClothingItemRead)
+def get_clothing_item(item_id: int, db: Session = Depends(get_db)):
+    clothing_item = wardrobe_service.get_clothing_item(db, item_id)
+    if clothing_item is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Clothing item not found",
+        )
+    return clothing_item
+
+
+@router.put("/{item_id}", response_model=ClothingItemRead)
+def update_clothing_item(
+    item_id: int,
+    item_in: ClothingItemUpdate,
+    db: Session = Depends(get_db),
+):
+    clothing_item = wardrobe_service.update_clothing_item(db, item_id, item_in)
+    if clothing_item is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Clothing item not found",
+        )
+    return clothing_item
+
+
+@router.delete("/{item_id}")
+def delete_clothing_item(item_id: int, db: Session = Depends(get_db)):
+    was_deleted = wardrobe_service.delete_clothing_item(db, item_id)
+    if not was_deleted:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Clothing item not found",
+        )
+    return {"message": "Clothing item deleted"}
