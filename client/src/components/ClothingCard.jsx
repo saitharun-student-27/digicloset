@@ -17,6 +17,8 @@ import {
   Sun,
 } from "lucide-react";
 
+import { getImageUrl } from "../services/clothingService";
+
 
 const categoryIcons = {
   shirt: Shirt,
@@ -70,9 +72,32 @@ export default function ClothingCard({ item }) {
   const CategoryIcon = categoryIcons[item.category] || Shirt;
   const SeasonIcon = seasonIcons[item.season] || Sparkles;
   const OccasionIcon = occasionIcons[item.occasion] || Sparkles;
+  const imageUrl = getImageUrl(item.image_url);
 
   return (
-    <article className="group rounded-2xl border border-black/5 bg-white p-5 shadow-soft transition hover:-translate-y-1 hover:shadow-xl">
+    <article className="group overflow-hidden rounded-2xl border border-black/5 bg-white shadow-soft transition hover:-translate-y-1 hover:shadow-xl">
+      <div className="relative h-48 bg-linen">
+        {imageUrl ? (
+          <img
+            src={imageUrl}
+            alt={item.name}
+            className="h-full w-full object-cover"
+          />
+        ) : (
+          <div className="flex h-full items-center justify-center bg-[linear-gradient(135deg,#eee6d9_0%,#f8f5ee_100%)]">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white text-sage shadow-soft">
+                <CategoryIcon className="h-7 w-7" />
+              </div>
+              <div className="h-16 w-16 rounded-2xl bg-charcoal/90" />
+              <div className="h-16 w-16 rounded-2xl bg-brass/30" />
+              <div className="h-16 w-16 rounded-2xl bg-sage/25" />
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className="p-5">
       <div className="flex items-start justify-between gap-3">
         <div className="flex gap-3">
           <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-linen text-charcoal">
@@ -114,6 +139,7 @@ export default function ClothingCard({ item }) {
             value={item.formality_level}
           />
         ) : null}
+      </div>
       </div>
     </article>
   );

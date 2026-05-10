@@ -1,5 +1,5 @@
-import { Plus, Shirt } from "lucide-react";
-import { useState } from "react";
+import { ImagePlus, Plus, Shirt, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 
 
 const categories = [
@@ -79,6 +79,21 @@ function SelectInput({ id, name, value, onChange, options }) {
 
 export default function ClothingForm({ onSubmit, isSubmitting }) {
   const [formData, setFormData] = useState(initialFormState);
+  const [imageFile, setImageFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState("");
+  const imageInputRef = useRef(null);
+
+  useEffect(() => {
+    if (!imageFile) {
+      setPreviewUrl("");
+      return undefined;
+    }
+
+    const objectUrl = URL.createObjectURL(imageFile);
+    setPreviewUrl(objectUrl);
+
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [imageFile]);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -88,14 +103,36 @@ export default function ClothingForm({ onSubmit, isSubmitting }) {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    const payload = {
-      ...formData,
-      style: formData.style.trim() || null,
-      formality_level: formData.formality_level.trim() || null,
-    };
+    const payload = new FormData();
+    payload.append("name", formData.name);
+    payload.append("category", formData.category);
+    payload.append("color", formData.color);
+    payload.append("season", formData.season);
+    payload.append("occasion", formData.occasion);
+
+    if (formData.style.trim()) {
+      payload.append("style", formData.style.trim());
+    }
+
+    if (formData.formality_level.trim()) {
+      payload.append("formality_level", formData.formality_level.trim());
+    }
+
+    if (imageFile) {
+      payload.append("image", imageFile);
+    }
 
     await onSubmit(payload);
     setFormData(initialFormState);
+    setImageFile(null);
+    if (imageInputRef.current) {
+      imageInputRef.current.value = "";
+    }
+  };
+
+  const handleImageChange = (event) => {
+    const file = event.target.files?.[0];
+    setImageFile(file || null);
   };
 
   return (
@@ -192,6 +229,59 @@ export default function ClothingForm({ onSubmit, isSubmitting }) {
             value={formData.formality_level}
             onChange={handleChange}
             placeholder="high"
+          />
+        </div>
+
+        <div className="md:col-span-2">
+          <FieldLabel htmlFor="image">Image</FieldLabel>
+          <label
+            htmlFor="image"
+            className="mt-2 flex cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-black/15 bg-ivory px-4 py-5 text-center transition hover:border-sage hover:bg-white"
+          >
+            {previewUrl ? (
+              <div className="relative w-full">
+                <img
+                  src={previewUrl}
+                  alt="Selected clothing preview"
+                  className="h-44 w-full rounded-2xl object-cover"
+                />
+                <button
+                  type="button"
+                  onClick={(event) => {
+                    event.preventDefault();
+                    setImageFile(null);
+                    if (imageInputRef.current) {
+                      imageInputRef.current.value = "";
+                    }
+                  }}
+                  className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-charcoal text-ivory shadow-soft"
+                  aria-label="Remove selected image"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+            ) : (
+              <>
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-sage shadow-soft">
+                  <ImagePlus className="h-5 w-5" />
+                </div>
+                <p className="mt-3 text-sm font-medium text-charcoal">
+                  Add an optional clothing image
+                </p>
+                <p className="mt-1 text-xs text-stone">
+                  JPG, PNG, or WEBP up to 5MB
+                </p>
+              </>
+            )}
+          </label>
+          <input
+            id="image"
+            ref={imageInputRef}
+            name="image"
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            onChange={handleImageChange}
+            className="sr-only"
           />
         </div>
       </div>

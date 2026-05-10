@@ -6,6 +6,9 @@ class Settings(BaseSettings):
     API_PREFIX: str = "/api"
     DATABASE_URL: str = "postgresql+psycopg://postgres:postgres@localhost:5432/digicloset"
     CORS_ORIGINS: str = "http://localhost:5173"
+    UPLOAD_DIR: str = "uploads"
+    UPLOAD_URL_PREFIX: str = "/uploads"
+    MAX_UPLOAD_SIZE_BYTES: int = 5 * 1024 * 1024
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
 

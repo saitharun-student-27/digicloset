@@ -1,9 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
+from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
 from app.db.database import get_db
 from app.schemas.clothing_item import (
-    ClothingItemCreate,
     ClothingItemRead,
     ClothingItemUpdate,
 )
@@ -18,10 +18,23 @@ router = APIRouter(prefix="/clothing", tags=["Clothing"])
     response_model=ClothingItemRead,
     status_code=status.HTTP_201_CREATED,
 )
-def create_clothing_item(
-    item_in: ClothingItemCreate,
+async def create_clothing_item(
+    request: Request,
     db: Session = Depends(get_db),
 ):
+    try:
+        item_in = await wardrobe_service.build_clothing_item_from_request(request)
+    except ValidationError as error:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=error.errors(),
+        ) from error
+    except ValueError as error:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(error),
+        ) from error
+
     return wardrobe_service.create_clothing_item(db, item_in)
 
 
