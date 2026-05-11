@@ -9,7 +9,7 @@ export async function getOutfits() {
 
 export async function createOutfit(outfit) {
   const formData = new FormData();
-  const pieces = outfit.pieces.map((piece) => ({
+  const pieces = (outfit.pieces || []).map((piece) => ({
     name: piece.name,
     category: piece.category,
     color: piece.color,

@@ -37,7 +37,7 @@ class OutfitCreate(BaseModel):
     style: str | None = Field(default=None, max_length=80)
     image_url: str | None = Field(default=None, max_length=500)
     source_type: OutfitSourceType | None = None
-    pieces: list[OutfitPieceCreate] = Field(..., min_length=1)
+    pieces: list[OutfitPieceCreate] = Field(default_factory=list)
 
 
 class OutfitUpdate(BaseModel):

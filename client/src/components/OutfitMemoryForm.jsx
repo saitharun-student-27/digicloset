@@ -1,9 +1,11 @@
 import {
+  FileImage,
   FilePenLine,
   ImagePlus,
   Plus,
   Sparkles,
   Trash2,
+  Type,
   WandSparkles,
   X,
 } from "lucide-react";
@@ -11,12 +13,10 @@ import { useMemo, useRef, useState } from "react";
 
 import {
   categories,
-  deriveOutfitSourceType,
   emptyPiece,
   formatValue,
   generateOutfitNote,
   generateOutfitTitle,
-  initialOutfitState,
   occasions,
   parseOutfitDescription,
   roles,
@@ -24,6 +24,27 @@ import {
   titleCase,
 } from "../utils/outfitUtils";
 
+
+const captureModes = [
+  {
+    id: "photo_note",
+    title: "Upload outfit photo",
+    description: "Save a look from an outfit image with a short note.",
+    icon: FileImage,
+  },
+  {
+    id: "text_input",
+    title: "Type the outfit",
+    description: "Write the look in text and confirm the suggested pieces.",
+    icon: Type,
+  },
+  {
+    id: "image_title",
+    title: "Image with title only",
+    description: "Save just the outfit image and title without extra breakdown.",
+    icon: ImagePlus,
+  },
+];
 
 function TextInput({ value, name, onChange, placeholder, required = false }) {
   return (
@@ -68,6 +89,28 @@ function TextArea({ value, name, onChange, placeholder, rows = 4 }) {
   );
 }
 
+function ModeCard({ mode, activeMode, onClick }) {
+  const Icon = mode.icon;
+
+  return (
+    <button
+      type="button"
+      onClick={() => onClick(mode.id)}
+      className={`rounded-[1.5rem] border p-4 text-left transition ${
+        activeMode === mode.id
+          ? "border-sage bg-white shadow-soft"
+          : "border-black/5 bg-ivory hover:border-black/10 hover:bg-white"
+      }`}
+    >
+      <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-linen text-brass">
+        <Icon className="h-5 w-5" />
+      </div>
+      <p className="mt-4 text-sm font-semibold text-charcoal">{mode.title}</p>
+      <p className="mt-1 text-sm leading-6 text-stone">{mode.description}</p>
+    </button>
+  );
+}
+
 function PreviewBadge({ label, value }) {
   return (
     <div className="rounded-2xl bg-white p-3 shadow-soft">
@@ -94,8 +137,190 @@ function PieceSlot({ label, piece }) {
   );
 }
 
+function ImagePicker({
+  imagePreviewUrl,
+  imageName,
+  fileInputRef,
+  onChange,
+  onRemove,
+  helperText,
+}) {
+  return (
+    <section className="rounded-2xl bg-ivory p-4">
+      <div className="mb-4">
+        <p className="text-sm font-semibold text-charcoal">Outfit image</p>
+        <p className="mt-1 text-sm leading-6 text-stone">{helperText}</p>
+      </div>
+
+      <div className="rounded-[1.5rem] border border-dashed border-black/15 bg-white p-4">
+        {imagePreviewUrl ? (
+          <div className="space-y-4">
+            <div className="flex h-72 items-center justify-center rounded-[1.25rem] bg-[linear-gradient(135deg,#f4efe6_0%,#fbf8f2_100%)] p-4 sm:h-80">
+              <img
+                src={imagePreviewUrl}
+                alt="Outfit preview"
+                className="h-full w-full object-contain"
+              />
+            </div>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <p className="text-sm font-medium text-charcoal">
+                  {imageName || "Outfit photo selected"}
+                </p>
+                <p className="text-xs text-stone">
+                  We&apos;ll use this as your outfit memory.
+                </p>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="inline-flex h-10 items-center gap-2 rounded-full bg-linen px-4 text-sm font-medium text-charcoal transition hover:bg-brass/20"
+                >
+                  <ImagePlus className="h-4 w-4" />
+                  Change image
+                </button>
+                <button
+                  type="button"
+                  onClick={onRemove}
+                  className="inline-flex h-10 items-center gap-2 rounded-full bg-white px-4 text-sm font-medium text-stone transition hover:text-charcoal"
+                >
+                  <X className="h-4 w-4" />
+                  Remove
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="flex w-full cursor-pointer flex-col items-center justify-center rounded-[1.25rem] bg-[linear-gradient(135deg,#f4efe6_0%,#fbf8f2_100%)] px-4 py-10 text-center transition hover:bg-white"
+          >
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-sage shadow-soft">
+              <ImagePlus className="h-5 w-5" />
+            </div>
+            <p className="mt-4 text-sm font-medium text-charcoal">
+              Add outfit photo
+            </p>
+            <p className="mt-1 text-xs leading-6 text-stone">
+              JPG, PNG, or WEBP up to 5MB
+            </p>
+          </button>
+        )}
+
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          onChange={onChange}
+          className="sr-only"
+        />
+      </div>
+    </section>
+  );
+}
+
+function PiecesEditor({ pieces, updatePiece, removePiece, addPiece }) {
+  return (
+    <section className="rounded-2xl bg-ivory p-4">
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <div>
+          <p className="text-sm font-semibold text-charcoal">
+            Confirm pieces
+          </p>
+          <p className="mt-1 text-sm leading-6 text-stone">
+            Review the suggested pieces or add your own.
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={addPiece}
+          className="inline-flex h-10 items-center gap-2 rounded-full bg-white px-4 text-sm font-medium text-charcoal transition hover:bg-brass/20"
+        >
+          <Plus className="h-4 w-4" />
+          Add piece
+        </button>
+      </div>
+
+      <div className="space-y-3">
+        {pieces.map((piece, index) => (
+          <div
+            key={index}
+            className="rounded-2xl border border-black/5 bg-white p-4"
+          >
+            <div className="mb-3 flex items-center justify-between gap-3">
+              <div className="flex flex-wrap gap-2">
+                <span className="rounded-full bg-linen px-3 py-1 text-xs font-medium text-charcoal">
+                  Piece {index + 1}
+                </span>
+                <span className="rounded-full bg-sage/10 px-3 py-1 text-xs font-medium capitalize text-sage">
+                  {formatValue(piece.role)}
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => removePiece(index)}
+                className="flex h-8 w-8 items-center justify-center rounded-full text-stone transition hover:bg-ivory hover:text-charcoal"
+                aria-label={`Remove piece ${index + 1}`}
+              >
+                <Trash2 className="h-4 w-4" />
+              </button>
+            </div>
+
+            <div className="grid gap-3 md:grid-cols-2">
+              <TextInput
+                name="name"
+                value={piece.name}
+                onChange={(event) =>
+                  updatePiece(index, "name", event.target.value)
+                }
+                placeholder="Maroon Shirt"
+                required
+              />
+              <TextInput
+                name="color"
+                value={piece.color}
+                onChange={(event) =>
+                  updatePiece(index, "color", event.target.value)
+                }
+                placeholder="maroon"
+                required
+              />
+              <SelectInput
+                name="category"
+                value={piece.category}
+                onChange={(event) =>
+                  updatePiece(index, "category", event.target.value)
+                }
+                options={categories}
+              />
+              <SelectInput
+                name="role"
+                value={piece.role}
+                onChange={(event) =>
+                  updatePiece(index, "role", event.target.value)
+                }
+                options={roles}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
-  const [formData, setFormData] = useState(initialOutfitState);
+  const [captureMode, setCaptureMode] = useState("photo_note");
+  const [formData, setFormData] = useState({
+    title: "",
+    occasion: "casual",
+    season: "all",
+    style: "",
+    descriptionText: "",
+    photoNote: "",
+  });
   const [pieces, setPieces] = useState([{ ...emptyPiece }]);
   const [imageFile, setImageFile] = useState(null);
   const [imagePreviewUrl, setImagePreviewUrl] = useState("");
@@ -128,15 +353,29 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
     [validPieces, formData.occasion, formData.season, formData.style],
   );
 
-  const generatedNote = useMemo(
-    () =>
-      generateOutfitNote({
-        pieces: validPieces,
-        occasion: formData.occasion,
-        season: formData.season,
-      }),
-    [validPieces, formData.occasion, formData.season],
-  );
+  const generatedNote = useMemo(() => {
+    if (captureMode === "photo_note" && formData.photoNote.trim()) {
+      return formData.photoNote.trim();
+    }
+
+    if (captureMode === "image_title" && validPieces.length === 0) {
+      return `Saved as a ${formatValue(formData.occasion)} ${formatValue(
+        formData.season,
+      )} outfit memory.`;
+    }
+
+    return generateOutfitNote({
+      pieces: validPieces,
+      occasion: formData.occasion,
+      season: formData.season,
+    });
+  }, [
+    captureMode,
+    formData.photoNote,
+    formData.occasion,
+    formData.season,
+    validPieces,
+  ]);
 
   const previewSlots = useMemo(() => {
     const slotMap = {
@@ -181,6 +420,11 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
     );
   };
 
+  const handleModeChange = (modeId) => {
+    setCaptureMode(modeId);
+    setParseMessage("");
+  };
+
   const handleImageChange = (event) => {
     const file = event.target.files?.[0];
     if (!file) {
@@ -199,6 +443,15 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
     reader.readAsDataURL(file);
   };
 
+  const clearImage = () => {
+    setImageFile(null);
+    setImagePreviewUrl("");
+    setImageName("");
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
   const handleParseDescription = () => {
     const suggestedPieces = parseOutfitDescription(formData.descriptionText);
 
@@ -209,25 +462,22 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
       return;
     }
 
-    setPieces((current) => {
-      const basePieces = current.filter(
-        (piece) => piece.name.trim() || piece.color.trim(),
-      );
-
-      if (basePieces.length === 0 || (basePieces.length === 1 && !basePieces[0].name && !basePieces[0].color)) {
-        return suggestedPieces;
-      }
-
-      return [...basePieces, ...suggestedPieces];
-    });
-
+    setPieces(suggestedPieces);
     setParseMessage(
-      `Suggested breakdown added. Review and edit the pieces before saving.`,
+      "Suggested breakdown added. Review and edit the pieces before saving.",
     );
   };
 
   const resetForm = () => {
-    setFormData(initialOutfitState);
+    setCaptureMode("photo_note");
+    setFormData({
+      title: "",
+      occasion: "casual",
+      season: "all",
+      style: "",
+      descriptionText: "",
+      photoNote: "",
+    });
     setPieces([{ ...emptyPiece }]);
     setImageFile(null);
     setImagePreviewUrl("");
@@ -238,29 +488,47 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
     }
   };
 
+  const canSubmit = useMemo(() => {
+    if (captureMode === "photo_note") {
+      return Boolean(imageFile && formData.photoNote.trim());
+    }
+
+    if (captureMode === "text_input") {
+      return validPieces.length > 0;
+    }
+
+    return Boolean(imageFile && formData.title.trim());
+  }, [captureMode, formData.photoNote, formData.title, imageFile, validPieces]);
+
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    if (validPieces.length === 0) {
+    if (!canSubmit) {
       return;
     }
 
-    const hasText = Boolean(formData.descriptionText.trim());
-
-    await onSubmit({
-      ...formData,
+    const payload = {
       title: formData.title.trim() || generatedTitle,
       style: formData.style.trim(),
-      pieces: validPieces,
+      occasion: formData.occasion,
+      season: formData.season,
       imagePreviewUrl,
       imageFile,
       imageName,
-      description: generatedNote,
-      source_type: deriveOutfitSourceType({
-        hasImage: Boolean(imageFile),
-        hasText,
-      }),
-    });
+      pieces: captureMode === "text_input" ? validPieces : [],
+      description:
+        captureMode === "photo_note"
+          ? formData.photoNote.trim()
+          : generatedNote,
+      source_type:
+        captureMode === "text_input"
+          ? "text_input"
+          : imageFile
+            ? "image_upload"
+            : "manual_build",
+    };
+
+    await onSubmit(payload);
 
     resetForm();
     event.target.reset();
@@ -280,235 +548,129 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
             Create Outfit Memory
           </h2>
           <p className="mt-1 text-sm text-stone">
-            Upload a look, type a short description, add pieces manually, or mix
-            them together in one flow. Nothing here claims automatic detection.
+            Pick one way to save the look. You do not need to fill every kind of
+            input anymore.
           </p>
         </div>
       </div>
 
-      <div className="space-y-5">
-        <section className="rounded-2xl bg-ivory p-4">
-          <div className="mb-4">
-            <p className="text-sm font-semibold text-charcoal">Outfit image</p>
-            <p className="mt-1 text-sm leading-6 text-stone">
-              Optional. Upload only if you want the memory anchored to a real
-              look photo.
-            </p>
-          </div>
-
-          <div className="rounded-[1.5rem] border border-dashed border-black/15 bg-white p-4">
-            {imagePreviewUrl ? (
-              <div className="space-y-4">
-                <div className="flex h-72 items-center justify-center rounded-[1.25rem] bg-[linear-gradient(135deg,#f4efe6_0%,#fbf8f2_100%)] p-4 sm:h-80">
-                  <img
-                    src={imagePreviewUrl}
-                    alt="Outfit preview"
-                    className="h-full w-full object-contain"
-                  />
-                </div>
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <div>
-                    <p className="text-sm font-medium text-charcoal">
-                      {imageName || "Outfit photo selected"}
-                    </p>
-                    <p className="text-xs text-stone">
-                      We&apos;ll use this as your outfit memory. Add or confirm
-                      the pieces below.
-                    </p>
-                  </div>
-                  <div className="flex gap-2">
-                    <button
-                      type="button"
-                      onClick={() => fileInputRef.current?.click()}
-                      className="inline-flex h-10 items-center gap-2 rounded-full bg-linen px-4 text-sm font-medium text-charcoal transition hover:bg-brass/20"
-                    >
-                      <ImagePlus className="h-4 w-4" />
-                      Change image
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setImageFile(null);
-                        setImagePreviewUrl("");
-                        setImageName("");
-                        if (fileInputRef.current) {
-                          fileInputRef.current.value = "";
-                        }
-                      }}
-                      className="inline-flex h-10 items-center gap-2 rounded-full bg-white px-4 text-sm font-medium text-stone transition hover:text-charcoal"
-                    >
-                      <X className="h-4 w-4" />
-                      Remove
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                className="flex w-full cursor-pointer flex-col items-center justify-center rounded-[1.25rem] bg-[linear-gradient(135deg,#f4efe6_0%,#fbf8f2_100%)] px-4 py-10 text-center transition hover:bg-white"
-              >
-                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-sage shadow-soft">
-                  <ImagePlus className="h-5 w-5" />
-                </div>
-                <p className="mt-4 text-sm font-medium text-charcoal">
-                  Add an optional full outfit photo
-                </p>
-                <p className="mt-1 text-xs leading-6 text-stone">
-                  JPG, PNG, or WEBP up to 5MB
-                </p>
-              </button>
-            )}
-
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/jpeg,image/png,image/webp"
-              onChange={handleImageChange}
-              className="sr-only"
+      <section className="mb-5">
+        <p className="mb-3 text-sm font-semibold text-charcoal">
+          Choose how you want to save this look
+        </p>
+        <div className="grid gap-3 md:grid-cols-3">
+          {captureModes.map((mode) => (
+            <ModeCard
+              key={mode.id}
+              mode={mode}
+              activeMode={captureMode}
+              onClick={handleModeChange}
             />
-          </div>
-        </section>
+          ))}
+        </div>
+      </section>
 
-        <section className="rounded-2xl bg-ivory p-4">
-          <div className="mb-4">
-            <p className="text-sm font-semibold text-charcoal">
-              Prefer typing the look?
-            </p>
-            <p className="mt-1 text-sm leading-6 text-stone">
-              Optional shortcut. Write the outfit in plain language and suggest
-              pieces from it.
-            </p>
-          </div>
+      <div className="space-y-5">
+        {captureMode === "photo_note" ? (
+          <>
+            <ImagePicker
+              imagePreviewUrl={imagePreviewUrl}
+              imageName={imageName}
+              fileInputRef={fileInputRef}
+              onChange={handleImageChange}
+              onRemove={clearImage}
+              helperText="Upload the full look, then add a short note about it. No forced piece-by-piece form."
+            />
 
-          <TextArea
-            name="descriptionText"
-            value={formData.descriptionText}
-            onChange={handleChange}
-            placeholder="Maroon shirt with cream pants and white sneakers"
-          />
+            <section className="rounded-2xl bg-ivory p-4">
+              <div className="mb-4">
+                <p className="text-sm font-semibold text-charcoal">
+                  Short look note
+                </p>
+                <p className="mt-1 text-sm leading-6 text-stone">
+                  A simple line is enough. For example: maroon shirt and cream
+                  pants for a calm college look.
+                </p>
+              </div>
 
-          <div className="mt-4 flex flex-wrap items-center gap-3">
-            <button
-              type="button"
-              onClick={handleParseDescription}
-              className="inline-flex h-11 items-center gap-2 rounded-full bg-charcoal px-4 text-sm font-medium text-ivory shadow-soft transition hover:-translate-y-0.5 hover:bg-softblack"
-            >
-              <WandSparkles className="h-4 w-4" />
-              Suggest pieces
-            </button>
-            <p className="text-xs leading-6 text-stone">
-              Deterministic text parsing only, not AI recognition.
-            </p>
-          </div>
-
-          {parseMessage ? (
-            <div className="mt-4 rounded-2xl border border-black/5 bg-white p-4 text-sm leading-6 text-stone">
-              {parseMessage}
-            </div>
-          ) : null}
-        </section>
-
-        <section className="rounded-2xl bg-ivory p-4">
-          <div className="mb-4 flex items-center justify-between gap-3">
-            <div>
-              <p className="text-sm font-semibold text-charcoal">
-                Confirm pieces
-              </p>
-              <p className="mt-1 text-sm leading-6 text-stone">
-                Add, remove, or edit the outfit pieces anytime before saving.
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={addPiece}
-              className="inline-flex h-10 items-center gap-2 rounded-full bg-white px-4 text-sm font-medium text-charcoal transition hover:bg-brass/20"
-            >
-              <Plus className="h-4 w-4" />
-              Add piece
-            </button>
-          </div>
-
-          <div className="space-y-3">
-            {pieces.map((piece, index) => (
-              <div
-                key={index}
-                className="rounded-2xl border border-black/5 bg-white p-4"
-              >
-                <div className="mb-3 flex items-center justify-between gap-3">
-                  <div className="flex flex-wrap gap-2">
-                    <span className="rounded-full bg-linen px-3 py-1 text-xs font-medium text-charcoal">
-                      Piece {index + 1}
-                    </span>
-                    <span className="rounded-full bg-sage/10 px-3 py-1 text-xs font-medium capitalize text-sage">
-                      {formatValue(piece.role)}
-                    </span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => removePiece(index)}
-                    className="flex h-8 w-8 items-center justify-center rounded-full text-stone transition hover:bg-ivory hover:text-charcoal"
-                    aria-label={`Remove piece ${index + 1}`}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
+              <div className="grid gap-4">
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-charcoal">
+                    Outfit title
+                  </label>
+                  <TextInput
+                    name="title"
+                    value={formData.title}
+                    onChange={handleChange}
+                    placeholder={generatedTitle}
+                  />
                 </div>
-
-                <div className="grid gap-3 md:grid-cols-2">
-                  <TextInput
-                    name="name"
-                    value={piece.name}
-                    onChange={(event) =>
-                      updatePiece(index, "name", event.target.value)
-                    }
-                    placeholder="Maroon Shirt"
-                    required
-                  />
-                  <TextInput
-                    name="color"
-                    value={piece.color}
-                    onChange={(event) =>
-                      updatePiece(index, "color", event.target.value)
-                    }
-                    placeholder="maroon"
-                    required
-                  />
-                  <SelectInput
-                    name="category"
-                    value={piece.category}
-                    onChange={(event) =>
-                      updatePiece(index, "category", event.target.value)
-                    }
-                    options={categories}
-                  />
-                  <SelectInput
-                    name="role"
-                    value={piece.role}
-                    onChange={(event) =>
-                      updatePiece(index, "role", event.target.value)
-                    }
-                    options={roles}
+                <div>
+                  <label className="mb-2 block text-sm font-medium text-charcoal">
+                    Small description
+                  </label>
+                  <TextArea
+                    name="photoNote"
+                    value={formData.photoNote}
+                    onChange={handleChange}
+                    placeholder="Maroon shirt with cream pants and white sneakers for a clean casual day."
+                    rows={4}
                   />
                 </div>
               </div>
-            ))}
-          </div>
-        </section>
+            </section>
+          </>
+        ) : null}
 
-        <section className="rounded-2xl bg-ivory p-4">
-          <div className="mb-4">
-            <p className="text-sm font-semibold text-charcoal">
-              Style context
-            </p>
-            <p className="mt-1 text-sm leading-6 text-stone">
-              Give the memory just enough context to feel like a look, not a
-              record.
-            </p>
-          </div>
+        {captureMode === "text_input" ? (
+          <>
+            <section className="rounded-2xl bg-ivory p-4">
+              <div className="mb-4">
+                <p className="text-sm font-semibold text-charcoal">
+                  Type the outfit
+                </p>
+                <p className="mt-1 text-sm leading-6 text-stone">
+                  Describe the look in plain language and we&apos;ll suggest a
+                  breakdown for you to confirm.
+                </p>
+              </div>
 
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="md:col-span-2">
+              <TextArea
+                name="descriptionText"
+                value={formData.descriptionText}
+                onChange={handleChange}
+                placeholder="Maroon shirt with cream pants and white sneakers"
+              />
+
+              <div className="mt-4 flex flex-wrap items-center gap-3">
+                <button
+                  type="button"
+                  onClick={handleParseDescription}
+                  className="inline-flex h-11 items-center gap-2 rounded-full bg-charcoal px-4 text-sm font-medium text-ivory shadow-soft transition hover:-translate-y-0.5 hover:bg-softblack"
+                >
+                  <WandSparkles className="h-4 w-4" />
+                  Suggest pieces
+                </button>
+                <p className="text-xs leading-6 text-stone">
+                  Suggested breakdown only. This is not image or AI detection.
+                </p>
+              </div>
+
+              {parseMessage ? (
+                <div className="mt-4 rounded-2xl border border-black/5 bg-white p-4 text-sm leading-6 text-stone">
+                  {parseMessage}
+                </div>
+              ) : null}
+            </section>
+
+            <PiecesEditor
+              pieces={pieces}
+              updatePiece={updatePiece}
+              removePiece={removePiece}
+              addPiece={addPiece}
+            />
+
+            <section className="rounded-2xl bg-ivory p-4">
               <label className="mb-2 block text-sm font-medium text-charcoal">
                 Outfit title
               </label>
@@ -518,8 +680,46 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
                 onChange={handleChange}
                 placeholder={generatedTitle}
               />
-            </div>
+            </section>
+          </>
+        ) : null}
 
+        {captureMode === "image_title" ? (
+          <>
+            <ImagePicker
+              imagePreviewUrl={imagePreviewUrl}
+              imageName={imageName}
+              fileInputRef={fileInputRef}
+              onChange={handleImageChange}
+              onRemove={clearImage}
+              helperText="Upload the outfit and give it a title. This is the lightest save path."
+            />
+
+            <section className="rounded-2xl bg-ivory p-4">
+              <label className="mb-2 block text-sm font-medium text-charcoal">
+                Outfit title
+              </label>
+              <TextInput
+                name="title"
+                value={formData.title}
+                onChange={handleChange}
+                placeholder="Campus Neutral Fit"
+                required
+              />
+            </section>
+          </>
+        ) : null}
+
+        <section className="rounded-2xl bg-ivory p-4">
+          <div className="mb-4">
+            <p className="text-sm font-semibold text-charcoal">Style context</p>
+            <p className="mt-1 text-sm leading-6 text-stone">
+              Light context helps the memory feel organized without turning this
+              into a big form.
+            </p>
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-2">
             <div>
               <label className="mb-2 block text-sm font-medium text-charcoal">
                 Occasion
@@ -565,10 +765,10 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
             </div>
             <div>
               <p className="text-sm font-semibold text-charcoal">
-                Generated preview
+                Preview before saving
               </p>
               <p className="mt-1 text-sm leading-6 text-stone">
-                Preview the memory before saving.
+                See what this outfit memory will look like.
               </p>
             </div>
           </div>
@@ -602,7 +802,7 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
 
           <div className="mt-4 grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
             <PreviewBadge
-              label="Generated title"
+              label="Title"
               value={formData.title.trim() || generatedTitle}
             />
             <PreviewBadge
@@ -621,40 +821,42 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
 
           <div className="mt-4 rounded-2xl bg-white p-4 shadow-soft">
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-stone">
-              Generated outfit note
+              Outfit note
             </p>
             <p className="mt-2 text-sm leading-6 text-charcoal">
               {generatedNote}
             </p>
           </div>
 
-          <div className="mt-4 rounded-2xl bg-white p-4 shadow-soft">
-            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-stone">
-              Pieces summary
-            </p>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {validPieces.length > 0 ? (
-                validPieces.map((piece, index) => (
-                  <span
-                    key={`${piece.name}-${index}`}
-                    className="rounded-full bg-linen px-3 py-2 text-xs font-medium capitalize text-charcoal"
-                  >
-                    {piece.name} - {formatValue(piece.role)}
+          {captureMode === "text_input" ? (
+            <div className="mt-4 rounded-2xl bg-white p-4 shadow-soft">
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-stone">
+                Pieces summary
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {validPieces.length > 0 ? (
+                  validPieces.map((piece, index) => (
+                    <span
+                      key={`${piece.name}-${index}`}
+                      className="rounded-full bg-linen px-3 py-2 text-xs font-medium capitalize text-charcoal"
+                    >
+                      {piece.name} - {formatValue(piece.role)}
+                    </span>
+                  ))
+                ) : (
+                  <span className="text-sm text-stone">
+                    Suggest or add pieces to build the outfit summary.
                   </span>
-                ))
-              ) : (
-                <span className="text-sm text-stone">
-                  Add pieces to build the outfit summary.
-                </span>
-              )}
+                )}
+              </div>
             </div>
-          </div>
+          ) : null}
         </section>
       </div>
 
       <button
         type="submit"
-        disabled={isSubmitting || validPieces.length === 0}
+        disabled={isSubmitting || !canSubmit}
         className="mt-6 inline-flex h-12 items-center justify-center gap-2 rounded-full bg-charcoal px-5 text-sm font-medium text-ivory shadow-soft transition hover:-translate-y-0.5 hover:bg-softblack disabled:cursor-not-allowed disabled:bg-stone"
       >
         <Sparkles className="h-4 w-4" />

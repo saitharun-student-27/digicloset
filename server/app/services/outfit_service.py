@@ -56,7 +56,15 @@ def generate_outfit_description(
     pieces: list[OutfitPieceCreate],
     occasion: str,
     season: str,
+    style: str | None = None,
 ) -> str:
+    if len(pieces) == 0:
+        style_prefix = f"{_format_value(style)} " if style else ""
+        return (
+            f"Saved as a {style_prefix}{_format_value(occasion)} "
+            f"{_format_value(season)} outfit memory."
+        )
+
     piece_names = [_format_piece_name(piece) for piece in pieces]
 
     if len(piece_names) == 1:
@@ -78,6 +86,12 @@ def _generate_outfit_title(outfit_in: OutfitCreate) -> str:
 
     if accent_color:
         return f"{_format_value(outfit_in.occasion).title()} {_format_value(accent_color).title()} {_format_value(outfit_in.season).title()} Fit"
+
+    if outfit_in.style:
+        return f"{_format_value(outfit_in.occasion).title()} {_format_value(outfit_in.style).title()} Look"
+
+    if len(outfit_in.pieces) == 0:
+        return f"{_format_value(outfit_in.occasion).title()} Outfit Memory"
 
     first_piece = outfit_in.pieces[0].name
     return f"{_format_value(outfit_in.occasion).title()} outfit with {first_piece}"
@@ -132,6 +146,7 @@ def create_outfit(db: Session, outfit_in: OutfitCreate) -> Outfit:
         outfit_in.pieces,
         outfit_in.occasion,
         outfit_in.season,
+        outfit_in.style,
     )
 
     outfit = Outfit(
