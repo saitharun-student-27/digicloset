@@ -6,6 +6,7 @@ from fastapi.staticfiles import StaticFiles
 
 from app.api.routes.clothing import router as clothing_router
 from app.api.routes.health import router as health_router
+from app.api.routes.outfits import router as outfits_router
 from app.core.config import settings
 from app.db.database import create_db_tables
 from app.utils.upload import ensure_upload_dir
@@ -31,6 +32,7 @@ def create_app() -> FastAPI:
 
     app.include_router(health_router, prefix=settings.API_PREFIX)
     app.include_router(clothing_router, prefix=settings.API_PREFIX)
+    app.include_router(outfits_router, prefix=settings.API_PREFIX)
     app.mount(
         settings.UPLOAD_URL_PREFIX,
         StaticFiles(directory=settings.UPLOAD_DIR),

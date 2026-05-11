@@ -98,48 +98,49 @@ export default function ClothingCard({ item }) {
       </div>
 
       <div className="p-5">
-      <div className="flex items-start justify-between gap-3">
-        <div className="flex gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-linen text-charcoal">
-            <CategoryIcon className="h-5 w-5" />
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex gap-3">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-linen text-charcoal">
+              <CategoryIcon className="h-5 w-5" />
+            </div>
+            <div>
+              <h3 className="text-base font-semibold text-charcoal">
+                {item.name}
+              </h3>
+              <p className="mt-1 text-sm capitalize text-stone">
+                {formatValue(item.category)}
+              </p>
+            </div>
           </div>
-          <div>
-            <h3 className="text-base font-semibold text-charcoal">
-              {item.name}
-            </h3>
-            <p className="mt-1 text-sm capitalize text-stone">
-              {formatValue(item.category)}
+          <div className="text-right">
+            <span className="rounded-full bg-sage/10 px-3 py-1 text-xs font-medium capitalize text-sage">
+              {item.source_type}
+            </span>
+            <p className="mt-2 text-xs uppercase tracking-[0.12em] text-stone">
+              Wardrobe piece
             </p>
           </div>
         </div>
-        <span className="rounded-full bg-sage/10 px-3 py-1 text-xs font-medium capitalize text-sage">
-          {item.source_type}
-        </span>
-      </div>
 
-      <div className="mt-5 h-1.5 overflow-hidden rounded-full bg-linen">
-        <div className="h-full w-2/3 rounded-full bg-brass/70" />
-      </div>
-
-      <div className="mt-5 grid grid-cols-2 gap-3">
-        <DetailBadge icon={Palette} label="Color" value={item.color} />
-        <DetailBadge icon={SeasonIcon} label="Season" value={item.season} />
-        <DetailBadge
-          icon={OccasionIcon}
-          label="Occasion"
-          value={item.occasion}
-        />
-        {item.style ? (
-          <DetailBadge icon={Sparkles} label="Style" value={item.style} />
-        ) : null}
-        {item.formality_level ? (
+        <div className="mt-5 grid grid-cols-2 gap-3">
+          <DetailBadge icon={Palette} label="Color" value={item.color} />
+          <DetailBadge icon={SeasonIcon} label="Season" value={item.season} />
           <DetailBadge
-            icon={Briefcase}
-            label="Formality"
-            value={item.formality_level}
+            icon={OccasionIcon}
+            label="Occasion"
+            value={item.occasion}
           />
-        ) : null}
-      </div>
+          {item.style ? (
+            <DetailBadge icon={Sparkles} label="Style" value={item.style} />
+          ) : null}
+          {item.formality_level ? (
+            <DetailBadge
+              icon={Briefcase}
+              label="Formality"
+              value={item.formality_level}
+            />
+          ) : null}
+        </div>
       </div>
     </article>
   );

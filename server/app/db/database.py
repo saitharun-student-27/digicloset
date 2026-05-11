@@ -21,5 +21,6 @@ def get_db() -> Generator[Session, None, None]:
 
 def create_db_tables() -> None:
     from app.models.clothing_item import ClothingItem  # noqa: F401
+    from app.models.outfit import Outfit, OutfitItem  # noqa: F401
 
     Base.metadata.create_all(bind=engine)
