@@ -52,7 +52,11 @@ async def build_clothing_item_from_request(request: Request) -> ClothingItemCrea
 
 
 def create_clothing_item(db: Session, item_in: ClothingItemCreate) -> ClothingItem:
-    clothing_item = ClothingItem(**item_in.model_dump())
+    item_data = item_in.model_dump()
+    item_data["season"] = item_data.get("season") or "all"
+    item_data["occasion"] = item_data.get("occasion") or "casual"
+
+    clothing_item = ClothingItem(**item_data)
     db.add(clothing_item)
     db.commit()
     db.refresh(clothing_item)
@@ -89,6 +93,11 @@ def delete_clothing_item(db: Session, item_id: int) -> bool:
     clothing_item = get_clothing_item(db, item_id)
     if clothing_item is None:
         return False
+
+    if clothing_item.outfit_items:
+        raise ValueError(
+            "This clothing piece is linked to one or more outfit memories and cannot be deleted safely.",
+        )
 
     db.delete(clothing_item)
     db.commit()

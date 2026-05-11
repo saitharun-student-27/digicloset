@@ -14,13 +14,21 @@ export async function createOutfit(outfit) {
     category: piece.category,
     color: piece.color,
     slot: piece.slot || piece.role,
+    season: piece.season || null,
+    occasion: piece.occasion || null,
     style: piece.style || outfit.style || null,
     formality_level: piece.formality_level || null,
+    source_type: piece.source_type || null,
+    layer_order: piece.layer_order ?? null,
   }));
 
   formData.append("occasion", outfit.occasion);
   formData.append("season", outfit.season);
   formData.append("pieces", JSON.stringify(pieces));
+
+  if (outfit.source_type) {
+    formData.append("source_type", outfit.source_type);
+  }
 
   if (outfit.title) {
     formData.append("title", outfit.title);

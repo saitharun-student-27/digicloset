@@ -71,7 +71,14 @@ def update_clothing_item(
 
 @router.delete("/{item_id}")
 def delete_clothing_item(item_id: int, db: Session = Depends(get_db)):
-    was_deleted = wardrobe_service.delete_clothing_item(db, item_id)
+    try:
+        was_deleted = wardrobe_service.delete_clothing_item(db, item_id)
+    except ValueError as error:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=str(error),
+        ) from error
+
     if not was_deleted:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

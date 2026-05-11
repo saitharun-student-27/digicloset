@@ -16,6 +16,7 @@ class Outfit(Base):
     season: Mapped[str] = mapped_column(String(50), nullable=False)
     style: Mapped[str | None] = mapped_column(String(80), nullable=True)
     image_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    source_type: Mapped[str] = mapped_column(String(50), nullable=False)
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         server_default=func.now(),
@@ -48,6 +49,7 @@ class OutfitItem(Base):
         nullable=False,
     )
     slot: Mapped[str] = mapped_column(String(50), nullable=False)
+    layer_order: Mapped[int | None] = mapped_column(nullable=True)
 
     outfit: Mapped[Outfit] = relationship("Outfit", back_populates="outfit_items")
     clothing_item: Mapped["ClothingItem"] = relationship(

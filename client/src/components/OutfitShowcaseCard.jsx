@@ -15,11 +15,13 @@ export default function OutfitShowcaseCard({ outfit }) {
     <article className="overflow-hidden rounded-2xl border border-black/5 bg-white shadow-soft">
       <div className="h-56 bg-linen">
         {imageUrl ? (
-          <img
-            src={imageUrl}
-            alt={outfit.title}
-            className="h-full w-full object-cover"
-          />
+          <div className="flex h-full items-center justify-center bg-[linear-gradient(135deg,#eee6d9_0%,#f8f5ee_100%)] p-3">
+            <img
+              src={imageUrl}
+              alt={outfit.title}
+              className="h-full w-full object-contain"
+            />
+          </div>
         ) : (
           <div className="flex h-full items-center justify-center bg-[linear-gradient(135deg,#eee6d9_0%,#f8f5ee_100%)]">
             <div className="grid grid-cols-2 gap-3">

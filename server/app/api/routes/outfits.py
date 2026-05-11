@@ -3,7 +3,7 @@ from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
 from app.db.database import get_db
-from app.schemas.outfit import OutfitRead
+from app.schemas.outfit import OutfitRead, OutfitUpdate
 from app.services import outfit_service
 
 
@@ -36,6 +36,21 @@ def list_outfits(db: Session = Depends(get_db)):
 @router.get("/{outfit_id}", response_model=OutfitRead)
 def get_outfit(outfit_id: int, db: Session = Depends(get_db)):
     outfit = outfit_service.get_outfit(db, outfit_id)
+    if outfit is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Outfit not found",
+        )
+    return outfit
+
+
+@router.put("/{outfit_id}", response_model=OutfitRead)
+def update_outfit(
+    outfit_id: int,
+    outfit_in: OutfitUpdate,
+    db: Session = Depends(get_db),
+):
+    outfit = outfit_service.update_outfit(db, outfit_id, outfit_in)
     if outfit is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,

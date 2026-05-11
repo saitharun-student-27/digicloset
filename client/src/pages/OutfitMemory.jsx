@@ -64,12 +64,12 @@ export default function OutfitMemory() {
                 Outfit memory capture
               </div>
               <h1 className="text-3xl font-semibold tracking-normal sm:text-4xl">
-                Save complete looks before anything else
+                Save complete looks in whatever way feels natural
               </h1>
               <p className="mt-3 max-w-2xl text-sm leading-6 text-ivory/70">
-                Capture the whole outfit, break down the pieces inside it, then
-                save the memory through the backend so it stays with your
-                wardrobe over time.
+                Start from a photo, a text description, or a manual build. The
+                goal is to preserve the look as wardrobe memory, not make you
+                fill a long clothing database form.
               </p>
             </div>
 
@@ -124,6 +124,10 @@ export default function OutfitMemory() {
                 <h2 className="mt-2 text-2xl font-semibold text-charcoal">
                   Your captured looks
                 </h2>
+                <p className="mt-1 text-sm text-stone">
+                  Saved memories stay in the backend, so they remain after
+                  refresh and continue to build your closet.
+                </p>
               </div>
             </div>
 

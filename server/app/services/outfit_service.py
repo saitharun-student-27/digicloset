@@ -1,17 +1,16 @@
 import json
 
 from fastapi import Request
-from pydantic import ValidationError
 from sqlalchemy.orm import Session, joinedload
 from starlette.datastructures import UploadFile as StarletteUploadFile
 
 from app.models.clothing_item import ClothingItem
 from app.models.outfit import Outfit, OutfitItem
-from app.schemas.outfit import OutfitCreate, OutfitPieceCreate
+from app.schemas.outfit import OutfitCreate, OutfitPieceCreate, OutfitUpdate
 from app.utils.upload import save_clothing_image
 
 
-FORM_FIELDS = ["title", "description", "occasion", "season", "style"]
+FORM_FIELDS = ["title", "description", "occasion", "season", "style", "source_type"]
 
 
 def _clean_optional(value: object) -> object:
@@ -22,6 +21,27 @@ def _clean_optional(value: object) -> object:
 
 def _format_value(value: str) -> str:
     return value.replace("_", " ")
+
+
+def _derive_outfit_source_type(
+    image_url: str | None,
+    explicit_source_type: str | None,
+) -> str:
+    if image_url:
+        return "image_upload"
+
+    if explicit_source_type:
+        return explicit_source_type
+
+    return "manual_build"
+
+
+def _derive_piece_source_type(outfit_source_type: str) -> str:
+    if outfit_source_type == "image_upload":
+        return "image_upload"
+    if outfit_source_type == "text_input":
+        return "text_parse"
+    return "outfit_breakdown"
 
 
 def _format_piece_name(piece: OutfitPieceCreate) -> str:
@@ -51,6 +71,14 @@ def generate_outfit_description(
 
 
 def _generate_outfit_title(outfit_in: OutfitCreate) -> str:
+    colors = [piece.color.strip().lower() for piece in outfit_in.pieces if piece.color.strip()]
+    accent_color = next((color for color in colors if color not in {"white", "black", "grey", "gray", "beige", "cream", "tan", "charcoal", "brown", "navy"}), None)
+    if not accent_color and colors:
+        accent_color = colors[0]
+
+    if accent_color:
+        return f"{_format_value(outfit_in.occasion).title()} {_format_value(accent_color).title()} {_format_value(outfit_in.season).title()} Fit"
+
     first_piece = outfit_in.pieces[0].name
     return f"{_format_value(outfit_in.occasion).title()} outfit with {first_piece}"
 
@@ -98,6 +126,7 @@ def _with_outfit_relations(query):
 
 
 def create_outfit(db: Session, outfit_in: OutfitCreate) -> Outfit:
+    source_type = _derive_outfit_source_type(outfit_in.image_url, outfit_in.source_type)
     title = outfit_in.title or _generate_outfit_title(outfit_in)
     description = outfit_in.description or generate_outfit_description(
         outfit_in.pieces,
@@ -112,20 +141,23 @@ def create_outfit(db: Session, outfit_in: OutfitCreate) -> Outfit:
         season=outfit_in.season,
         style=outfit_in.style,
         image_url=outfit_in.image_url,
+        source_type=source_type,
     )
     db.add(outfit)
     db.flush()
 
-    for piece in outfit_in.pieces:
+    default_piece_source_type = _derive_piece_source_type(source_type)
+
+    for index, piece in enumerate(outfit_in.pieces):
         clothing_item = ClothingItem(
             name=piece.name,
             category=piece.category,
             color=piece.color,
-            season=outfit_in.season,
-            occasion=outfit_in.occasion,
+            season=piece.season or outfit_in.season,
+            occasion=piece.occasion or outfit_in.occasion,
             style=piece.style or outfit_in.style,
             formality_level=piece.formality_level,
-            source_type="outfit",
+            source_type=piece.source_type or default_piece_source_type,
         )
         db.add(clothing_item)
         db.flush()
@@ -135,6 +167,7 @@ def create_outfit(db: Session, outfit_in: OutfitCreate) -> Outfit:
                 outfit_id=outfit.id,
                 clothing_item_id=clothing_item.id,
                 slot=piece.slot,
+                layer_order=piece.layer_order if piece.layer_order is not None else index,
             ),
         )
 
@@ -156,6 +189,23 @@ def get_outfit(db: Session, outfit_id: int) -> Outfit | None:
         .filter(Outfit.id == outfit_id)
         .first()
     )
+
+
+def update_outfit(
+    db: Session,
+    outfit_id: int,
+    outfit_in: OutfitUpdate,
+) -> Outfit | None:
+    outfit = get_outfit(db, outfit_id)
+    if outfit is None:
+        return None
+
+    update_data = outfit_in.model_dump(exclude_unset=True)
+    for field, value in update_data.items():
+        setattr(outfit, field, value)
+
+    db.commit()
+    return get_outfit(db, outfit.id)
 
 
 def delete_outfit(db: Session, outfit_id: int) -> bool:
