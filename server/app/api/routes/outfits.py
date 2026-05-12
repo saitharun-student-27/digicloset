@@ -68,3 +68,25 @@ def delete_outfit(outfit_id: int, db: Session = Depends(get_db)):
             detail="Outfit not found",
         )
     return {"message": "Outfit deleted"}
+
+
+@router.post("/{outfit_id}/favorite", response_model=OutfitRead)
+def toggle_favorite(outfit_id: int, db: Session = Depends(get_db)):
+    outfit = outfit_service.toggle_favorite(db, outfit_id)
+    if not outfit:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Outfit not found",
+        )
+    return outfit
+
+
+@router.post("/{outfit_id}/worn", response_model=OutfitRead)
+def mark_worn(outfit_id: int, db: Session = Depends(get_db)):
+    outfit = outfit_service.mark_worn(db, outfit_id)
+    if not outfit:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Outfit not found",
+        )
+    return outfit

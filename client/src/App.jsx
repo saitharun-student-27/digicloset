@@ -1,9 +1,10 @@
 import { Route, Routes } from "react-router-dom";
 
 import AppShell from "./components/AppShell";
+import Suggestions from "./pages/Suggestions";
+import Capture from "./pages/Capture";
 import Home from "./pages/Home";
-import OutfitMemory from "./pages/OutfitMemory";
-import Wardrobe from "./pages/Wardrobe";
+import Vault from "./pages/Vault";
 
 function AppRoute({ children }) {
   return <AppShell>{children}</AppShell>;
@@ -21,18 +22,26 @@ function App() {
         }
       />
       <Route
-        path="/outfit-memory"
+        path="/vault"
         element={
           <AppRoute>
-            <OutfitMemory />
+            <Vault />
           </AppRoute>
         }
       />
       <Route
-        path="/wardrobe"
+        path="/capture"
         element={
           <AppRoute>
-            <Wardrobe />
+            <Capture />
+          </AppRoute>
+        }
+      />
+      <Route
+        path="/suggestions"
+        element={
+          <AppRoute>
+            <Suggestions />
           </AppRoute>
         }
       />

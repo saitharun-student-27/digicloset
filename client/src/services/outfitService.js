@@ -49,3 +49,8 @@ export async function createOutfit(outfit) {
   const response = await api.post("/outfits", formData);
   return response.data;
 }
+
+export async function deleteOutfit(id) {
+  const response = await api.delete(`/outfits/${id}`);
+  return response.data;
+}

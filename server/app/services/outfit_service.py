@@ -109,13 +109,18 @@ async def build_outfit_from_request(request: Request) -> OutfitCreate:
         }
 
         pieces_raw = form.get("pieces")
-        if not isinstance(pieces_raw, str):
-            raise ValueError("Pieces must be provided as a JSON string.")
+        if isinstance(pieces_raw, str):
+            try:
+                outfit_data["pieces"] = json.loads(pieces_raw)
+            except json.JSONDecodeError as error:
+                raise ValueError("Pieces must be valid JSON.") from error
 
-        try:
-            outfit_data["pieces"] = json.loads(pieces_raw)
-        except json.JSONDecodeError as error:
-            raise ValueError("Pieces must be valid JSON.") from error
+        clothing_item_ids_raw = form.get("clothing_item_ids")
+        if isinstance(clothing_item_ids_raw, str):
+            try:
+                outfit_data["clothing_item_ids"] = json.loads(clothing_item_ids_raw)
+            except json.JSONDecodeError as error:
+                raise ValueError("clothing_item_ids must be valid JSON.") from error
 
         outfit_in = OutfitCreate.model_validate(outfit_data)
 
@@ -186,6 +191,16 @@ def create_outfit(db: Session, outfit_in: OutfitCreate) -> Outfit:
             ),
         )
 
+    for item_id in outfit_in.clothing_item_ids:
+        db.add(
+            OutfitItem(
+                outfit_id=outfit.id,
+                clothing_item_id=item_id,
+                slot="manual_select",
+                layer_order=None,
+            )
+        )
+
     db.commit()
     return get_outfit(db, outfit.id)
 
@@ -231,3 +246,28 @@ def delete_outfit(db: Session, outfit_id: int) -> bool:
     db.delete(outfit)
     db.commit()
     return True
+
+
+def toggle_favorite(db: Session, outfit_id: int) -> Outfit | None:
+    """Toggle the favorite status of an outfit."""
+    outfit = get_outfit(db, outfit_id)
+    if outfit is None:
+        return None
+
+    outfit.is_favorite = not outfit.is_favorite
+    db.commit()
+    db.refresh(outfit)
+    return get_outfit(db, outfit.id)
+
+
+def mark_worn(db: Session, outfit_id: int) -> Outfit | None:
+    """Mark an outfit as worn today."""
+    outfit = get_outfit(db, outfit_id)
+    if outfit is None:
+        return None
+
+    from datetime import datetime, timezone
+    outfit.last_worn_date = datetime.now(timezone.utc)
+    db.commit()
+    db.refresh(outfit)
+    return get_outfit(db, outfit.id)

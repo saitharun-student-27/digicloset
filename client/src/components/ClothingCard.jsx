@@ -1,146 +1,106 @@
 import {
-  Briefcase,
-  CloudRain,
-  Dumbbell,
-  Footprints,
-  Glasses,
-  GraduationCap,
-  PanelsTopLeft,
-  Luggage,
-  Moon,
-  Palette,
-  PartyPopper,
-  Shirt,
-  ShoppingBag,
-  Snowflake,
+  MoreVertical,
+  Pencil,
+  Trash2,
   Sparkles,
-  Sun,
 } from "lucide-react";
+import { useState } from "react";
+import { getImageUrl, deleteClothingItem } from "../services/clothingService";
 
-import { getImageUrl } from "../services/clothingService";
-
-
-const categoryIcons = {
-  shirt: Shirt,
-  t_shirt: Shirt,
-  pant: PanelsTopLeft,
-  jeans: PanelsTopLeft,
-  shorts: PanelsTopLeft,
-  jacket: ShoppingBag,
-  hoodie: ShoppingBag,
-  shoes: Footprints,
-  accessory: Glasses,
-  dress: Sparkles,
-};
-
-const seasonIcons = {
-  summer: Sun,
-  winter: Snowflake,
-  rainy: CloudRain,
-  all: Moon,
-};
-
-const occasionIcons = {
-  casual: Shirt,
-  formal: Briefcase,
-  college: GraduationCap,
-  party: PartyPopper,
-  sports: Dumbbell,
-  travel: Luggage,
-  traditional: Sparkles,
-};
-
-function formatValue(value) {
-  return String(value).replace("_", " ");
-}
-
-function DetailBadge({ icon: Icon, label, value }) {
-  return (
-    <div className="rounded-2xl border border-black/5 bg-ivory px-3 py-3">
-      <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.12em] text-stone">
-        <Icon className="h-3.5 w-3.5 text-sage" />
-        {label}
-      </div>
-      <p className="mt-2 text-sm font-medium capitalize text-charcoal">
-        {formatValue(value)}
-      </p>
-    </div>
-  );
-}
-
-export default function ClothingCard({ item }) {
-  const CategoryIcon = categoryIcons[item.category] || Shirt;
-  const SeasonIcon = seasonIcons[item.season] || Sparkles;
-  const OccasionIcon = occasionIcons[item.occasion] || Sparkles;
+export default function ClothingCard({ item, onDeleteSuccess }) {
+  const [isHovered, setIsHovered] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const imageUrl = getImageUrl(item.image_url);
 
+  const handleDelete = async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!confirm("Remove this piece from your vault?")) return;
+    
+    setIsDeleting(true);
+    try {
+      await deleteClothingItem(item.id);
+      if (onDeleteSuccess) {
+        onDeleteSuccess(item.id);
+      }
+    } catch (err) {
+      console.error("Failed to delete item", err);
+      setIsDeleting(false);
+    }
+  };
+
+  const handleEdit = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    // In a future update, we will open an edit modal
+    alert("Edit mode coming soon!");
+  };
+
   return (
-    <article className="group overflow-hidden rounded-2xl border border-black/5 bg-white shadow-soft transition hover:-translate-y-1 hover:shadow-xl">
-      <div className="relative h-48 bg-linen">
+    <article 
+      className={`group relative flex w-full cursor-pointer flex-col overflow-hidden rounded-[2rem] bg-white shadow-sm transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl ${isDeleting ? "opacity-50 pointer-events-none" : ""}`}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <div className="relative w-full bg-ivory min-h-[220px] flex items-center justify-center p-4">
         {imageUrl ? (
           <img
             src={imageUrl}
             alt={item.name}
-            className="h-full w-full object-cover"
+            className="w-full h-auto max-h-[300px] object-contain mix-blend-multiply transition-transform duration-700 group-hover:scale-110"
           />
         ) : (
-          <div className="flex h-full items-center justify-center bg-[linear-gradient(135deg,#eee6d9_0%,#f8f5ee_100%)]">
-            <div className="grid grid-cols-2 gap-3">
-              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white text-sage shadow-soft">
-                <CategoryIcon className="h-7 w-7" />
-              </div>
-              <div className="h-16 w-16 rounded-2xl bg-charcoal/90" />
-              <div className="h-16 w-16 rounded-2xl bg-brass/30" />
-              <div className="h-16 w-16 rounded-2xl bg-sage/25" />
-            </div>
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white/50 text-sage backdrop-blur-md shadow-sm">
+            <Sparkles className="h-8 w-8" />
           </div>
         )}
       </div>
 
-      <div className="p-5">
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-linen text-charcoal">
-              <CategoryIcon className="h-5 w-5" />
-            </div>
-            <div>
-              <h3 className="text-base font-semibold text-charcoal">
-                {item.name}
-              </h3>
-              <p className="mt-1 text-sm capitalize text-stone">
-                {formatValue(item.category)}
-              </p>
-            </div>
-          </div>
-          <div className="text-right">
-            <span className="rounded-full bg-sage/10 px-3 py-1 text-xs font-medium capitalize text-sage">
-              {item.source_type}
-            </span>
-            <p className="mt-2 text-xs uppercase tracking-[0.12em] text-stone">
-              Wardrobe piece
-            </p>
-          </div>
-        </div>
+      {/* Glassmorphic Hover Tags (Pinterest Vibe) */}
+      <div className={`absolute top-4 left-4 right-4 flex flex-wrap gap-2 transition-all duration-500 ${isHovered ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4 pointer-events-none"}`}>
+        <span className="rounded-full bg-white/80 backdrop-blur-md px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-charcoal shadow-sm">
+          #{item.category}
+        </span>
+        {item.occasion && (
+          <span className="rounded-full bg-white/80 backdrop-blur-md px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-charcoal shadow-sm">
+            #{item.occasion}
+          </span>
+        )}
+        {item.season && (
+          <span className="rounded-full bg-white/80 backdrop-blur-md px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-sage shadow-sm">
+            {item.season}
+          </span>
+        )}
+      </div>
 
-        <div className="mt-5 grid grid-cols-2 gap-3">
-          <DetailBadge icon={Palette} label="Color" value={item.color} />
-          <DetailBadge icon={SeasonIcon} label="Season" value={item.season} />
-          <DetailBadge
-            icon={OccasionIcon}
-            label="Occasion"
-            value={item.occasion}
-          />
-          {item.style ? (
-            <DetailBadge icon={Sparkles} label="Style" value={item.style} />
-          ) : null}
-          {item.formality_level ? (
-            <DetailBadge
-              icon={Briefcase}
-              label="Formality"
-              value={item.formality_level}
-            />
-          ) : null}
+      {/* Hover Overlay Actions */}
+      <div className={`absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent transition-opacity duration-300 flex items-end justify-between p-4 ${isHovered ? "opacity-100" : "opacity-0 pointer-events-none"}`}>
+        <div className="flex gap-2 mb-2">
+          <button 
+            onClick={handleEdit}
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-white/90 backdrop-blur-sm text-charcoal shadow-lg transition hover:scale-110 hover:bg-white"
+            title="Edit Item"
+          >
+            <Pencil className="h-4 w-4" />
+          </button>
+          <button 
+            onClick={handleDelete}
+            className="flex h-10 w-10 items-center justify-center rounded-full bg-white/90 backdrop-blur-sm text-red-500 shadow-lg transition hover:scale-110 hover:bg-red-50"
+            title="Delete Item"
+          >
+            <Trash2 className="h-4 w-4" />
+          </button>
         </div>
+      </div>
+
+      {/* Editorial Minimal Info */}
+      <div className={`bg-white px-5 py-4 transition-transform duration-500 z-10`}>
+        <h3 className="font-serif text-lg text-charcoal line-clamp-1">
+          {item.name}
+        </h3>
+        <p className="text-xs font-medium uppercase tracking-widest text-stone mt-1">
+          {item.color}
+        </p>
       </div>
     </article>
   );

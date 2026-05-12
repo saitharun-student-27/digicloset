@@ -38,6 +38,7 @@ class OutfitCreate(BaseModel):
     image_url: str | None = Field(default=None, max_length=500)
     source_type: OutfitSourceType | None = None
     pieces: list[OutfitPieceCreate] = Field(default_factory=list)
+    clothing_item_ids: list[int] = Field(default_factory=list)
 
 
 class OutfitUpdate(BaseModel):
@@ -60,12 +61,14 @@ class OutfitItemRead(BaseModel):
 class OutfitRead(BaseModel):
     id: int
     title: str
-    description: str
+    description: str | None
     occasion: ClothingOccasion
     season: ClothingSeason
     style: str | None
     image_url: str | None
     source_type: OutfitSourceType
+    is_favorite: bool
+    last_worn_date: datetime | None
     created_at: datetime
     updated_at: datetime
     outfit_items: list[OutfitItemRead]

@@ -9,8 +9,9 @@ class Settings(BaseSettings):
     UPLOAD_DIR: str = "uploads"
     UPLOAD_URL_PREFIX: str = "/uploads"
     MAX_UPLOAD_SIZE_BYTES: int = 5 * 1024 * 1024
+    GEMINI_API_KEY: str | None = None
 
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
+    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="allow")
 
     @property
     def cors_origins(self) -> list[str]:

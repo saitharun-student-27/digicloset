@@ -21,3 +21,6 @@ server/uploads/*
 
 # OS
 .DS_Store
+
+# Local Codex workspace artifacts
+.agent/

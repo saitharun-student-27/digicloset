@@ -13,6 +13,16 @@ export async function createClothingItem(item) {
 }
 
 
+export async function updateClothingItem(id, data) {
+  const response = await api.put(`/clothing/${id}`, data);
+  return response.data;
+}
+
+export async function deleteClothingItem(id) {
+  const response = await api.delete(`/clothing/${id}`);
+  return response.data;
+}
+
 export function getImageUrl(imageUrl) {
   if (!imageUrl) {
     return "";

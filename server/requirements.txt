@@ -6,3 +6,5 @@ psycopg[binary]
 pydantic-settings
 python-dotenv
 python-multipart
+httpx
+google-genai
