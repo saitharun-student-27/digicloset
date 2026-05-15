@@ -1,14 +1,238 @@
-# Changelog
+﻿# Changelog
 
-All notable changes to DigiCloset are documented here.
+All notable changes to DigiCloset are documented here in chronological order.
+
+This changelog tracks the product from the original full-stack scaffold to the current outfit-memory-first, mobile-first wardrobe experience.
+
+## 2026-03-15 - Initial commit - DigiCloset full-stack app
+
+Commit: `31fee73`
+
+### What started here
+
+- created the first full-stack DigiCloset scaffold
+- added the initial React + Vite frontend
+- added the initial Python backend
+- introduced early wardrobe, upload, and try-on experiments
+
+### Initial frontend shape
+
+- basic Home page
+- Closet / wardrobe-facing screens
+- upload component
+- outfit generator component
+- virtual try-on component
+
+### Initial backend shape
+
+- first wardrobe model
+- first wardrobe routes
+- uploads directory
+- basic environment setup
+
+### Historical note
+
+This was the earliest broad concept stage, before DigiCloset was refocused around outfit memory as the primary product unit.
+
+## 2026-05-10 - Initialize DigiCloset full-stack foundation
+
+Commit: `7aa41ac`
+
+### Foundation reset
+
+- replaced the earlier broad prototype structure with a cleaner app foundation
+- reorganized the backend into a more maintainable modular FastAPI structure
+- introduced:
+  - `api/routes`
+  - `core`
+  - `db`
+  - `models`
+  - `schemas`
+  - `services`
+  - `utils`
+
+### Backend setup
+
+- added a proper `main.py`
+- added health route support
+- added config and database bootstrap files
+- added a server-specific README and cleaner environment handling
+
+### Frontend cleanup
+
+- removed early prototype-heavy frontend features
+- reduced the app back to a cleaner starting point
+- aligned the repository more closely with a product that could grow intentionally
+
+### Why this phase mattered
+
+This was the structural reset that made the later product direction possible.
+
+## 2026-05-10 - Add clothing item backend foundation
+
+Commit: `b0c4e0b`
+
+### Backend wardrobe data layer
+
+- added `clothing_item` model
+- added clothing item schemas
+- added clothing routes
+- added wardrobe service support for clothing pieces
+- updated database wiring for clothing persistence
+
+### Result
+
+DigiCloset gained its first real backend foundation for storing reusable wardrobe pieces.
+
+## 2026-05-10 - Build wardrobe frontend and enhance branding
+
+Commit: `c16c87f`
+
+### Frontend wardrobe experience
+
+- added branded frontend presentation
+- added a wardrobe page
+- added clothing cards
+- added clothing form support
+- added loading, empty, and error state components
+- added brand/logo components
+- added frontend service layer for clothing items
+
+### Visual direction
+
+- improved branding
+- introduced a more intentional presentation style
+- moved beyond a bare scaffold toward an actual product surface
+
+### Result
+
+DigiCloset became a recognizably branded wardrobe app instead of only a backend-first scaffold.
+
+## 2026-05-10 - Add optional clothing image upload
+
+Commit: `abec612`
+
+### Upload support
+
+- added optional clothing image upload
+- added upload utilities on the backend
+- updated clothing form and clothing card behavior
+- added configuration for upload handling
+- ensured the backend could save uploaded clothing images safely
+
+### Result
+
+Wardrobe pieces could now carry visual memory support through uploaded images.
+
+## 2026-05-11 - Refactor DigiCloset around outfit memory
+
+Commit: `56bef30`
+
+### Major product direction change
+
+- introduced `PROJECT_RULES.md` as the permanent source of truth
+- formally redefined DigiCloset as an outfit-memory-first product
+- made outfits the primary user-facing asset
+
+### Frontend changes
+
+- added `AppShell`
+- added `OutfitMemoryForm`
+- added `OutfitShowcaseCard`
+- added outfit-first Home
+- added outfit-memory page
+- reshaped Wardrobe around the new hierarchy
+
+### Backend changes
+
+- added outfit model
+- added outfit schemas
+- added outfit routes
+- added outfit service layer
+
+### Why this phase mattered
+
+This was the real product identity shift.
+
+DigiCloset stopped being "clothing inventory with outfit support" and became "outfit memories supported by wardrobe pieces."
+
+## 2026-05-11 - Unify outfit capture and support quick add pieces
+
+Commit: `f5b2517`
+
+### Capture flow improvements
+
+- refined the outfit capture flow
+- expanded reusable outfit utilities
+- improved wardrobe behavior around piece support
+- kept Quick Add Piece available while preserving outfit-first hierarchy
+
+### Backend alignment
+
+- updated clothing and outfit schemas
+- improved outfit service behavior
+- improved wardrobe service behavior
+
+### Result
+
+The outfit-memory flow became more coherent while still allowing single-piece support when needed.
+
+## 2026-05-11 - Split outfit memory into three capture paths
+
+Commit: `34ac1a2`
+
+### Capture path refinement
+
+- split outfit capture into three distinct save modes
+- refined the main outfit memory form around clearer user paths
+- updated backend schema/service support to handle those flows more safely
+
+### Result
+
+DigiCloset moved away from one heavy capture form and toward a more flexible outfit-memory creation experience.
+
+## 2026-05-12 - Add vault capture and resilient AI suggestion flows
+
+Commit: `f1806c7`
+
+### Page structure expansion
+
+- added `Capture`
+- added `Vault`
+- added `Suggestions`
+- improved `App.jsx` routing
+- updated `AppShell`
+
+### Suggestions and assistive systems
+
+- introduced backend AI route scaffolding
+- introduced backend suggestions route scaffolding
+- added suggestion service logic
+- added AI service support
+
+### Product data support
+
+- added seed script
+- expanded outfit service behavior
+- improved clothing and outfit service coordination
+
+### Result
+
+This phase created the broad app shape that the later refinement phases would polish:
+
+- capture
+- wardrobe browsing
+- suggestions
 
 ## 2026-05-15 - Refine outfit memory UX and mobile wardrobe flow
+
+Commit: `3e0befe`
 
 ### Product direction
 
 - kept DigiCloset firmly outfit-memory-first
 - avoided AI chat, avatars, shopping compatibility, analytics dashboards, and feature-heavy expansion
-- strengthened daily-use usefulness instead of adding more speculative surfaces
+- strengthened daily-use usefulness instead of adding speculative systems
 
 ### Outfit lifecycle consistency
 
@@ -64,7 +288,7 @@ All notable changes to DigiCloset are documented here.
 - introduced adaptive Home states based on wardrobe maturity
 - added deterministic starter looks from real closet pieces when outfit history is still shallow
 - reduced forced rediscovery on low-data accounts
-- demoted history-heavy resurfacing until enough real usage exists
+- demoted history-heavy resurfacing until enough real usage existed
 
 ### Wardrobe improvements
 
@@ -75,7 +299,7 @@ All notable changes to DigiCloset are documented here.
 
 ### Suggestions cleanup
 
-- re-scoped Suggestions so it no longer competes with Home
+- re-scoped Suggestions so it no longer competed with Home
 - moved it toward quieter resurfacing and rotation
 - hid low-signal empty rails
 - kept rediscovery deterministic and explainable
@@ -100,18 +324,27 @@ All notable changes to DigiCloset are documented here.
 - reduced the main entry bundle and split pages into route chunks
 - improved first-load efficiency without changing product scope
 
+## 2026-05-15 - Document current DigiCloset product state
+
+Commit: `a0ca408`
+
 ### Documentation
 
 - replaced the old Phase 0 README with a full current-state project README
-- added screenshots for the main app surfaces
-- added a real changelog for ongoing release tracking
+- added a real release-style changelog
+- added screenshots for:
+  - Home
+  - Outfit Memory
+  - Wardrobe
+  - Suggestions
+  - Piece Detail
 
-## Earlier foundation
+### Maintenance support
 
-Before the 2026-05-15 refinement cycle, DigiCloset had already established:
+- documented how to refresh screenshots with headless Edge
+- documented current setup, routes, upload rules, strengths, and known gaps
 
-- FastAPI backend scaffold
-- React + Vite frontend scaffold
-- outfit-memory-first product direction
-- initial wardrobe data model
-- basic capture, wardrobe, and suggestions structure
+### Result
+
+The repo now reflects the actual current DigiCloset product state instead of only its early scaffold.
+
