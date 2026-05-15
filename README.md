@@ -1,10 +1,318 @@
-# DigiCloset
+﻿# DigiCloset
 
-DigiCloset is a wardrobe memory and outfit intelligence platform.
+DigiCloset is a mobile-first, outfit-memory-first wardrobe application.
 
-Phase 0 contains only the initial backend-first scaffold:
+It is built to help people save complete looks, organize wardrobe pieces around those looks, and resurface combinations they already trust. The product is intentionally not a clothing inventory dashboard, e-commerce store, social feed, or fake-AI fashion wrapper.
 
-- `server` - FastAPI backend with configuration, database bootstrap, and health route
-- `client` - React + Vite + Tailwind frontend with a minimal home page
+## Current Product State
 
-No authentication, AI recommendations, image detection, camera, avatar, virtual try-on, or dashboard features are implemented in Phase 0.
+DigiCloset currently includes:
+
+- adaptive Home experience focused on daily outfit usefulness
+- outfit-memory-first capture flow
+- wardrobe browsing with outfit rails and clothing-piece sections
+- piece detail pages
+- outfit lifecycle actions:
+  - favorite / unfavorite
+  - mark worn
+  - edit metadata
+  - delete
+- deterministic suggestions and rediscovery
+- mobile-first layout and bottom dock navigation
+- image upload support for outfits and pieces
+- shared 10 MB upload validation across frontend and backend
+
+## Product Philosophy
+
+DigiCloset follows a strict hierarchy:
+
+1. Outfit experiences
+2. Outfit memories
+3. Wardrobe visualization
+4. Clothing pieces as supporting structure
+5. Suggestions as lightweight, explainable rediscovery
+
+The app should feel:
+
+- premium
+- calm
+- visually organized
+- personal
+- style-aware
+- mobile-first
+
+The app should not feel like:
+
+- an admin dashboard
+- a spreadsheet
+- a raw clothing inventory tool
+- a fake AI chatbot
+
+## Main App Areas
+
+### Home
+
+Home is now adaptive instead of fixed.
+
+Depending on how much wardrobe data exists, it can show:
+
+- a daily wardrobe brief
+- Today's Fit
+- deterministic starting looks from real closet pieces
+- Good Starting Points
+- Favorite Fits
+- Seasonal Staples
+- Quiet Rediscovery only when enough real wear history exists
+
+Home is designed to answer:
+
+> What can I wear today?
+
+### Outfit Memory
+
+This is the primary creation flow.
+
+Users can save a complete look through:
+
+- outfit photo upload
+- text-guided outfit capture
+- image with title only
+
+Secondary tools exist, but remain clearly secondary:
+
+- Quick Add Piece
+- AI Scan Piece
+
+### Wardrobe
+
+Wardrobe behaves like a digital closet:
+
+- Favorite Fits
+- All Outfit Memories
+- Upperwear
+- Lowerwear
+- Footwear
+- Outerwear
+- Accessories
+- Other
+
+Favorites are featured, not moved. A favorited outfit still remains in the full outfit memory rail.
+
+### Suggestions
+
+Suggestions is the quieter resurfacing page, not a second Home.
+
+It can surface:
+
+- Useful for today
+- Favorite Fits
+- Recently Worn
+- Seasonal Rotation
+- Quiet Rediscovery
+- Most Reused Pieces
+
+These sections are deterministic and based on real data only.
+
+### Piece Detail
+
+Each clothing piece has a dedicated detail page:
+
+- image or placeholder
+- category and section
+- color
+- season
+- occasion
+- style
+- formality
+- source
+- related outfit memories
+
+## Routes
+
+- `/` -> Home
+- `/outfit-memory` -> Outfit Memory
+- `/wardrobe` -> Wardrobe
+- `/suggestions` -> Suggestions
+- `/pieces/:id` -> Piece Detail
+
+Legacy redirects:
+
+- `/capture` -> `/outfit-memory`
+- `/vault` -> `/wardrobe`
+
+## Tech Stack
+
+### Frontend
+
+- React
+- Vite
+- React Router
+- Tailwind CSS
+- Lucide React
+- route-level lazy loading
+
+### Backend
+
+- FastAPI
+- SQLAlchemy
+- Pydantic
+- SQLite for local development
+
+## Repository Structure
+
+```text
+client/
+  src/
+    components/
+    pages/
+    services/
+    utils/
+server/
+  app/
+    api/routes/
+    core/
+    db/
+    models/
+    schemas/
+    services/
+    utils/
+docs/
+  screenshots/
+```
+
+## Screenshots
+
+### Home
+
+![Home mobile](docs/screenshots/home-mobile.png)
+
+![Home desktop](docs/screenshots/home-desktop.png)
+
+### Outfit Memory
+
+![Outfit memory mobile](docs/screenshots/capture-mobile.png)
+
+### Wardrobe
+
+![Wardrobe mobile](docs/screenshots/wardrobe-mobile.png)
+
+### Suggestions
+
+![Suggestions mobile](docs/screenshots/suggestions-mobile.png)
+
+### Piece Detail
+
+![Piece detail mobile](docs/screenshots/piece-detail-mobile.png)
+
+## Local Setup
+
+### Backend
+
+```powershell
+cd D:\projects\digicloset\server
+python -m venv venv
+venv\Scripts\activate
+pip install -r requirements.txt
+copy .env.example .env
+python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
+```
+
+### Frontend
+
+```powershell
+cd D:\projects\digicloset\client
+npm install
+npm.cmd run dev -- --host 127.0.0.1 --port 5173
+```
+
+Open:
+
+```text
+http://127.0.0.1:5173
+```
+
+## Build / Verification
+
+### Frontend production build
+
+```powershell
+cd D:\projects\digicloset\client
+npm.cmd run build
+```
+
+### Backend compile sanity check
+
+```powershell
+cd D:\projects\digicloset
+python -m compileall server\app
+```
+
+## Upload Rules
+
+Current upload policy:
+
+- max image size: 10 MB
+- allowed formats:
+  - jpg
+  - jpeg
+  - png
+  - webp
+- validation exists in both frontend and backend
+- base64 image persistence is not used
+
+Oversize message:
+
+> Image is too large. Please upload an image under 10 MB.
+
+## Current Strengths
+
+- coherent outfit-memory-first structure
+- calmer, less dashboard-like UX
+- better mobile layout behavior
+- stronger daily-use Home logic
+- consistent outfit lifecycle actions
+- real piece detail flow
+- deterministic, explainable suggestions
+
+## Honest Current Gaps
+
+The biggest remaining product-quality gap is mutation speed:
+
+- many user actions still trigger full refetches
+- the app is correct and stable, but some interactions can still feel heavier than they should
+
+The highest-impact next refinement would be:
+
+- a shared client-side data/cache strategy for outfits and wardrobe items
+
+## Documentation Maintenance
+
+When the product changes meaningfully, update:
+
+- `README.md` for current behavior
+- `CHANGELOG.md` for release history
+- `docs/screenshots/` for UI screenshots
+
+To refresh screenshots with headless Edge:
+
+```powershell
+New-Item -ItemType Directory -Force -Path docs\screenshots | Out-Null
+
+& 'C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe' `
+  --headless --disable-gpu --hide-scrollbars `
+  --window-size=390,1200 --virtual-time-budget=5000 `
+  --screenshot='D:\projects\digicloset\docs\screenshots\home-mobile.png' `
+  'http://127.0.0.1:5173/'
+```
+
+Repeat the same pattern for:
+
+- `/outfit-memory`
+- `/wardrobe`
+- `/suggestions`
+- `/pieces/:id`
+
+## Changelog
+
+Release history lives in [CHANGELOG.md](CHANGELOG.md).
+
