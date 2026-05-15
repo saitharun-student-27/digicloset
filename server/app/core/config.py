@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     CORS_ORIGINS: str = "http://localhost:5173"
     UPLOAD_DIR: str = "uploads"
     UPLOAD_URL_PREFIX: str = "/uploads"
-    MAX_UPLOAD_SIZE_BYTES: int = 5 * 1024 * 1024
+    MAX_UPLOAD_SIZE_BYTES: int = 10 * 1024 * 1024
     GEMINI_API_KEY: str | None = None
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="allow")

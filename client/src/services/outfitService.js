@@ -50,7 +50,22 @@ export async function createOutfit(outfit) {
   return response.data;
 }
 
+export async function updateOutfit(id, outfit) {
+  const response = await api.put(`/outfits/${id}`, outfit);
+  return response.data;
+}
+
 export async function deleteOutfit(id) {
   const response = await api.delete(`/outfits/${id}`);
+  return response.data;
+}
+
+export async function toggleFavoriteOutfit(id) {
+  const response = await api.post(`/outfits/${id}/favorite`);
+  return response.data;
+}
+
+export async function markOutfitWorn(id) {
+  const response = await api.post(`/outfits/${id}/worn`);
   return response.data;
 }

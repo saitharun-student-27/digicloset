@@ -13,14 +13,34 @@ export const occasions = [
 export const categories = [
   "shirt",
   "t_shirt",
+  "top",
+  "kurta",
+  "blouse",
   "pant",
+  "pants",
   "jeans",
   "shorts",
+  "skirt",
+  "trousers",
   "jacket",
   "hoodie",
+  "blazer",
+  "coat",
+  "sweater",
   "shoes",
+  "sneakers",
+  "sandals",
+  "boots",
+  "loafers",
   "accessory",
+  "watch",
+  "belt",
+  "bag",
+  "cap",
+  "hat",
+  "scarf",
   "dress",
+  "unknown",
 ];
 
 export const roles = ["upper", "lower", "footwear", "outerwear", "accessory"];
@@ -70,6 +90,24 @@ const pieceMatchers = [
     aliases: ["dress", "gown"],
   },
   {
+    category: "top",
+    slot: "upper",
+    name: "Top",
+    aliases: ["top"],
+  },
+  {
+    category: "kurta",
+    slot: "upper",
+    name: "Kurta",
+    aliases: ["kurta"],
+  },
+  {
+    category: "blouse",
+    slot: "upper",
+    name: "Blouse",
+    aliases: ["blouse"],
+  },
+  {
     category: "shirt",
     slot: "upper",
     name: "Shirt",
@@ -85,7 +123,13 @@ const pieceMatchers = [
     category: "pant",
     slot: "lower",
     name: "Pants",
-    aliases: ["pants", "pant", "trousers", "slacks"],
+    aliases: ["pant", "slacks"],
+  },
+  {
+    category: "pants",
+    slot: "lower",
+    name: "Pants",
+    aliases: ["pants"],
   },
   {
     category: "jeans",
@@ -100,10 +144,22 @@ const pieceMatchers = [
     aliases: ["shorts"],
   },
   {
+    category: "skirt",
+    slot: "lower",
+    name: "Skirt",
+    aliases: ["skirt"],
+  },
+  {
+    category: "trousers",
+    slot: "lower",
+    name: "Trousers",
+    aliases: ["trousers"],
+  },
+  {
     category: "jacket",
     slot: "outerwear",
     name: "Jacket",
-    aliases: ["jacket", "blazer", "coat"],
+    aliases: ["jacket"],
   },
   {
     category: "hoodie",
@@ -112,37 +168,140 @@ const pieceMatchers = [
     aliases: ["hoodie", "sweatshirt"],
   },
   {
+    category: "blazer",
+    slot: "outerwear",
+    name: "Blazer",
+    aliases: ["blazer"],
+  },
+  {
+    category: "coat",
+    slot: "outerwear",
+    name: "Coat",
+    aliases: ["coat"],
+  },
+  {
+    category: "sweater",
+    slot: "outerwear",
+    name: "Sweater",
+    aliases: ["sweater", "cardigan"],
+  },
+  {
     category: "shoes",
     slot: "footwear",
+    name: "Shoes",
+    aliases: ["shoes", "heels"],
+  },
+  {
+    category: "sneakers",
+    slot: "footwear",
     name: "Sneakers",
-    aliases: [
-      "sneakers",
-      "sneaker",
-      "shoes",
-      "boots",
-      "loafers",
-      "sandals",
-      "heels",
-    ],
+    aliases: ["sneakers", "sneaker"],
+  },
+  {
+    category: "sandals",
+    slot: "footwear",
+    name: "Sandals",
+    aliases: ["sandals", "sandal"],
+  },
+  {
+    category: "boots",
+    slot: "footwear",
+    name: "Boots",
+    aliases: ["boots", "boot"],
+  },
+  {
+    category: "loafers",
+    slot: "footwear",
+    name: "Loafers",
+    aliases: ["loafers", "loafer"],
   },
   {
     category: "accessory",
     slot: "accessory",
     name: "Accessory",
-    aliases: [
-      "accessory",
-      "bag",
-      "belt",
-      "watch",
-      "cap",
-      "hat",
-      "scarf",
-      "glasses",
-      "sunglasses",
-      "necklace",
-    ],
+    aliases: ["accessory", "glasses", "sunglasses", "necklace"],
+  },
+  {
+    category: "watch",
+    slot: "accessory",
+    name: "Watch",
+    aliases: ["watch"],
+  },
+  {
+    category: "belt",
+    slot: "accessory",
+    name: "Belt",
+    aliases: ["belt"],
+  },
+  {
+    category: "bag",
+    slot: "accessory",
+    name: "Bag",
+    aliases: ["bag", "purse", "backpack"],
+  },
+  {
+    category: "cap",
+    slot: "accessory",
+    name: "Cap",
+    aliases: ["cap"],
+  },
+  {
+    category: "hat",
+    slot: "accessory",
+    name: "Hat",
+    aliases: ["hat"],
+  },
+  {
+    category: "scarf",
+    slot: "accessory",
+    name: "Scarf",
+    aliases: ["scarf"],
   },
 ];
+
+export const wardrobeSections = [
+  "Upperwear",
+  "Lowerwear",
+  "Footwear",
+  "Outerwear",
+  "Accessories",
+  "Other",
+];
+
+const categorySectionMap = {
+  shirt: "Upperwear",
+  t_shirt: "Upperwear",
+  top: "Upperwear",
+  kurta: "Upperwear",
+  blouse: "Upperwear",
+  pant: "Lowerwear",
+  pants: "Lowerwear",
+  jeans: "Lowerwear",
+  shorts: "Lowerwear",
+  skirt: "Lowerwear",
+  trousers: "Lowerwear",
+  shoes: "Footwear",
+  sneakers: "Footwear",
+  sandals: "Footwear",
+  boots: "Footwear",
+  loafers: "Footwear",
+  jacket: "Outerwear",
+  hoodie: "Outerwear",
+  blazer: "Outerwear",
+  coat: "Outerwear",
+  sweater: "Outerwear",
+  accessory: "Accessories",
+  watch: "Accessories",
+  belt: "Accessories",
+  bag: "Accessories",
+  cap: "Accessories",
+  hat: "Accessories",
+  scarf: "Accessories",
+};
+
+export function getWardrobeSection(category) {
+  return categorySectionMap[category] || "Other";
+}
 
 export const emptyPiece = {
   name: "",
@@ -182,52 +341,141 @@ function buildPieceLabel(piece) {
   return name.startsWith(color) ? name : `${color} ${name}`;
 }
 
-export function generateOutfitNote({ pieces, occasion, season }) {
-  const labels = pieces
-    .filter((piece) => piece.name.trim() && piece.color.trim())
-    .map(buildPieceLabel);
-
-  if (labels.length === 0) {
-    return "Add or confirm a few outfit pieces to generate a memory note.";
+function getColorMood(colors) {
+  if (colors.some((color) => ["cream", "beige", "tan", "brown"].includes(color))) {
+    return "warm neutral";
   }
 
-  const pieceText =
-    labels.length === 1
-      ? labels[0]
-      : `${labels.slice(0, -1).join(", ")} and ${labels.at(-1)}`;
+  if (colors.some((color) => ["white", "black", "grey", "gray", "charcoal"].includes(color))) {
+    return "neutral";
+  }
 
-  return `${pieceText}, suitable for a ${formatValue(occasion)} ${formatValue(
-    season,
-  )} look.`;
+  if (colors.some((color) => ["navy", "blue"].includes(color))) {
+    return "deep blue";
+  }
+
+  if (colors.some((color) => ["olive", "green"].includes(color))) {
+    return "soft olive";
+  }
+
+  if (colors.some((color) => ["maroon", "red"].includes(color))) {
+    return "rich tone";
+  }
+
+  return "";
+}
+
+function getOccasionPhrase(occasion) {
+  const phrases = {
+    casual: "easy everyday",
+    formal: "polished evening",
+    college: "campus",
+    party: "going-out",
+    sports: "active",
+    travel: "travel",
+    traditional: "traditional",
+  };
+
+  return phrases[occasion] || formatValue(occasion);
+}
+
+function getSeasonPhrase(season) {
+  const phrases = {
+    summer: "light",
+    winter: "cold-weather",
+    rainy: "rainy-day",
+    all: "",
+  };
+
+  return phrases[season] || formatValue(season);
+}
+
+function hasLayeringPieces(pieces) {
+  return pieces.some((piece) => ["outerwear", "upper"].includes(piece.role)) && pieces.length >= 3;
+}
+
+export function generateOutfitNote({ pieces, occasion, season }) {
+  const validPieces = pieces.filter((piece) => piece.name.trim());
+  const colors = validPieces
+    .map((piece) => piece.color.trim().toLowerCase())
+    .filter(Boolean);
+  const colorMood = getColorMood(colors);
+
+  if (validPieces.length === 0) {
+    return "A saved look worth coming back to.";
+  }
+
+  if (occasion === "travel") {
+    return "Easy travel combination that keeps things simple.";
+  }
+
+  if (occasion === "college") {
+    return colorMood
+      ? `Easy ${colorMood} fit for long campus days.`
+      : "Easy fit for long campus days.";
+  }
+
+  if (season === "winter" || season === "rainy") {
+    return hasLayeringPieces(validPieces)
+      ? "Light layering for colder evenings."
+      : "A steady look for colder days.";
+  }
+
+  if (occasion === "formal" || occasion === "party") {
+    return "A polished combination with a calm evening feel.";
+  }
+
+  if (colorMood) {
+    return `Relaxed ${colorMood} combination you can keep returning to.`;
+  }
+
+  return "Relaxed combination built from pieces that work well together.";
 }
 
 export function generateOutfitTitle({ pieces, occasion, season, style }) {
   const validPieces = pieces.filter((piece) => piece.name.trim());
 
   if (validPieces.length === 0) {
-    return `New ${titleCase(occasion)} Outfit`;
+    return `Saved ${titleCase(occasion)} look`;
   }
 
   const colors = validPieces
     .map((piece) => piece.color.trim().toLowerCase())
     .filter(Boolean);
+  const colorMood = getColorMood(colors);
+  const seasonPhrase = getSeasonPhrase(season);
+  const occasionPhrase = getOccasionPhrase(occasion);
+  const styleLabel = style?.trim().toLowerCase();
 
-  const accentColor =
-    colors.find((color) => !neutralColors.has(color)) || colors[0] || "styled";
+  if (occasion === "college" && season === "rainy") {
+    return "Rainy campus fit";
+  }
 
-  const occasionLabel = titleCase(occasion);
-  const seasonLabel = season === "all" ? "" : ` ${titleCase(season)}`;
-  const styleLabel = style?.trim() ? `${titleCase(style)} ` : "";
+  if (occasion === "travel") {
+    return season !== "all" ? `Easy ${formatValue(season)} travel combo` : "Easy travel combo";
+  }
+
+  if ((occasion === "formal" || occasion === "party") && season === "winter") {
+    return "Dinner look from last winter";
+  }
+
+  if (colorMood === "warm neutral" && hasLayeringPieces(validPieces)) {
+    return "Warm neutral layering";
+  }
 
   if (styleLabel) {
-    return `${occasionLabel} ${styleLabel}Look`;
+    return `${titleCase(styleLabel)} ${occasionPhrase} look`;
   }
 
-  if (season === "all") {
-    return `${occasionLabel} ${titleCase(accentColor)} Look`;
+  if (seasonPhrase && occasionPhrase && occasion !== "casual") {
+    return `${titleCase(seasonPhrase)} ${occasionPhrase} fit`;
   }
 
-  return `${occasionLabel} ${titleCase(accentColor)}${seasonLabel} Fit`;
+  if (colorMood) {
+    return `${titleCase(colorMood)} ${validPieces.length >= 3 ? "layering" : "look"}`;
+  }
+
+  return `${titleCase(occasionPhrase)} combo`;
 }
 
 export function deriveOutfitSourceType({ hasImage, hasText }) {

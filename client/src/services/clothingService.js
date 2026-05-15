@@ -6,6 +6,16 @@ export async function getClothingItems() {
   return response.data;
 }
 
+export async function getClothingItem(id) {
+  const response = await api.get(`/clothing/${id}`);
+  return response.data;
+}
+
+export async function getClothingItemOutfits(id) {
+  const response = await api.get(`/clothing/${id}/outfits`);
+  return response.data;
+}
+
 
 export async function createClothingItem(item) {
   const response = await api.post("/clothing", item);

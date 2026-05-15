@@ -28,7 +28,7 @@ async def scan_clothing_image(file_bytes: bytes, mime_type: str) -> dict:
     prompt = """
     Analyze this clothing item. Return ONLY a JSON object with the following fields:
     - name (string): A short, descriptive name (e.g. "Vintage Denim Jacket")
-    - category (string): Must be one of: shirt, t_shirt, pant, jeans, shorts, jacket, hoodie, shoes, accessory, dress
+    - category (string): Must be one of: shirt, t_shirt, top, kurta, blouse, pant, pants, jeans, shorts, skirt, trousers, jacket, hoodie, blazer, coat, sweater, shoes, sneakers, sandals, boots, loafers, accessory, watch, belt, bag, cap, hat, scarf, dress, unknown
     - color (string): The dominant color
     - season (string): Must be one of: summer, winter, rainy, all
     - occasion (string): Must be one of: casual, formal, college, party, sports, travel, traditional
@@ -54,7 +54,7 @@ async def scan_clothing_image(file_bytes: bytes, mime_type: str) -> dict:
         print(f"Gemini API Error: {e}")
         return {
             "name": "Unknown Item",
-            "category": "shirt",
+            "category": "unknown",
             "color": "unknown",
             "season": "all",
             "occasion": "casual",

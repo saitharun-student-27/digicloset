@@ -8,13 +8,13 @@ const navigationItems = [
     icon: HomeIcon,
   },
   {
-    to: "/vault",
-    label: "Vault",
+    to: "/wardrobe",
+    label: "Wardrobe",
     icon: Box,
   },
   {
-    to: "/capture",
-    label: "Capture",
+    to: "/outfit-memory",
+    label: "Outfit Memory",
     icon: Plus,
   },
   {
@@ -26,18 +26,18 @@ const navigationItems = [
 
 export default function AppShell({ children }) {
   return (
-    <div className="relative min-h-screen bg-ivory text-charcoal pb-24">
+    <div className="relative min-h-[100vh] min-h-[100dvh] bg-ivory pb-[var(--bottom-dock-clearance)] text-charcoal">
       {children}
       
       {/* Floating Bottom Dock Navigation */}
-      <div className="fixed bottom-6 left-0 right-0 z-50 flex justify-center px-4 pointer-events-none">
-        <nav className="flex items-center gap-2 rounded-[2rem] border border-white/20 bg-white/70 p-2 shadow-soft backdrop-blur-xl pointer-events-auto">
+      <div className="pointer-events-none fixed bottom-[max(0.75rem,env(safe-area-inset-bottom))] left-0 right-0 z-50 flex justify-center px-3 sm:px-4">
+        <nav className="pointer-events-auto flex items-center gap-1.5 rounded-[2rem] border border-white/20 bg-white/78 p-2 shadow-soft backdrop-blur-xl">
           {navigationItems.map(({ to, label, icon: Icon }) => (
             <NavLink
               key={to}
               to={to}
               className={({ isActive }) =>
-                `group relative flex h-14 w-14 items-center justify-center rounded-full transition-all duration-300 ${
+                `group relative flex h-12 min-h-[var(--touch-target-min)] w-12 min-w-[var(--touch-target-min)] items-center justify-center rounded-full transition-all duration-300 sm:h-14 sm:w-14 ${
                   isActive
                     ? "bg-charcoal text-ivory shadow-lg scale-105"
                     : "text-stone hover:bg-white hover:text-charcoal hover:shadow-md"

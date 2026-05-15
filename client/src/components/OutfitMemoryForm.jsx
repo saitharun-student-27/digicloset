@@ -1,4 +1,5 @@
 import {
+  Check,
   FileImage,
   FilePenLine,
   ImagePlus,
@@ -23,6 +24,10 @@ import {
   seasons,
   titleCase,
 } from "../utils/outfitUtils";
+import {
+  ACCEPTED_IMAGE_INPUT,
+  validateImageFile,
+} from "../utils/uploadValidation";
 
 
 const captureModes = [
@@ -155,7 +160,7 @@ function ImagePicker({
       <div className="rounded-[1.5rem] border border-dashed border-black/15 bg-white p-4">
         {imagePreviewUrl ? (
           <div className="space-y-4">
-            <div className="flex h-72 items-center justify-center rounded-[1.25rem] bg-[linear-gradient(135deg,#f4efe6_0%,#fbf8f2_100%)] p-4 sm:h-80">
+            <div className="flex h-56 items-center justify-center rounded-[1.25rem] bg-[linear-gradient(135deg,#f4efe6_0%,#fbf8f2_100%)] p-3 sm:h-72 sm:p-4">
               <img
                 src={imagePreviewUrl}
                 alt="Outfit preview"
@@ -195,7 +200,7 @@ function ImagePicker({
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="flex w-full cursor-pointer flex-col items-center justify-center rounded-[1.25rem] bg-[linear-gradient(135deg,#f4efe6_0%,#fbf8f2_100%)] px-4 py-10 text-center transition hover:bg-white"
+            className="flex w-full cursor-pointer flex-col items-center justify-center rounded-[1.25rem] bg-[linear-gradient(135deg,#f4efe6_0%,#fbf8f2_100%)] px-4 py-8 text-center transition hover:bg-white sm:py-10"
           >
             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-sage shadow-soft">
               <ImagePlus className="h-5 w-5" />
@@ -204,7 +209,7 @@ function ImagePicker({
               Add outfit photo
             </p>
             <p className="mt-1 text-xs leading-6 text-stone">
-              JPG, PNG, or WEBP up to 5MB
+              JPG, PNG, or WEBP up to 10 MB
             </p>
           </button>
         )}
@@ -212,7 +217,7 @@ function ImagePicker({
         <input
           ref={fileInputRef}
           type="file"
-          accept="image/jpeg,image/png,image/webp"
+          accept={ACCEPTED_IMAGE_INPUT}
           onChange={onChange}
           className="sr-only"
         />
@@ -268,7 +273,7 @@ function PiecesEditor({ pieces, updatePiece, removePiece, addPiece }) {
               </button>
             </div>
 
-            <div className="grid gap-3 md:grid-cols-2">
+            <div className="grid gap-3 sm:grid-cols-2">
               <TextInput
                 name="name"
                 value={piece.name}
@@ -326,6 +331,7 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
   const [imagePreviewUrl, setImagePreviewUrl] = useState("");
   const [imageName, setImageName] = useState("");
   const [parseMessage, setParseMessage] = useState("");
+  const [saveFeedback, setSaveFeedback] = useState("");
 
   const fileInputRef = useRef(null);
 
@@ -398,6 +404,9 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
   const handleChange = (event) => {
     const { name, value } = event.target;
     setFormData((current) => ({ ...current, [name]: value }));
+    if (saveFeedback) {
+      setSaveFeedback("");
+    }
   };
 
   const updatePiece = (index, field, value) => {
@@ -423,6 +432,7 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
   const handleModeChange = (modeId) => {
     setCaptureMode(modeId);
     setParseMessage("");
+    setSaveFeedback("");
   };
 
   const handleImageChange = (event) => {
@@ -434,11 +444,22 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
       return;
     }
 
+    const validationMessage = validateImageFile(file);
+    if (validationMessage) {
+      clearImage();
+      setParseMessage(validationMessage);
+      if (event.target) {
+        event.target.value = "";
+      }
+      return;
+    }
+
     setImageFile(file);
     const reader = new FileReader();
     reader.onload = () => {
       setImagePreviewUrl(String(reader.result || ""));
       setImageName(file.name);
+      setParseMessage("Photo ready. You can keep this simple and move straight into the memory.");
     };
     reader.readAsDataURL(file);
   };
@@ -450,6 +471,7 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
+    setParseMessage("");
   };
 
   const handleParseDescription = () => {
@@ -457,14 +479,14 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
 
     if (suggestedPieces.length === 0) {
       setParseMessage(
-        "We could not suggest pieces from that description yet. Try naming colors and clothing types like shirt, pants, or sneakers.",
+        "We could not suggest pieces from that description yet. Try a calmer breakdown like cream pants, navy shirt, or white sneakers.",
       );
       return;
     }
 
     setPieces(suggestedPieces);
     setParseMessage(
-      "Suggested breakdown added. Review and edit the pieces before saving.",
+      "Suggested breakdown added. Confirm what feels right, then save the memory.",
     );
   };
 
@@ -528,16 +550,18 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
             : "manual_build",
     };
 
-    await onSubmit(payload);
+    const savedOutfit = await onSubmit(payload);
+    const savedTitle = payload.title || savedOutfit?.title || generatedTitle;
 
     resetForm();
     event.target.reset();
+    setSaveFeedback(`Saved "${savedTitle}" to your outfit memories.`);
   };
 
   return (
     <form
       onSubmit={handleSubmit}
-      className="rounded-2xl border border-black/5 bg-white p-5 shadow-soft"
+      className="rounded-2xl border border-black/5 bg-white p-4 shadow-soft sm:p-5"
     >
       <div className="mb-6 flex items-start gap-3">
         <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-linen text-brass">
@@ -548,17 +572,28 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
             Create Outfit Memory
           </h2>
           <p className="mt-1 text-sm text-stone">
-            Pick one way to save the look. You do not need to fill every kind of
-            input anymore.
+            Pick one way to save the look. Keep the flow light, then let the memory carry the context.
           </p>
         </div>
       </div>
+
+      {saveFeedback ? (
+        <div className="mb-5 flex items-start gap-3 rounded-2xl border border-sage/15 bg-sage/10 px-4 py-4 text-sm text-charcoal">
+          <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white text-sage shadow-soft">
+            <Check className="h-4 w-4" />
+          </div>
+          <div>
+            <p className="font-medium">Outfit memory saved</p>
+            <p className="mt-1 leading-6 text-stone">{saveFeedback}</p>
+          </div>
+        </div>
+      ) : null}
 
       <section className="mb-5">
         <p className="mb-3 text-sm font-semibold text-charcoal">
           Choose how you want to save this look
         </p>
-        <div className="grid gap-3 md:grid-cols-3">
+        <div className="grid gap-3 sm:grid-cols-3">
           {captureModes.map((mode) => (
             <ModeCard
               key={mode.id}
@@ -588,8 +623,7 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
                   Short look note
                 </p>
                 <p className="mt-1 text-sm leading-6 text-stone">
-                  A simple line is enough. For example: maroon shirt and cream
-                  pants for a calm college look.
+                  A simple line is enough. Think memory first, not description first.
                 </p>
               </div>
 
@@ -613,7 +647,7 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
                     name="photoNote"
                     value={formData.photoNote}
                     onChange={handleChange}
-                    placeholder="Maroon shirt with cream pants and white sneakers for a clean casual day."
+                    placeholder="Easy neutral fit for a long campus day."
                     rows={4}
                   />
                 </div>
@@ -639,7 +673,7 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
                 name="descriptionText"
                 value={formData.descriptionText}
                 onChange={handleChange}
-                placeholder="Maroon shirt with cream pants and white sneakers"
+                placeholder="Cream hoodie with dark jeans and white sneakers"
               />
 
               <div className="mt-4 flex flex-wrap items-center gap-3">
@@ -652,7 +686,7 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
                   Suggest pieces
                 </button>
                 <p className="text-xs leading-6 text-stone">
-                  Suggested breakdown only. This is not image or AI detection.
+                  Suggested breakdown only. It is a gentle parser, not magic.
                 </p>
               </div>
 
@@ -703,7 +737,7 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
                 name="title"
                 value={formData.title}
                 onChange={handleChange}
-                placeholder="Campus Neutral Fit"
+                placeholder="Rainy campus fit"
                 required
               />
             </section>
@@ -714,12 +748,11 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
           <div className="mb-4">
             <p className="text-sm font-semibold text-charcoal">Style context</p>
             <p className="mt-1 text-sm leading-6 text-stone">
-              Light context helps the memory feel organized without turning this
-              into a big form.
+              Light context helps the memory feel remembered without turning this into a big form.
             </p>
           </div>
 
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="grid gap-4">
             <div>
               <label className="mb-2 block text-sm font-medium text-charcoal">
                 Occasion
@@ -752,7 +785,7 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
                 name="style"
                 value={formData.style}
                 onChange={handleChange}
-                placeholder="minimal, street, classic"
+                placeholder="minimal, classic, relaxed"
               />
             </div>
           </div>
@@ -768,14 +801,14 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
                 Preview before saving
               </p>
               <p className="mt-1 text-sm leading-6 text-stone">
-                See what this outfit memory will look like.
+                See how the memory will read before you save it.
               </p>
             </div>
           </div>
 
           {imagePreviewUrl ? (
             <div className="rounded-[1.5rem] border border-black/5 bg-white p-4">
-              <div className="flex h-72 items-center justify-center rounded-[1.25rem] bg-[linear-gradient(135deg,#f4efe6_0%,#fbf8f2_100%)] p-4">
+              <div className="flex h-56 items-center justify-center rounded-[1.25rem] bg-[linear-gradient(135deg,#f4efe6_0%,#fbf8f2_100%)] p-3 sm:h-72 sm:p-4">
                 <img
                   src={imagePreviewUrl}
                   alt="Outfit memory preview"
@@ -785,7 +818,7 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
             </div>
           ) : (
             <div className="rounded-[1.5rem] border border-black/5 bg-white p-4">
-              <div className="flex min-h-72 flex-col justify-between rounded-[1.25rem] bg-[linear-gradient(135deg,#f4efe6_0%,#fbf8f2_100%)] p-4">
+              <div className="flex min-h-[14rem] flex-col justify-between rounded-[1.25rem] bg-[linear-gradient(135deg,#f4efe6_0%,#fbf8f2_100%)] p-4 sm:min-h-72">
                 <div className="mx-auto flex h-36 w-24 items-end justify-center rounded-[999px] border border-dashed border-charcoal/10 bg-white/70">
                   <div className="flex h-24 w-14 items-center justify-center rounded-t-[999px] bg-charcoal/6" />
                 </div>
@@ -857,7 +890,7 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
       <button
         type="submit"
         disabled={isSubmitting || !canSubmit}
-        className="mt-6 inline-flex h-12 items-center justify-center gap-2 rounded-full bg-charcoal px-5 text-sm font-medium text-ivory shadow-soft transition hover:-translate-y-0.5 hover:bg-softblack disabled:cursor-not-allowed disabled:bg-stone"
+        className="mt-6 inline-flex h-12 min-h-[var(--touch-target-min)] w-full items-center justify-center gap-2 rounded-full bg-charcoal px-5 text-sm font-medium text-ivory shadow-soft transition hover:-translate-y-0.5 hover:bg-softblack disabled:cursor-not-allowed disabled:bg-stone sm:w-auto"
       >
         <Sparkles className="h-4 w-4" />
         {isSubmitting ? "Saving outfit memory..." : "Save Outfit Memory"}

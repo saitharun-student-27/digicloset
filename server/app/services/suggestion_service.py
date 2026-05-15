@@ -1,8 +1,10 @@
+from datetime import datetime, timedelta, timezone
+
 import httpx
-from sqlalchemy.orm import Session
-from datetime import datetime, timezone, timedelta
-from app.models.outfit import Outfit
+from sqlalchemy.orm import Session, joinedload
+
 from app.models.clothing_item import ClothingItem
+from app.models.outfit import Outfit, OutfitItem
 
 
 async def get_current_weather():
@@ -25,7 +27,6 @@ async def get_current_weather():
             temp = current.get("temperature", 30)
             weathercode = current.get("weathercode", 0)
 
-            # Determine condition label
             if weathercode in (61, 63, 65, 80, 81, 82, 95, 96, 99):
                 condition = "rainy"
             elif temp < 18:
@@ -40,21 +41,19 @@ async def get_current_weather():
                 "condition": condition,
                 "weathercode": weathercode,
             }
-    except Exception as e:
-        print(f"Weather API error: {e}")
+    except Exception as error:
+        print(f"Weather API error: {error}")
         return {"temperature": 30, "condition": "pleasant", "weathercode": 0}
 
 
 def _season_for_condition(condition: str) -> list[str]:
-    """Map weather condition to DB season values."""
     if condition == "rainy":
         return ["rainy", "all"]
-    elif condition == "cold":
+    if condition == "cold":
         return ["winter", "all"]
-    elif condition == "hot":
+    if condition == "hot":
         return ["summer", "all"]
-    else:
-        return ["summer", "all"]
+    return ["summer", "all"]
 
 
 async def get_suggestions(db: Session):
@@ -64,11 +63,9 @@ async def get_suggestions(db: Session):
     now = datetime.now(timezone.utc)
     one_week_ago = now - timedelta(days=7)
 
-    # 1. Live Weather
     weather = await get_current_weather()
     matching_seasons = _season_for_condition(weather["condition"])
 
-    # 2. Weather-matched clothing
     weather_items = (
         db.query(ClothingItem)
         .filter(ClothingItem.season.in_(matching_seasons))
@@ -76,55 +73,93 @@ async def get_suggestions(db: Session):
         .all()
     )
 
-    # 3. Recently Unworn Outfits
     unworn_outfits = (
         db.query(Outfit)
-        .filter(
-            (Outfit.last_worn_date == None) | (Outfit.last_worn_date < one_week_ago)
-        )
+        .options(joinedload(Outfit.outfit_items).joinedload(OutfitItem.clothing_item))
+        .filter((Outfit.last_worn_date == None) | (Outfit.last_worn_date < one_week_ago))
         .limit(3)
         .all()
     )
 
-    # 4. Frequently Reused Pieces
     all_clothing = db.query(ClothingItem).all()
-    all_clothing.sort(key=lambda x: len(x.outfit_items), reverse=True)
+    all_clothing.sort(key=lambda item: len(item.outfit_items), reverse=True)
     frequent_pieces = all_clothing[:3]
 
-    # Format for the frontend
     return {
         "weather": weather,
         "weather_picks": [
             {
-                "id": c.id,
-                "name": c.name,
-                "image_url": c.image_url,
-                "category": c.category,
-                "message": f"Great for {weather['condition']} weather ({weather['temperature']}°C).",
+                "id": item.id,
+                "name": item.name,
+                "image_url": item.image_url,
+                "category": item.category,
+                "color": item.color,
+                "season": item.season,
+                "occasion": item.occasion,
+                "style": item.style,
+                "formality_level": item.formality_level,
+                "source_type": item.source_type,
+                "message": f"Useful for {weather['condition']} weather ({weather['temperature']}°C).",
             }
-            for c in weather_items
+            for item in weather_items
         ],
         "unworn_outfits": [
             {
-                "id": o.id,
-                "title": o.title,
-                "image_url": o.image_url,
+                "id": outfit.id,
+                "title": outfit.title,
+                "description": outfit.description,
+                "occasion": outfit.occasion,
+                "season": outfit.season,
+                "style": outfit.style,
+                "image_url": outfit.image_url,
+                "is_favorite": outfit.is_favorite,
+                "last_worn_date": outfit.last_worn_date,
+                "outfit_items": [
+                    {
+                        "id": outfit_item.id,
+                        "slot": outfit_item.slot,
+                        "layer_order": outfit_item.layer_order,
+                        "clothing_item": {
+                            "id": outfit_item.clothing_item.id,
+                            "name": outfit_item.clothing_item.name,
+                            "category": outfit_item.clothing_item.category,
+                            "color": outfit_item.clothing_item.color,
+                            "season": outfit_item.clothing_item.season,
+                            "occasion": outfit_item.clothing_item.occasion,
+                            "style": outfit_item.clothing_item.style,
+                            "formality_level": outfit_item.clothing_item.formality_level,
+                            "image_url": outfit_item.clothing_item.image_url,
+                            "source_type": outfit_item.clothing_item.source_type,
+                            "created_at": outfit_item.clothing_item.created_at,
+                            "updated_at": outfit_item.clothing_item.updated_at,
+                        },
+                    }
+                    for outfit_item in outfit.outfit_items
+                ],
                 "message": (
                     "You haven't worn this fit recently."
-                    if o.last_worn_date
-                    else "You've never worn this saved fit."
+                    if outfit.last_worn_date
+                    else "You saved this fit but have not marked it worn yet."
                 ),
             }
-            for o in unworn_outfits
+            for outfit in unworn_outfits
         ],
         "frequent_pieces": [
             {
-                "id": c.id,
-                "name": c.name,
-                "image_url": c.image_url,
-                "message": f"Used in {len(c.outfit_items)} outfits.",
+                "id": item.id,
+                "name": item.name,
+                "image_url": item.image_url,
+                "category": item.category,
+                "color": item.color,
+                "season": item.season,
+                "occasion": item.occasion,
+                "style": item.style,
+                "formality_level": item.formality_level,
+                "source_type": item.source_type,
+                "outfit_count": len(item.outfit_items),
+                "message": f"You keep coming back to this across {len(item.outfit_items)} outfit memories.",
             }
-            for c in frequent_pieces
-            if len(c.outfit_items) > 0
+            for item in frequent_pieces
+            if len(item.outfit_items) > 0
         ],
     }

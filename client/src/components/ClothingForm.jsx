@@ -1,6 +1,10 @@
 import { ImagePlus, Plus, Shirt, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
+import {
+  ACCEPTED_IMAGE_INPUT,
+  validateImageFile,
+} from "../utils/uploadValidation";
 
 const categories = [
   "shirt",
@@ -81,6 +85,7 @@ export default function ClothingForm({ onSubmit, isSubmitting }) {
   const [formData, setFormData] = useState(initialFormState);
   const [imageFile, setImageFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState("");
+  const [imageError, setImageError] = useState("");
   const imageInputRef = useRef(null);
 
   useEffect(() => {
@@ -125,6 +130,7 @@ export default function ClothingForm({ onSubmit, isSubmitting }) {
     await onSubmit(payload);
     setFormData(initialFormState);
     setImageFile(null);
+    setImageError("");
     if (imageInputRef.current) {
       imageInputRef.current.value = "";
     }
@@ -132,6 +138,16 @@ export default function ClothingForm({ onSubmit, isSubmitting }) {
 
   const handleImageChange = (event) => {
     const file = event.target.files?.[0];
+    const validationMessage = validateImageFile(file);
+
+    if (validationMessage) {
+      setImageFile(null);
+      setImageError(validationMessage);
+      event.target.value = "";
+      return;
+    }
+
+    setImageError("");
     setImageFile(file || null);
   };
 
@@ -250,6 +266,7 @@ export default function ClothingForm({ onSubmit, isSubmitting }) {
                   onClick={(event) => {
                     event.preventDefault();
                     setImageFile(null);
+                    setImageError("");
                     if (imageInputRef.current) {
                       imageInputRef.current.value = "";
                     }
@@ -269,17 +286,22 @@ export default function ClothingForm({ onSubmit, isSubmitting }) {
                   Add an optional clothing image
                 </p>
                 <p className="mt-1 text-xs text-stone">
-                  JPG, PNG, or WEBP up to 5MB
+                  JPG, PNG, or WEBP up to 10 MB
                 </p>
               </>
             )}
           </label>
+          {imageError ? (
+            <p className="mt-2 text-xs font-medium text-red-600">
+              {imageError}
+            </p>
+          ) : null}
           <input
             id="image"
             ref={imageInputRef}
             name="image"
             type="file"
-            accept="image/jpeg,image/png,image/webp"
+            accept={ACCEPTED_IMAGE_INPUT}
             onChange={handleImageChange}
             className="sr-only"
           />

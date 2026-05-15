@@ -1,9 +1,10 @@
 from fastapi import Request
 from pydantic import ValidationError
 from starlette.datastructures import UploadFile as StarletteUploadFile
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from app.models.clothing_item import ClothingItem
+from app.models.outfit import Outfit, OutfitItem
 from app.schemas.clothing_item import ClothingItemCreate, ClothingItemUpdate
 from app.utils.upload import save_clothing_image
 
@@ -69,6 +70,23 @@ def list_clothing_items(db: Session) -> list[ClothingItem]:
 
 def get_clothing_item(db: Session, item_id: int) -> ClothingItem | None:
     return db.query(ClothingItem).filter(ClothingItem.id == item_id).first()
+
+
+def get_outfits_for_clothing_item(db: Session, item_id: int):
+    clothing_item = get_clothing_item(db, item_id)
+    if clothing_item is None:
+        return None
+
+    return (
+        db.query(Outfit)
+        .join(OutfitItem, OutfitItem.outfit_id == Outfit.id)
+        .options(
+            joinedload(Outfit.outfit_items).joinedload(OutfitItem.clothing_item),
+        )
+        .filter(OutfitItem.clothing_item_id == item_id)
+        .order_by(Outfit.created_at.desc())
+        .all()
+    )
 
 
 def update_clothing_item(

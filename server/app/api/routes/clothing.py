@@ -7,6 +7,7 @@ from app.schemas.clothing_item import (
     ClothingItemRead,
     ClothingItemUpdate,
 )
+from app.schemas.outfit import OutfitRead
 from app.services import wardrobe_service
 
 
@@ -52,6 +53,17 @@ def get_clothing_item(item_id: int, db: Session = Depends(get_db)):
             detail="Clothing item not found",
         )
     return clothing_item
+
+
+@router.get("/{item_id}/outfits", response_model=list[OutfitRead])
+def get_outfits_for_clothing_item(item_id: int, db: Session = Depends(get_db)):
+    outfits = wardrobe_service.get_outfits_for_clothing_item(db, item_id)
+    if outfits is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Clothing item not found",
+        )
+    return outfits
 
 
 @router.put("/{item_id}", response_model=ClothingItemRead)

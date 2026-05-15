@@ -1,107 +1,92 @@
-import {
-  MoreVertical,
-  Pencil,
-  Trash2,
-  Sparkles,
-} from "lucide-react";
-import { useState } from "react";
-import { getImageUrl, deleteClothingItem } from "../services/clothingService";
+import { Pencil, Shirt, Trash2 } from "lucide-react";
+import { Link } from "react-router-dom";
 
-export default function ClothingCard({ item, onDeleteSuccess }) {
-  const [isHovered, setIsHovered] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
+import { getImageUrl } from "../services/clothingService";
+import { formatValue, getWardrobeSection } from "../utils/outfitUtils";
+
+export default function ClothingCard({
+  item,
+  onEdit,
+  onDelete,
+  showActions = false,
+  supportingText = "",
+}) {
   const imageUrl = getImageUrl(item.image_url);
-
-  const handleDelete = async (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (!confirm("Remove this piece from your vault?")) return;
-    
-    setIsDeleting(true);
-    try {
-      await deleteClothingItem(item.id);
-      if (onDeleteSuccess) {
-        onDeleteSuccess(item.id);
-      }
-    } catch (err) {
-      console.error("Failed to delete item", err);
-      setIsDeleting(false);
-    }
-  };
-
-  const handleEdit = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    // In a future update, we will open an edit modal
-    alert("Edit mode coming soon!");
-  };
+  const section = getWardrobeSection(item.category);
 
   return (
-    <article 
-      className={`group relative flex w-full cursor-pointer flex-col overflow-hidden rounded-[2rem] bg-white shadow-sm transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl ${isDeleting ? "opacity-50 pointer-events-none" : ""}`}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-    >
-      <div className="relative w-full bg-ivory min-h-[220px] flex items-center justify-center p-4">
-        {imageUrl ? (
-          <img
-            src={imageUrl}
-            alt={item.name}
-            className="w-full h-auto max-h-[300px] object-contain mix-blend-multiply transition-transform duration-700 group-hover:scale-110"
-          />
-        ) : (
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white/50 text-sage backdrop-blur-md shadow-sm">
-            <Sparkles className="h-8 w-8" />
+    <article className="group h-full overflow-hidden rounded-[1.75rem] border border-black/5 bg-white shadow-soft transition duration-300 hover:-translate-y-0.5 hover:shadow-xl">
+      <Link to={`/pieces/${item.id}`} className="block focus:outline-none">
+        <div className="relative aspect-square overflow-hidden bg-[linear-gradient(135deg,#f4efe6_0%,#fbf8f2_100%)] p-3 sm:p-4">
+          {imageUrl ? (
+            <img
+              src={imageUrl}
+              alt={item.name}
+              className="h-full w-full object-contain transition duration-500 group-hover:scale-[1.02]"
+            />
+          ) : (
+            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white/80 text-sage shadow-soft sm:h-16 sm:w-16">
+              <Shirt className="h-7 w-7" />
+            </div>
+          )}
+
+          <div className="absolute left-3 top-3 rounded-full bg-white/85 px-3 py-1 text-[11px] font-medium text-charcoal shadow-soft backdrop-blur">
+            {section}
           </div>
-        )}
-      </div>
-
-      {/* Glassmorphic Hover Tags (Pinterest Vibe) */}
-      <div className={`absolute top-4 left-4 right-4 flex flex-wrap gap-2 transition-all duration-500 ${isHovered ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-4 pointer-events-none"}`}>
-        <span className="rounded-full bg-white/80 backdrop-blur-md px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-charcoal shadow-sm">
-          #{item.category}
-        </span>
-        {item.occasion && (
-          <span className="rounded-full bg-white/80 backdrop-blur-md px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-charcoal shadow-sm">
-            #{item.occasion}
-          </span>
-        )}
-        {item.season && (
-          <span className="rounded-full bg-white/80 backdrop-blur-md px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-sage shadow-sm">
-            {item.season}
-          </span>
-        )}
-      </div>
-
-      {/* Hover Overlay Actions */}
-      <div className={`absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent transition-opacity duration-300 flex items-end justify-between p-4 ${isHovered ? "opacity-100" : "opacity-0 pointer-events-none"}`}>
-        <div className="flex gap-2 mb-2">
-          <button 
-            onClick={handleEdit}
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-white/90 backdrop-blur-sm text-charcoal shadow-lg transition hover:scale-110 hover:bg-white"
-            title="Edit Item"
-          >
-            <Pencil className="h-4 w-4" />
-          </button>
-          <button 
-            onClick={handleDelete}
-            className="flex h-10 w-10 items-center justify-center rounded-full bg-white/90 backdrop-blur-sm text-red-500 shadow-lg transition hover:scale-110 hover:bg-red-50"
-            title="Delete Item"
-          >
-            <Trash2 className="h-4 w-4" />
-          </button>
         </div>
-      </div>
 
-      {/* Editorial Minimal Info */}
-      <div className={`bg-white px-5 py-4 transition-transform duration-500 z-10`}>
-        <h3 className="font-serif text-lg text-charcoal line-clamp-1">
-          {item.name}
-        </h3>
-        <p className="text-xs font-medium uppercase tracking-widest text-stone mt-1">
-          {item.color}
-        </p>
-      </div>
+        <div className="p-4">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <h3 className="line-clamp-1 text-base font-semibold text-charcoal">
+                {item.name}
+              </h3>
+              <p className="mt-1 text-xs font-medium uppercase tracking-[0.14em] text-stone">
+                {formatValue(item.category)}
+              </p>
+            </div>
+
+            {item.color ? (
+              <span className="rounded-full bg-ivory px-3 py-1 text-[11px] font-medium capitalize text-stone">
+                {item.color}
+              </span>
+            ) : null}
+          </div>
+
+          {supportingText ? (
+            <p className="mt-3 text-xs leading-5 text-stone">{supportingText}</p>
+          ) : null}
+
+          {showActions ? (
+            <div className="mt-4 flex items-center gap-2">
+              <button
+                type="button"
+                onClick={(event) => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  onEdit?.(item);
+                }}
+                className="inline-flex h-10 min-h-[var(--touch-target-min)] items-center gap-2 rounded-full bg-ivory px-3 text-xs font-medium text-charcoal transition hover:bg-linen"
+              >
+                <Pencil className="h-3.5 w-3.5" />
+                Edit
+              </button>
+              <button
+                type="button"
+                onClick={(event) => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  onDelete?.(item);
+                }}
+                className="inline-flex h-10 min-h-[var(--touch-target-min)] items-center gap-2 rounded-full bg-white px-3 text-xs font-medium text-stone transition hover:bg-red-50 hover:text-red-600"
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+                Delete
+              </button>
+            </div>
+          ) : null}
+        </div>
+      </Link>
     </article>
   );
 }

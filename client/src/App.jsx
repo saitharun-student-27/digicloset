@@ -1,13 +1,21 @@
-import { Route, Routes } from "react-router-dom";
+import { Suspense, lazy } from "react";
+import { Navigate, Route, Routes } from "react-router-dom";
 
 import AppShell from "./components/AppShell";
-import Suggestions from "./pages/Suggestions";
-import Capture from "./pages/Capture";
-import Home from "./pages/Home";
-import Vault from "./pages/Vault";
+import LoadingState from "./components/LoadingState";
+
+const Home = lazy(() => import("./pages/Home"));
+const Vault = lazy(() => import("./pages/Vault"));
+const Capture = lazy(() => import("./pages/Capture"));
+const Suggestions = lazy(() => import("./pages/Suggestions"));
+const PieceDetail = lazy(() => import("./pages/PieceDetail"));
 
 function AppRoute({ children }) {
-  return <AppShell>{children}</AppShell>;
+  return (
+    <AppShell>
+      <Suspense fallback={<LoadingState />}>{children}</Suspense>
+    </AppShell>
+  );
 }
 
 function App() {
@@ -22,7 +30,7 @@ function App() {
         }
       />
       <Route
-        path="/vault"
+        path="/wardrobe"
         element={
           <AppRoute>
             <Vault />
@@ -30,7 +38,7 @@ function App() {
         }
       />
       <Route
-        path="/capture"
+        path="/outfit-memory"
         element={
           <AppRoute>
             <Capture />
@@ -44,6 +52,19 @@ function App() {
             <Suggestions />
           </AppRoute>
         }
+      />
+      <Route
+        path="/pieces/:id"
+        element={
+          <AppRoute>
+            <PieceDetail />
+          </AppRoute>
+        }
+      />
+      <Route path="/vault" element={<Navigate to="/wardrobe" replace />} />
+      <Route
+        path="/capture"
+        element={<Navigate to="/outfit-memory" replace />}
       />
     </Routes>
   );
