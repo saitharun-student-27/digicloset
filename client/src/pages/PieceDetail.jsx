@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
 import EmptyState from "../components/EmptyState";
+import ErrorState from "../components/ErrorState";
 import LoadingState from "../components/LoadingState";
 import OutfitEditModal from "../components/OutfitEditModal";
 import OutfitShowcaseCard from "../components/OutfitShowcaseCard";
@@ -246,10 +247,10 @@ export default function PieceDetail() {
   const [isSavingPiece, setIsSavingPiece] = useState(false);
   const [editingOutfit, setEditingOutfit] = useState(null);
   const [isSavingOutfit, setIsSavingOutfit] = useState(false);
-  const [error, setError] = useState("");
+  const [actionError, setActionError] = useState("");
 
   const pieceId = Number(id);
-  const loadError = error || clothingError || outfitsError;
+  const loadError = clothingError || outfitsError;
   const item = useMemo(
     () => clothingItems.find((entry) => entry.id === pieceId) || null,
     [clothingItems, pieceId],
@@ -272,11 +273,11 @@ export default function PieceDetail() {
     }
 
     try {
-      setError("");
+      setActionError("");
       await deletePiece(item.id);
       navigate("/wardrobe");
     } catch (deleteError) {
-      setError(
+      setActionError(
         deleteError?.response?.data?.detail ||
           "This piece could not be deleted safely.",
       );
@@ -286,11 +287,11 @@ export default function PieceDetail() {
   async function handleSavePiece(payload) {
     setIsSavingPiece(true);
     try {
-      setError("");
+      setActionError("");
       await updatePiece(item.id, payload);
       setIsEditingPiece(false);
     } catch (saveError) {
-      setError(
+      setActionError(
         saveError?.response?.data?.detail ||
           "Could not save piece changes right now.",
       );
@@ -301,10 +302,10 @@ export default function PieceDetail() {
 
   async function handleFavorite(outfit) {
     try {
-      setError("");
+      setActionError("");
       await favoriteOutfit(outfit.id);
     } catch (favoriteError) {
-      setError(
+      setActionError(
         favoriteError?.response?.data?.detail ||
           "Could not update favorites right now.",
       );
@@ -313,10 +314,10 @@ export default function PieceDetail() {
 
   async function handleMarkWorn(outfit) {
     try {
-      setError("");
+      setActionError("");
       await markOutfitWorn(outfit.id);
     } catch (markError) {
-      setError(
+      setActionError(
         markError?.response?.data?.detail ||
           "Could not mark that outfit worn right now.",
       );
@@ -329,10 +330,10 @@ export default function PieceDetail() {
     }
 
     try {
-      setError("");
+      setActionError("");
       await deleteOutfit(outfit.id);
     } catch (deleteError) {
-      setError(
+      setActionError(
         deleteError?.response?.data?.detail || "Could not delete that outfit.",
       );
     }
@@ -343,9 +344,9 @@ export default function PieceDetail() {
     try {
       await updateOutfit(editingOutfit.id, payload);
       setEditingOutfit(null);
-      setError("");
+      setActionError("");
     } catch (saveError) {
-      setError(
+      setActionError(
         saveError?.response?.data?.detail ||
           "Could not save outfit changes right now.",
       );
@@ -379,6 +380,15 @@ export default function PieceDetail() {
 
   return (
     <main className="page-shell max-w-5xl">
+      {actionError ? (
+        <div className="mb-6">
+          <ErrorState
+            title="That action did not stick"
+            message={actionError}
+          />
+        </div>
+      ) : null}
+
       <Link
         to="/wardrobe"
         className="inline-flex items-center gap-2 text-sm font-medium text-stone transition hover:text-charcoal"
