@@ -21,6 +21,7 @@ function ActionButton({
   onClick,
   tone = "default",
   compact = false,
+  disabled = false,
 }) {
   const toneClass =
     tone === "danger"
@@ -34,7 +35,8 @@ function ActionButton({
       <button
         type="button"
         onClick={onClick}
-        className={`inline-flex h-10 min-h-[var(--touch-target-min)] items-center gap-2 rounded-full bg-ivory px-3 text-xs font-medium transition ${toneClass}`}
+        disabled={disabled}
+        className={`inline-flex h-10 min-h-[var(--touch-target-min)] items-center gap-2 rounded-full bg-ivory px-3 text-xs font-medium transition disabled:cursor-not-allowed disabled:opacity-55 ${toneClass}`}
       >
         <Icon className={`h-3.5 w-3.5 ${active ? "fill-current" : ""}`} />
         {label}
@@ -46,7 +48,8 @@ function ActionButton({
     <button
       type="button"
       onClick={onClick}
-      className={`flex h-10 w-10 items-center justify-center rounded-full bg-white/92 shadow-lg backdrop-blur-sm transition-colors duration-200 ${toneClass}`}
+      disabled={disabled}
+      className={`flex h-10 w-10 items-center justify-center rounded-full bg-white/92 shadow-lg backdrop-blur-sm transition-colors duration-200 disabled:cursor-not-allowed disabled:opacity-55 ${toneClass}`}
       title={label}
       aria-label={label}
     >
@@ -66,6 +69,7 @@ export default function OutfitShowcaseCard({
   showMeta = true,
   showDescription = true,
   supportingText = "",
+  isBusy = false,
 }) {
   const [showMobileActions, setShowMobileActions] = useState(false);
   const imageUrl = getImageUrl(outfit.image_url || outfit.imagePreviewUrl);
@@ -81,7 +85,12 @@ export default function OutfitShowcaseCard({
   }
 
   return (
-    <article className="group relative h-full overflow-hidden rounded-2xl border border-black/5 bg-white shadow-soft transition duration-300 hover:-translate-y-0.5 hover:shadow-xl">
+    <article
+      className={`group relative h-full overflow-hidden rounded-2xl border border-black/5 bg-white shadow-soft transition duration-300 hover:-translate-y-0.5 hover:shadow-xl ${
+        isBusy ? "opacity-80" : ""
+      }`}
+      aria-busy={isBusy}
+    >
       <Link to={linkTo} className="block focus:outline-none">
         <div className="relative aspect-[4/5] min-h-[14.5rem] bg-linen sm:min-h-[15rem]">
           <div className="absolute left-3 top-3 z-10 rounded-full bg-white/88 px-3 py-1 text-[11px] font-medium tracking-[0.08em] text-charcoal shadow-soft backdrop-blur">
@@ -127,22 +136,26 @@ export default function OutfitShowcaseCard({
                   label={outfit.is_favorite ? "Unfavorite outfit" : "Favorite outfit"}
                   active={outfit.is_favorite}
                   onClick={withAction(onFavorite)}
+                  disabled={isBusy}
                 />
                 <ActionButton
                   icon={CheckCircle}
                   label="Mark outfit as worn"
                   onClick={withAction(onMarkWorn)}
+                  disabled={isBusy}
                 />
                 <ActionButton
                   icon={Pencil}
                   label="Edit outfit"
                   onClick={withAction(onEdit)}
+                  disabled={isBusy}
                 />
                 <ActionButton
                   icon={Trash2}
                   label="Delete outfit"
                   tone="danger"
                   onClick={withAction(onDelete)}
+                  disabled={isBusy}
                 />
               </div>
             </div>
@@ -173,6 +186,7 @@ export default function OutfitShowcaseCard({
                     event.preventDefault();
                     setShowMobileActions((current) => !current);
                   }}
+                  disabled={isBusy}
                   className="flex h-10 min-h-[var(--touch-target-min)] w-10 min-w-[var(--touch-target-min)] items-center justify-center rounded-full bg-ivory text-charcoal transition hover:bg-linen sm:hidden"
                   aria-label={showMobileActions ? "Hide outfit actions" : "Show outfit actions"}
                 >
@@ -194,18 +208,21 @@ export default function OutfitShowcaseCard({
                 active={outfit.is_favorite}
                 onClick={withAction(onFavorite)}
                 compact
+                disabled={isBusy}
               />
               <ActionButton
                 icon={CheckCircle}
                 label="Worn"
                 onClick={withAction(onMarkWorn)}
                 compact
+                disabled={isBusy}
               />
               <ActionButton
                 icon={Pencil}
                 label="Edit"
                 onClick={withAction(onEdit)}
                 compact
+                disabled={isBusy}
               />
               <ActionButton
                 icon={Trash2}
@@ -213,6 +230,7 @@ export default function OutfitShowcaseCard({
                 tone="danger"
                 onClick={withAction(onDelete)}
                 compact
+                disabled={isBusy}
               />
             </div>
           ) : null}

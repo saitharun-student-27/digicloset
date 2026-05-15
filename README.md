@@ -12,6 +12,7 @@ DigiCloset currently includes:
 - outfit-memory-first capture flow
 - wardrobe browsing with outfit rails and clothing-piece sections
 - piece detail pages
+- shared client-side wardrobe data layer for outfits and clothing
 - outfit lifecycle actions:
   - favorite / unfavorite
   - mark worn
@@ -150,6 +151,7 @@ Legacy redirects:
 - Tailwind CSS
 - Lucide React
 - route-level lazy loading
+- shared `WardrobeDataProvider` for outfit and clothing state
 
 ### Backend
 
@@ -164,6 +166,7 @@ Legacy redirects:
 client/
   src/
     components/
+    context/
     pages/
     services/
     utils/
@@ -273,17 +276,19 @@ Oversize message:
 - consistent outfit lifecycle actions
 - real piece detail flow
 - deterministic, explainable suggestions
+- faster cross-page outfit and piece mutations through shared client state
 
 ## Honest Current Gaps
 
-The biggest remaining product-quality gap is mutation speed:
+The biggest remaining product-quality gap is secondary data freshness:
 
-- many user actions still trigger full refetches
-- the app is correct and stable, but some interactions can still feel heavier than they should
+- core outfit and piece mutations now use shared client state
+- but weather/suggestion-derived content is still fetched separately from the shared wardrobe layer
+- some secondary derived sections could still feel fresher after mutations
 
 The highest-impact next refinement would be:
 
-- a shared client-side data/cache strategy for outfits and wardrobe items
+- a small second pass on shared derived suggestion data and lightweight success feedback
 
 ## Documentation Maintenance
 

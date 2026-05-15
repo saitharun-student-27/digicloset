@@ -10,12 +10,18 @@ export default function ClothingCard({
   onDelete,
   showActions = false,
   supportingText = "",
+  isBusy = false,
 }) {
   const imageUrl = getImageUrl(item.image_url);
   const section = getWardrobeSection(item.category);
 
   return (
-    <article className="group h-full overflow-hidden rounded-[1.75rem] border border-black/5 bg-white shadow-soft transition duration-300 hover:-translate-y-0.5 hover:shadow-xl">
+    <article
+      className={`group h-full overflow-hidden rounded-[1.75rem] border border-black/5 bg-white shadow-soft transition duration-300 hover:-translate-y-0.5 hover:shadow-xl ${
+        isBusy ? "opacity-80" : ""
+      }`}
+      aria-busy={isBusy}
+    >
       <Link to={`/pieces/${item.id}`} className="block focus:outline-none">
         <div className="relative aspect-square overflow-hidden bg-[linear-gradient(135deg,#f4efe6_0%,#fbf8f2_100%)] p-3 sm:p-4">
           {imageUrl ? (
@@ -66,7 +72,8 @@ export default function ClothingCard({
                   event.stopPropagation();
                   onEdit?.(item);
                 }}
-                className="inline-flex h-10 min-h-[var(--touch-target-min)] items-center gap-2 rounded-full bg-ivory px-3 text-xs font-medium text-charcoal transition hover:bg-linen"
+                disabled={isBusy}
+                className="inline-flex h-10 min-h-[var(--touch-target-min)] items-center gap-2 rounded-full bg-ivory px-3 text-xs font-medium text-charcoal transition hover:bg-linen disabled:cursor-not-allowed disabled:opacity-55"
               >
                 <Pencil className="h-3.5 w-3.5" />
                 Edit
@@ -78,7 +85,8 @@ export default function ClothingCard({
                   event.stopPropagation();
                   onDelete?.(item);
                 }}
-                className="inline-flex h-10 min-h-[var(--touch-target-min)] items-center gap-2 rounded-full bg-white px-3 text-xs font-medium text-stone transition hover:bg-red-50 hover:text-red-600"
+                disabled={isBusy}
+                className="inline-flex h-10 min-h-[var(--touch-target-min)] items-center gap-2 rounded-full bg-white px-3 text-xs font-medium text-stone transition hover:bg-red-50 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-55"
               >
                 <Trash2 className="h-3.5 w-3.5" />
                 Delete

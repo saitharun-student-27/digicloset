@@ -14,15 +14,9 @@ import ErrorState from "../components/ErrorState";
 import LoadingState from "../components/LoadingState";
 import OutfitEditModal from "../components/OutfitEditModal";
 import OutfitShowcaseCard from "../components/OutfitShowcaseCard";
+import { useWardrobeData } from "../context/WardrobeDataProvider.jsx";
 import { api } from "../lib/api";
-import { getClothingItems, getImageUrl } from "../services/clothingService";
-import {
-  deleteOutfit,
-  getOutfits,
-  markOutfitWorn,
-  toggleFavoriteOutfit,
-  updateOutfit,
-} from "../services/outfitService";
+import { getImageUrl } from "../services/clothingService";
 import {
   generateOutfitNote,
   generateOutfitTitle,
@@ -261,6 +255,7 @@ function HeroOutfitCard({
   onMarkWorn,
   onEdit,
   onDelete,
+  isBusy = false,
 }) {
   const imageUrl = getImageUrl(outfit?.image_url);
 
@@ -364,6 +359,7 @@ function HeroOutfitCard({
                 <button
                   type="button"
                   onClick={() => onFavorite?.(outfit)}
+                  disabled={isBusy}
                   className="inline-flex h-11 min-h-[var(--touch-target-min)] items-center justify-center rounded-full bg-ivory px-4 text-sm font-medium text-charcoal transition hover:bg-linen"
                 >
                   {outfit.is_favorite ? "Unfavorite" : "Favorite"}
@@ -371,6 +367,7 @@ function HeroOutfitCard({
                 <button
                   type="button"
                   onClick={() => onMarkWorn?.(outfit)}
+                  disabled={isBusy}
                   className="inline-flex h-11 min-h-[var(--touch-target-min)] items-center justify-center rounded-full bg-ivory px-4 text-sm font-medium text-charcoal transition hover:bg-linen"
                 >
                   Mark worn
@@ -378,6 +375,7 @@ function HeroOutfitCard({
                 <button
                   type="button"
                   onClick={() => onEdit?.(outfit)}
+                  disabled={isBusy}
                   className="inline-flex h-11 min-h-[var(--touch-target-min)] items-center justify-center rounded-full bg-ivory px-4 text-sm font-medium text-charcoal transition hover:bg-linen"
                 >
                   Edit
@@ -385,6 +383,7 @@ function HeroOutfitCard({
                 <button
                   type="button"
                   onClick={() => onDelete?.(outfit)}
+                  disabled={isBusy}
                   className="inline-flex h-11 min-h-[var(--touch-target-min)] items-center justify-center rounded-full bg-white px-4 text-sm font-medium text-red-600 transition hover:bg-red-50"
                 >
                   Delete
@@ -461,72 +460,70 @@ function RailSurface({
 }
 
 export default function Home() {
-  const [outfits, setOutfits] = useState([]);
-  const [clothingItems, setClothingItems] = useState([]);
+  const {
+    outfits,
+    clothingItems,
+    outfitsLoading,
+    clothingLoading,
+    outfitsError,
+    clothingError,
+    favoriteOutfit,
+    markOutfitWorn,
+    updateOutfit,
+    deleteOutfit,
+    refreshAll,
+    isOutfitPending,
+  } = useWardrobeData();
   const [weather, setWeather] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [isWeatherLoading, setIsWeatherLoading] = useState(true);
+  const [weatherError, setWeatherError] = useState("");
+  const [actionError, setActionError] = useState("");
   const [editingOutfit, setEditingOutfit] = useState(null);
   const [isSavingEdit, setIsSavingEdit] = useState(false);
 
   useEffect(() => {
-    loadData();
+    loadWeather();
   }, []);
 
-  async function loadData() {
-    setIsLoading(true);
-    setError("");
-
-    const [outfitResult, clothingResult, suggestionsResult] =
-      await Promise.allSettled([
-        getOutfits(),
-        getClothingItems(),
-        api.get("/suggestions"),
-      ]);
+  async function loadWeather() {
+    setIsWeatherLoading(true);
+    setWeatherError("");
 
     try {
-      const outfitData =
-        outfitResult.status === "fulfilled" ? outfitResult.value : [];
-      const clothingData =
-        clothingResult.status === "fulfilled" ? clothingResult.value : [];
-      const weatherData =
-        suggestionsResult.status === "fulfilled"
-          ? suggestionsResult.value.data.weather || null
-          : null;
-
-      setOutfits(outfitData);
-      setClothingItems(clothingData);
-      setWeather(weatherData);
-
-      if (
-        outfitResult.status === "rejected" &&
-        clothingResult.status === "rejected" &&
-        suggestionsResult.status === "rejected"
-      ) {
-        throw (
-          outfitResult.reason ||
-          clothingResult.reason ||
-          suggestionsResult.reason
-        );
-      }
-    } catch (err) {
-      setError(
-        err?.response?.data?.detail ||
-          "Could not load your home view right now.",
+      const response = await api.get("/suggestions");
+      setWeather(response.data.weather || null);
+    } catch (error) {
+      setWeatherError(
+        error?.response?.data?.detail ||
+          "Could not load the daily weather context right now.",
       );
     } finally {
-      setIsLoading(false);
+      setIsWeatherLoading(false);
     }
   }
 
   async function handleFavorite(outfit) {
-    await toggleFavoriteOutfit(outfit.id);
-    await loadData();
+    setActionError("");
+    try {
+      await favoriteOutfit(outfit.id);
+    } catch (error) {
+      setActionError(
+        error?.response?.data?.detail ||
+          "Could not update favorites right now.",
+      );
+    }
   }
 
   async function handleMarkWorn(outfit) {
-    await markOutfitWorn(outfit.id);
-    await loadData();
+    setActionError("");
+    try {
+      await markOutfitWorn(outfit.id);
+    } catch (error) {
+      setActionError(
+        error?.response?.data?.detail ||
+          "Could not mark that outfit worn right now.",
+      );
+    }
   }
 
   async function handleDelete(outfit) {
@@ -534,8 +531,14 @@ export default function Home() {
       return;
     }
 
-    await deleteOutfit(outfit.id);
-    await loadData();
+    setActionError("");
+    try {
+      await deleteOutfit(outfit.id);
+    } catch (error) {
+      setActionError(
+        error?.response?.data?.detail || "Could not delete that outfit.",
+      );
+    }
   }
 
   async function handleSaveEdit(payload) {
@@ -543,11 +546,22 @@ export default function Home() {
     try {
       await updateOutfit(editingOutfit.id, payload);
       setEditingOutfit(null);
-      await loadData();
+      setActionError("");
+    } catch (error) {
+      setActionError(
+        error?.response?.data?.detail || "Could not save outfit changes.",
+      );
     } finally {
       setIsSavingEdit(false);
     }
   }
+
+  const hasCoreData = outfits.length > 0 || clothingItems.length > 0;
+  const isLoading = outfitsLoading || clothingLoading || isWeatherLoading;
+  const error =
+    !hasCoreData && outfitsError && clothingError && weatherError
+      ? outfitsError || clothingError || weatherError
+      : "";
 
   const preferredSeason = getPreferredSeason(weather);
   const weatherLabel = weather
@@ -759,7 +773,23 @@ export default function Home() {
 
       {error ? (
         <div className="mt-6">
-          <ErrorState title="Could not load your home view" message={error} />
+          <ErrorState
+            title="Could not load your home view"
+            message={error}
+            onRetry={() => {
+              refreshAll().catch(() => {});
+              loadWeather();
+            }}
+          />
+        </div>
+      ) : null}
+
+      {actionError ? (
+        <div className="mt-6">
+          <ErrorState
+            title="That action did not stick"
+            message={actionError}
+          />
         </div>
       ) : null}
 
@@ -779,6 +809,7 @@ export default function Home() {
             onMarkWorn={handleMarkWorn}
             onEdit={setEditingOutfit}
             onDelete={handleDelete}
+            isBusy={todaysFit?.synthetic ? false : isOutfitPending(todaysFit?.id)}
           />
 
           {goodStartingPoints.length > 0 ? (
@@ -797,6 +828,7 @@ export default function Home() {
                   onEdit={outfit.synthetic ? undefined : setEditingOutfit}
                   onDelete={outfit.synthetic ? undefined : handleDelete}
                   showActions={!outfit.synthetic}
+                  isBusy={outfit.synthetic ? false : isOutfitPending(outfit.id)}
                   showMeta={false}
                   supportingText={buildStartingPointNote(outfit, weatherLabel)}
                 />
@@ -819,6 +851,7 @@ export default function Home() {
                   onMarkWorn={handleMarkWorn}
                   onEdit={setEditingOutfit}
                   onDelete={handleDelete}
+                  isBusy={isOutfitPending(outfit.id)}
                   showMeta={false}
                 />
               )}
@@ -840,6 +873,7 @@ export default function Home() {
                   onMarkWorn={handleMarkWorn}
                   onEdit={setEditingOutfit}
                   onDelete={handleDelete}
+                  isBusy={isOutfitPending(outfit.id)}
                   showMeta={false}
                   supportingText="Saved as one of your dependable favorites."
                 />
@@ -863,6 +897,7 @@ export default function Home() {
                   onEdit={outfit.synthetic ? undefined : setEditingOutfit}
                   onDelete={outfit.synthetic ? undefined : handleDelete}
                   showActions={!outfit.synthetic}
+                  isBusy={outfit.synthetic ? false : isOutfitPending(outfit.id)}
                   showMeta={false}
                   supportingText={buildSeasonalNote(outfit)}
                 />
@@ -885,6 +920,7 @@ export default function Home() {
                   onMarkWorn={handleMarkWorn}
                   onEdit={setEditingOutfit}
                   onDelete={handleDelete}
+                  isBusy={isOutfitPending(outfit.id)}
                   showMeta={false}
                   supportingText={buildQuietRediscoveryNote(outfit)}
                 />

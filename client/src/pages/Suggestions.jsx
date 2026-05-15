@@ -7,15 +7,8 @@ import EmptyState from "../components/EmptyState";
 import ErrorState from "../components/ErrorState";
 import OutfitEditModal from "../components/OutfitEditModal";
 import OutfitShowcaseCard from "../components/OutfitShowcaseCard";
+import { useWardrobeData } from "../context/WardrobeDataProvider.jsx";
 import { api } from "../lib/api";
-import { deleteClothingItem } from "../services/clothingService";
-import {
-  deleteOutfit,
-  getOutfits,
-  markOutfitWorn,
-  toggleFavoriteOutfit,
-  updateOutfit,
-} from "../services/outfitService";
 
 function parseDate(value) {
   return value ? new Date(value) : null;
@@ -107,10 +100,26 @@ function buildRecentNote(outfit) {
 
 export default function Suggestions() {
   const navigate = useNavigate();
+  const {
+    outfits,
+    clothingItems,
+    outfitsLoading,
+    clothingLoading,
+    outfitsError,
+    clothingError,
+    favoriteOutfit,
+    markOutfitWorn,
+    updateOutfit,
+    deleteOutfit,
+    deletePiece,
+    refreshAll,
+    isOutfitPending,
+    isPiecePending,
+  } = useWardrobeData();
   const [suggestions, setSuggestions] = useState(null);
-  const [outfits, setOutfits] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(true);
   const [error, setError] = useState("");
+  const [actionError, setActionError] = useState("");
   const [editingOutfit, setEditingOutfit] = useState(null);
   const [isSavingEdit, setIsSavingEdit] = useState(false);
 
@@ -119,44 +128,51 @@ export default function Suggestions() {
   }, []);
 
   async function loadSuggestions() {
-    setIsLoading(true);
+    setIsLoadingSuggestions(true);
     setError("");
 
-    const [suggestionsResult, outfitsResult] = await Promise.allSettled([
-      api.get("/suggestions"),
-      getOutfits(),
-    ]);
+    const suggestionsResult = await Promise.allSettled([api.get("/suggestions")]);
 
     try {
       setSuggestions(
-        suggestionsResult.status === "fulfilled"
-          ? suggestionsResult.value.data
+        suggestionsResult[0].status === "fulfilled"
+          ? suggestionsResult[0].value.data
           : null,
       );
-      setOutfits(outfitsResult.status === "fulfilled" ? outfitsResult.value : []);
 
-      if (
-        suggestionsResult.status === "rejected" &&
-        outfitsResult.status === "rejected"
-      ) {
-        throw suggestionsResult.reason || outfitsResult.reason;
+      if (suggestionsResult[0].status === "rejected") {
+        throw suggestionsResult[0].reason;
       }
     } catch (loadError) {
       console.error("Failed to load suggestions", loadError);
       setError("Could not load suggestions right now.");
     } finally {
-      setIsLoading(false);
+      setIsLoadingSuggestions(false);
     }
   }
 
   async function handleFavorite(outfit) {
-    await toggleFavoriteOutfit(outfit.id);
-    await loadSuggestions();
+    try {
+      setActionError("");
+      await favoriteOutfit(outfit.id);
+    } catch (error) {
+      setActionError(
+        error?.response?.data?.detail ||
+          "Could not update favorites right now.",
+      );
+    }
   }
 
   async function handleMarkWorn(outfit) {
-    await markOutfitWorn(outfit.id);
-    await loadSuggestions();
+    try {
+      setActionError("");
+      await markOutfitWorn(outfit.id);
+    } catch (error) {
+      setActionError(
+        error?.response?.data?.detail ||
+          "Could not mark that outfit worn right now.",
+      );
+    }
   }
 
   async function handleDeleteOutfit(outfit) {
@@ -164,8 +180,14 @@ export default function Suggestions() {
       return;
     }
 
-    await deleteOutfit(outfit.id);
-    await loadSuggestions();
+    try {
+      setActionError("");
+      await deleteOutfit(outfit.id);
+    } catch (error) {
+      setActionError(
+        error?.response?.data?.detail || "Could not delete that outfit.",
+      );
+    }
   }
 
   async function handleSaveEdit(payload) {
@@ -173,7 +195,11 @@ export default function Suggestions() {
     try {
       await updateOutfit(editingOutfit.id, payload);
       setEditingOutfit(null);
-      await loadSuggestions();
+      setActionError("");
+    } catch (error) {
+      setActionError(
+        error?.response?.data?.detail || "Could not save outfit changes.",
+      );
     } finally {
       setIsSavingEdit(false);
     }
@@ -185,10 +211,10 @@ export default function Suggestions() {
     }
 
     try {
-      await deleteClothingItem(item.id);
-      await loadSuggestions();
+      setActionError("");
+      await deletePiece(item.id);
     } catch (deleteError) {
-      alert(
+      setActionError(
         deleteError?.response?.data?.detail ||
           "This piece could not be deleted safely.",
       );
@@ -206,8 +232,32 @@ export default function Suggestions() {
   const outfitCount = outfits.length;
   const wornOutfitCount = outfits.filter((outfit) => outfit.last_worn_date).length;
   const hasMeaningfulHistory = outfitCount >= 8 && wornOutfitCount >= 3;
-  const weatherSupport = suggestions?.weather_picks || [];
-  const reusedPieces = suggestions?.reused_items || [];
+  const clothingById = useMemo(
+    () => new Map(clothingItems.map((item) => [item.id, item])),
+    [clothingItems],
+  );
+
+  const weatherSupport = useMemo(
+    () =>
+      (suggestions?.weather_picks || [])
+        .map((piece) => {
+          const currentPiece = clothingById.get(piece.id);
+          return currentPiece ? { ...currentPiece, message: piece.message } : null;
+        })
+        .filter(Boolean),
+    [clothingById, suggestions],
+  );
+
+  const reusedPieces = useMemo(
+    () =>
+      (suggestions?.reused_items || [])
+        .map((piece) => {
+          const currentPiece = clothingById.get(piece.id);
+          return currentPiece ? { ...currentPiece, message: piece.message } : null;
+        })
+        .filter(Boolean),
+    [clothingById, suggestions],
+  );
 
   const quietRediscovery = useMemo(() => {
     if (!hasMeaningfulHistory) {
@@ -262,6 +312,9 @@ export default function Suggestions() {
     quietRediscovery.length > 0 ||
     reusedPieces.length > 0;
 
+  const isLoading = outfitsLoading || clothingLoading || isLoadingSuggestions;
+  const pageError = error || outfitsError || clothingError;
+
   if (isLoading) {
     return (
       <main className="page-shell flex min-h-[calc(100dvh-10rem)] max-w-6xl flex-col">
@@ -315,17 +368,26 @@ export default function Suggestions() {
         </div>
       </section>
 
-      {error ? (
+      {pageError ? (
         <div className="mt-6">
           <ErrorState
             title="Could not load suggestions right now"
-            message={error}
-            onRetry={loadSuggestions}
+            message={pageError}
+            onRetry={() => {
+              refreshAll().catch(() => {});
+              loadSuggestions();
+            }}
           />
         </div>
       ) : null}
 
-      {!error ? (
+      {actionError ? (
+        <div className="mt-6">
+          <ErrorState title="That action did not stick" message={actionError} />
+        </div>
+      ) : null}
+
+      {!pageError ? (
         <div className="mt-5 space-y-5 sm:mt-7 sm:space-y-7">
           <RailSurface
             eyebrow="Today"
@@ -341,6 +403,7 @@ export default function Suggestions() {
                 supportingText={piece.message}
                 onEdit={() => navigate(`/pieces/${piece.id}`)}
                 onDelete={handleDeletePiece}
+                isBusy={isPiecePending(piece.id)}
               />
             )}
           />
@@ -360,6 +423,7 @@ export default function Suggestions() {
                   onMarkWorn={handleMarkWorn}
                   onEdit={setEditingOutfit}
                   onDelete={handleDeleteOutfit}
+                  isBusy={isOutfitPending(outfit.id)}
                   showMeta={false}
                   supportingText="A trusted outfit memory you already know works."
                 />
@@ -380,6 +444,7 @@ export default function Suggestions() {
                   onMarkWorn={handleMarkWorn}
                   onEdit={setEditingOutfit}
                   onDelete={handleDeleteOutfit}
+                  isBusy={isOutfitPending(outfit.id)}
                   showMeta={false}
                   supportingText={buildRecentNote(outfit)}
                 />
@@ -402,6 +467,7 @@ export default function Suggestions() {
                   onMarkWorn={handleMarkWorn}
                   onEdit={setEditingOutfit}
                   onDelete={handleDeleteOutfit}
+                  isBusy={isOutfitPending(outfit.id)}
                   showMeta={false}
                   supportingText={
                     outfit.season === "all"
@@ -426,6 +492,7 @@ export default function Suggestions() {
                   onMarkWorn={handleMarkWorn}
                   onEdit={setEditingOutfit}
                   onDelete={handleDeleteOutfit}
+                  isBusy={isOutfitPending(outfit.id)}
                   showMeta={false}
                   supportingText={buildRediscoveryNote(outfit)}
                 />
@@ -447,6 +514,7 @@ export default function Suggestions() {
                 supportingText={piece.message}
                 onEdit={() => navigate(`/pieces/${piece.id}`)}
                 onDelete={handleDeletePiece}
+                isBusy={isPiecePending(piece.id)}
               />
             )}
           />

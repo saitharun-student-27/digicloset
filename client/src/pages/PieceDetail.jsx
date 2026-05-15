@@ -1,24 +1,13 @@
 ﻿import { ArrowLeft, Pencil, Shirt, Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
 import EmptyState from "../components/EmptyState";
 import LoadingState from "../components/LoadingState";
 import OutfitEditModal from "../components/OutfitEditModal";
 import OutfitShowcaseCard from "../components/OutfitShowcaseCard";
-import {
-  deleteClothingItem,
-  getClothingItem,
-  getClothingItemOutfits,
-  getImageUrl,
-  updateClothingItem,
-} from "../services/clothingService";
-import {
-  deleteOutfit,
-  markOutfitWorn,
-  toggleFavoriteOutfit,
-  updateOutfit,
-} from "../services/outfitService";
+import { useWardrobeData } from "../context/WardrobeDataProvider.jsx";
+import { getImageUrl } from "../services/clothingService";
 import {
   categories,
   formatValue,
@@ -237,38 +226,45 @@ function PieceEditModal({ item, isOpen, isSaving, onClose, onSubmit }) {
 export default function PieceDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [item, setItem] = useState(null);
-  const [relatedOutfits, setRelatedOutfits] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState("");
+  const {
+    clothingItems,
+    outfits,
+    clothingLoading,
+    outfitsLoading,
+    clothingError,
+    outfitsError,
+    updatePiece,
+    deletePiece,
+    favoriteOutfit,
+    markOutfitWorn,
+    updateOutfit,
+    deleteOutfit,
+    isOutfitPending,
+    isPiecePending,
+  } = useWardrobeData();
   const [isEditingPiece, setIsEditingPiece] = useState(false);
   const [isSavingPiece, setIsSavingPiece] = useState(false);
   const [editingOutfit, setEditingOutfit] = useState(null);
   const [isSavingOutfit, setIsSavingOutfit] = useState(false);
+  const [error, setError] = useState("");
 
-  useEffect(() => {
-    loadPiece();
-  }, [id]);
-
-  async function loadPiece() {
-    setIsLoading(true);
-    setError("");
-    try {
-      const [pieceData, outfitsData] = await Promise.all([
-        getClothingItem(id),
-        getClothingItemOutfits(id),
-      ]);
-      setItem(pieceData);
-      setRelatedOutfits(outfitsData);
-    } catch (loadError) {
-      setError(
-        loadError?.response?.data?.detail ||
-          "Could not load this clothing piece.",
-      );
-    } finally {
-      setIsLoading(false);
-    }
-  }
+  const pieceId = Number(id);
+  const loadError = error || clothingError || outfitsError;
+  const item = useMemo(
+    () => clothingItems.find((entry) => entry.id === pieceId) || null,
+    [clothingItems, pieceId],
+  );
+  const relatedOutfits = useMemo(
+    () =>
+      outfits.filter((outfit) =>
+        (outfit.outfit_items || []).some(
+          (outfitItem) =>
+            outfitItem.clothing_item?.id === pieceId ||
+            outfitItem.clothing_item_id === pieceId,
+        ),
+      ),
+    [outfits, pieceId],
+  );
 
   async function handleDeletePiece() {
     if (!window.confirm(`Delete "${item.name}"?`)) {
@@ -276,10 +272,11 @@ export default function PieceDetail() {
     }
 
     try {
-      await deleteClothingItem(item.id);
+      setError("");
+      await deletePiece(item.id);
       navigate("/wardrobe");
     } catch (deleteError) {
-      alert(
+      setError(
         deleteError?.response?.data?.detail ||
           "This piece could not be deleted safely.",
       );
@@ -289,22 +286,41 @@ export default function PieceDetail() {
   async function handleSavePiece(payload) {
     setIsSavingPiece(true);
     try {
-      await updateClothingItem(item.id, payload);
+      setError("");
+      await updatePiece(item.id, payload);
       setIsEditingPiece(false);
-      await loadPiece();
+    } catch (saveError) {
+      setError(
+        saveError?.response?.data?.detail ||
+          "Could not save piece changes right now.",
+      );
     } finally {
       setIsSavingPiece(false);
     }
   }
 
   async function handleFavorite(outfit) {
-    await toggleFavoriteOutfit(outfit.id);
-    await loadPiece();
+    try {
+      setError("");
+      await favoriteOutfit(outfit.id);
+    } catch (favoriteError) {
+      setError(
+        favoriteError?.response?.data?.detail ||
+          "Could not update favorites right now.",
+      );
+    }
   }
 
   async function handleMarkWorn(outfit) {
-    await markOutfitWorn(outfit.id);
-    await loadPiece();
+    try {
+      setError("");
+      await markOutfitWorn(outfit.id);
+    } catch (markError) {
+      setError(
+        markError?.response?.data?.detail ||
+          "Could not mark that outfit worn right now.",
+      );
+    }
   }
 
   async function handleDeleteOutfit(outfit) {
@@ -312,8 +328,14 @@ export default function PieceDetail() {
       return;
     }
 
-    await deleteOutfit(outfit.id);
-    await loadPiece();
+    try {
+      setError("");
+      await deleteOutfit(outfit.id);
+    } catch (deleteError) {
+      setError(
+        deleteError?.response?.data?.detail || "Could not delete that outfit.",
+      );
+    }
   }
 
   async function handleSaveOutfit(payload) {
@@ -321,23 +343,34 @@ export default function PieceDetail() {
     try {
       await updateOutfit(editingOutfit.id, payload);
       setEditingOutfit(null);
-      await loadPiece();
+      setError("");
+    } catch (saveError) {
+      setError(
+        saveError?.response?.data?.detail ||
+          "Could not save outfit changes right now.",
+      );
     } finally {
       setIsSavingOutfit(false);
     }
   }
 
+  const isLoading = clothingLoading || outfitsLoading;
+
   if (isLoading) {
     return <LoadingState />;
   }
 
-  if (error || !item) {
+  if (loadError || !item) {
     return (
       <main className="page-shell">
-        <EmptyState
-          title="Piece not available"
-          description={error || "This clothing piece could not be found."}
-        />
+        {loadError ? (
+          <EmptyState title="Piece not available" description={loadError} />
+        ) : (
+          <EmptyState
+            title="Piece not available"
+            description="This clothing piece could not be found."
+          />
+        )}
       </main>
     );
   }
@@ -448,6 +481,7 @@ export default function PieceDetail() {
                   onMarkWorn={handleMarkWorn}
                   onEdit={setEditingOutfit}
                   onDelete={handleDeleteOutfit}
+                  isBusy={isOutfitPending(outfit.id)}
                   showMeta={false}
                 />
               </div>

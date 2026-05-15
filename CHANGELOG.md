@@ -348,3 +348,65 @@ Commit: `a0ca408`
 
 The repo now reflects the actual current DigiCloset product state instead of only its early scaffold.
 
+## 2026-05-15 - Add shared client data layer and faster mutations
+
+Commit: see git history for the latest Phase 3D.3 checkpoint
+
+### Why this phase happened
+
+- the app had become structurally strong, but many simple actions still triggered full page or list refetches
+- this made common flows feel slightly prototype-like even when the product direction was correct
+
+### Shared client data layer
+
+- added `WardrobeDataProvider` to manage shared frontend state for:
+  - outfits
+  - clothing items
+  - loading
+  - error
+  - pending mutation state
+- exposed shared refresh helpers:
+  - `refreshOutfits()`
+  - `refreshClothing()`
+  - `refreshAll()`
+- exposed shared mutation helpers:
+  - favorite / unfavorite outfit
+  - mark outfit worn
+  - update outfit
+  - delete outfit
+  - create piece
+  - update piece
+  - delete piece
+
+### Faster mutation handling
+
+- added optimistic updates for:
+  - favorite / unfavorite
+  - mark worn
+- added near-instant local updates with rollback for:
+  - edit outfit metadata
+  - delete outfit
+  - edit piece
+  - delete piece
+- reduced page-wide flicker after small actions
+
+### Page integration
+
+- updated:
+  - `Home`
+  - `Capture`
+  - `Wardrobe`
+  - `Suggestions`
+  - `Piece Detail`
+- reduced page-level duplication of fetch and mutation handlers
+- improved cross-page consistency when navigating after an action
+
+### Result
+
+DigiCloset now feels more cohesive during repeated use:
+
+- favorites update faster
+- worn tracking updates faster
+- edits and deletes propagate more consistently
+- shared wardrobe state reduces duplicate fetching without introducing heavy state-management tooling
+

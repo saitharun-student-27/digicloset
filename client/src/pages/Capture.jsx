@@ -15,15 +15,8 @@ import LoadingState from "../components/LoadingState";
 import OutfitEditModal from "../components/OutfitEditModal";
 import OutfitMemoryForm from "../components/OutfitMemoryForm";
 import OutfitShowcaseCard from "../components/OutfitShowcaseCard";
+import { useWardrobeData } from "../context/WardrobeDataProvider.jsx";
 import { api } from "../lib/api";
-import {
-  createOutfit,
-  deleteOutfit,
-  getOutfits,
-  markOutfitWorn,
-  toggleFavoriteOutfit,
-  updateOutfit,
-} from "../services/outfitService";
 import { categories, formatValue } from "../utils/outfitUtils";
 import {
   ACCEPTED_IMAGE_INPUT,
@@ -70,8 +63,19 @@ function ToolPanel({
 }
 
 export default function Capture() {
-  const [outfits, setOutfits] = useState([]);
-  const [isLoadingOutfits, setIsLoadingOutfits] = useState(true);
+  const {
+    outfits,
+    outfitsLoading,
+    outfitsError,
+    createOutfit,
+    favoriteOutfit,
+    markOutfitWorn,
+    updateOutfit,
+    deleteOutfit,
+    createPiece,
+    refreshOutfits,
+    isOutfitPending,
+  } = useWardrobeData();
   const [isSubmittingOutfit, setIsSubmittingOutfit] = useState(false);
   const [pageError, setPageError] = useState("");
 
@@ -103,25 +107,10 @@ export default function Capture() {
   const [isSavingEdit, setIsSavingEdit] = useState(false);
 
   useEffect(() => {
-    loadOutfits();
-  }, []);
-
-  async function loadOutfits() {
-    setIsLoadingOutfits(true);
-    setPageError("");
-
-    try {
-      const outfitData = await getOutfits();
-      setOutfits(outfitData);
-    } catch (err) {
-      setPageError(
-        err?.response?.data?.detail ||
-          "Could not load saved outfit memories right now.",
-      );
-    } finally {
-      setIsLoadingOutfits(false);
+    if (outfitsError) {
+      setPageError(outfitsError);
     }
-  }
+  }, [outfitsError]);
 
   async function handleCreateOutfit(payload) {
     setIsSubmittingOutfit(true);
@@ -129,7 +118,6 @@ export default function Capture() {
 
     try {
       const createdOutfit = await createOutfit(payload);
-      await loadOutfits();
       return createdOutfit;
     } catch (err) {
       setPageError(
@@ -142,13 +130,27 @@ export default function Capture() {
   }
 
   async function handleFavorite(outfit) {
-    await toggleFavoriteOutfit(outfit.id);
-    await loadOutfits();
+    try {
+      setPageError("");
+      await favoriteOutfit(outfit.id);
+    } catch (error) {
+      setPageError(
+        error?.response?.data?.detail ||
+          "Could not update favorites right now.",
+      );
+    }
   }
 
   async function handleMarkWorn(outfit) {
-    await markOutfitWorn(outfit.id);
-    await loadOutfits();
+    try {
+      setPageError("");
+      await markOutfitWorn(outfit.id);
+    } catch (error) {
+      setPageError(
+        error?.response?.data?.detail ||
+          "Could not mark that outfit worn right now.",
+      );
+    }
   }
 
   async function handleDelete(outfit) {
@@ -156,8 +158,14 @@ export default function Capture() {
       return;
     }
 
-    await deleteOutfit(outfit.id);
-    await loadOutfits();
+    try {
+      setPageError("");
+      await deleteOutfit(outfit.id);
+    } catch (error) {
+      setPageError(
+        error?.response?.data?.detail || "Could not delete that outfit.",
+      );
+    }
   }
 
   async function handleSaveEdit(payload) {
@@ -165,7 +173,11 @@ export default function Capture() {
     try {
       await updateOutfit(editingOutfit.id, payload);
       setEditingOutfit(null);
-      await loadOutfits();
+      setPageError("");
+    } catch (error) {
+      setPageError(
+        error?.response?.data?.detail || "Could not save outfit changes.",
+      );
     } finally {
       setIsSavingEdit(false);
     }
@@ -216,9 +228,7 @@ export default function Capture() {
         formData.append("image", singleImage);
       }
 
-      await api.post("/clothing", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      await createPiece(formData);
 
       setPieceSavedMessage("Piece added to wardrobe.");
       setSingleForm({
@@ -304,9 +314,7 @@ export default function Capture() {
         formData.append("image", scanImage);
       }
 
-      await api.post("/clothing", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
+      await createPiece(formData);
       setScanSaved(true);
     } catch (err) {
       alert(err?.response?.data?.detail || "Failed to save scanned item.");
@@ -345,7 +353,10 @@ export default function Capture() {
           <ErrorState
             title="Something needs attention"
             message={pageError}
-            onRetry={loadOutfits}
+            onRetry={() => {
+              setPageError("");
+              refreshOutfits().catch(() => {});
+            }}
           />
         </div>
       ) : null}
@@ -604,16 +615,16 @@ export default function Capture() {
             </p>
           </div>
 
-          {isLoadingOutfits ? <LoadingState /> : null}
+          {outfitsLoading ? <LoadingState /> : null}
 
-          {!isLoadingOutfits && outfits.length === 0 ? (
+          {!outfitsLoading && outfits.length === 0 ? (
             <EmptyState
               title="No outfit memories yet"
               description="Save your first complete look here. The wardrobe will build itself around those memories."
             />
           ) : null}
 
-          {!isLoadingOutfits && outfits.length > 0 ? (
+          {!outfitsLoading && outfits.length > 0 ? (
             <div className="grid gap-4">
               {outfits.slice(0, 4).map((outfit) => (
                 <OutfitShowcaseCard
@@ -623,6 +634,7 @@ export default function Capture() {
                   onMarkWorn={handleMarkWorn}
                   onEdit={setEditingOutfit}
                   onDelete={handleDelete}
+                  isBusy={isOutfitPending(outfit.id)}
                   showMeta={false}
                 />
               ))}

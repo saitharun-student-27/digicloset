@@ -1,21 +1,12 @@
 import { Plus, Sparkles } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import ClothingCard from "../components/ClothingCard";
+import ErrorState from "../components/ErrorState";
 import OutfitEditModal from "../components/OutfitEditModal";
 import OutfitShowcaseCard from "../components/OutfitShowcaseCard";
-import {
-  deleteClothingItem,
-  getClothingItems,
-} from "../services/clothingService";
-import {
-  deleteOutfit,
-  getOutfits,
-  markOutfitWorn,
-  toggleFavoriteOutfit,
-  updateOutfit,
-} from "../services/outfitService";
+import { useWardrobeData } from "../context/WardrobeDataProvider.jsx";
 import { getWardrobeSection, wardrobeSections } from "../utils/outfitUtils";
 
 function RailSection({
@@ -62,31 +53,25 @@ function RailSection({
 
 export default function Vault() {
   const navigate = useNavigate();
-  const [clothingItems, setClothingItems] = useState([]);
-  const [outfits, setOutfits] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const {
+    clothingItems,
+    outfits,
+    clothingLoading,
+    outfitsLoading,
+    clothingError,
+    outfitsError,
+    deletePiece,
+    deleteOutfit,
+    favoriteOutfit,
+    markOutfitWorn,
+    updateOutfit,
+    refreshAll,
+    isOutfitPending,
+    isPiecePending,
+  } = useWardrobeData();
   const [editingOutfit, setEditingOutfit] = useState(null);
   const [isSavingEdit, setIsSavingEdit] = useState(false);
-
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  async function loadData() {
-    setIsLoading(true);
-    try {
-      const [clothingData, outfitData] = await Promise.all([
-        getClothingItems(),
-        getOutfits(),
-      ]);
-      setClothingItems(clothingData);
-      setOutfits(outfitData);
-    } catch (error) {
-      console.error("Failed to load wardrobe data", error);
-    } finally {
-      setIsLoading(false);
-    }
-  }
+  const [pageError, setPageError] = useState("");
 
   async function handleDeleteClothing(item) {
     if (!window.confirm(`Delete "${item.name}"?`)) {
@@ -94,10 +79,10 @@ export default function Vault() {
     }
 
     try {
-      await deleteClothingItem(item.id);
-      await loadData();
+      setPageError("");
+      await deletePiece(item.id);
     } catch (error) {
-      alert(
+      setPageError(
         error?.response?.data?.detail ||
           "This piece could not be deleted safely.",
       );
@@ -109,18 +94,38 @@ export default function Vault() {
       return;
     }
 
-    await deleteOutfit(outfit.id);
-    await loadData();
+    try {
+      setPageError("");
+      await deleteOutfit(outfit.id);
+    } catch (error) {
+      setPageError(
+        error?.response?.data?.detail || "Could not delete that outfit.",
+      );
+    }
   }
 
   async function handleFavorite(outfit) {
-    await toggleFavoriteOutfit(outfit.id);
-    await loadData();
+    try {
+      setPageError("");
+      await favoriteOutfit(outfit.id);
+    } catch (error) {
+      setPageError(
+        error?.response?.data?.detail ||
+          "Could not update favorites right now.",
+      );
+    }
   }
 
   async function handleMarkWorn(outfit) {
-    await markOutfitWorn(outfit.id);
-    await loadData();
+    try {
+      setPageError("");
+      await markOutfitWorn(outfit.id);
+    } catch (error) {
+      setPageError(
+        error?.response?.data?.detail ||
+          "Could not mark that outfit worn right now.",
+      );
+    }
   }
 
   async function handleSaveEdit(payload) {
@@ -128,7 +133,11 @@ export default function Vault() {
     try {
       await updateOutfit(editingOutfit.id, payload);
       setEditingOutfit(null);
-      await loadData();
+      setPageError("");
+    } catch (error) {
+      setPageError(
+        error?.response?.data?.detail || "Could not save outfit changes.",
+      );
     } finally {
       setIsSavingEdit(false);
     }
@@ -158,6 +167,9 @@ export default function Vault() {
     { id: "accessories", label: "Accessories" },
   ];
 
+  const isLoading = outfitsLoading || clothingLoading;
+  const loadError = pageError || outfitsError || clothingError;
+
   if (isLoading) {
     return (
       <div className="flex min-h-[calc(100dvh-10rem)] items-center justify-center px-4">
@@ -168,6 +180,18 @@ export default function Vault() {
 
   return (
     <main className="page-shell">
+      {loadError ? (
+        <div className="mb-6">
+          <ErrorState
+            title="Something needs attention"
+            message={loadError}
+            onRetry={() => {
+              setPageError("");
+              refreshAll().catch(() => {});
+            }}
+          />
+        </div>
+      ) : null}
       <div className="mb-6 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
         <div>
           <div className="mb-3 inline-flex items-center gap-2 rounded-full bg-linen px-3 py-2 text-sm font-medium text-charcoal">
@@ -232,6 +256,7 @@ export default function Vault() {
               onMarkWorn={handleMarkWorn}
               onEdit={setEditingOutfit}
               onDelete={handleDeleteOutfit}
+              isBusy={isOutfitPending(outfit.id)}
               showMeta={false}
               supportingText="Saved as a trusted combination."
             />
@@ -252,6 +277,7 @@ export default function Vault() {
               onMarkWorn={handleMarkWorn}
               onEdit={setEditingOutfit}
               onDelete={handleDeleteOutfit}
+              isBusy={isOutfitPending(outfit.id)}
               showMeta={false}
             />
           )}
@@ -271,6 +297,7 @@ export default function Vault() {
                 item={item}
                 onEdit={() => navigate(`/pieces/${item.id}`)}
                 onDelete={handleDeleteClothing}
+                isBusy={isPiecePending(item.id)}
                 showActions={false}
               />
             )}

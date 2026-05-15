@@ -310,6 +310,18 @@ Outfit cards should carry more visual weight than clothing cards.
 ### 9.5 State rule
 Persistent product data belongs in the backend, not in `localStorage`, except for narrowly scoped temporary drafts if explicitly justified.
 
+### 9.6 Shared client state rule
+Shared frontend product data may use a lightweight provider or hook when it reduces duplicate fetching, avoids page-to-page state drift, and keeps outfit or wardrobe mutations feeling fast.
+
+Do:
+- centralize common outfit and clothing fetches when reused across pages
+- centralize common mutation helpers when the same actions appear on multiple pages
+- keep rollback and error handling understandable
+
+Do not:
+- introduce heavy frontend state-management libraries without a real scaling need
+- split the same persistent outfit state across many unrelated page-level sources of truth
+
 ---
 
 ## 10. Allowed Future Phases
