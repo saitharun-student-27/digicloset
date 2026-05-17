@@ -6,6 +6,11 @@ export async function getOutfits() {
   return response.data;
 }
 
+export async function getOutfit(id) {
+  const response = await api.get(`/outfits/${id}`);
+  return response.data;
+}
+
 
 export async function createOutfit(outfit) {
   const formData = new FormData();

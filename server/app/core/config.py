@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -16,6 +18,30 @@ class Settings(BaseSettings):
     @property
     def cors_origins(self) -> list[str]:
         return [origin.strip() for origin in self.CORS_ORIGINS.split(",") if origin.strip()]
+
+    @property
+    def base_dir(self) -> Path:
+        return Path(__file__).resolve().parents[2]
+
+    @property
+    def upload_dir_path(self) -> Path:
+        upload_dir = Path(self.UPLOAD_DIR)
+        if not upload_dir.is_absolute():
+            upload_dir = self.base_dir / upload_dir
+        return upload_dir.resolve()
+
+    @property
+    def database_url_resolved(self) -> str:
+        sqlite_prefix = "sqlite:///"
+        if not self.DATABASE_URL.startswith(sqlite_prefix):
+            return self.DATABASE_URL
+
+        database_path = self.DATABASE_URL[len(sqlite_prefix) :]
+        if Path(database_path).is_absolute():
+            return self.DATABASE_URL
+
+        resolved_path = (self.base_dir / database_path).resolve()
+        return f"{sqlite_prefix}{resolved_path.as_posix()}"
 
 
 settings = Settings()

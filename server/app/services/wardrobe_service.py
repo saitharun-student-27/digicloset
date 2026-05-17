@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session, joinedload
 from app.models.clothing_item import ClothingItem
 from app.models.outfit import Outfit, OutfitItem
 from app.schemas.clothing_item import ClothingItemCreate, ClothingItemUpdate
-from app.utils.upload import save_clothing_image
+from app.utils.upload import delete_uploaded_file, save_clothing_image
 
 
 FORM_FIELDS = [
@@ -98,12 +98,15 @@ def update_clothing_item(
     if clothing_item is None:
         return None
 
+    previous_image_url = clothing_item.image_url
     update_data = item_in.model_dump(exclude_unset=True)
     for field, value in update_data.items():
         setattr(clothing_item, field, value)
 
     db.commit()
     db.refresh(clothing_item)
+    if previous_image_url != clothing_item.image_url:
+        delete_uploaded_file(previous_image_url)
     return clothing_item
 
 
@@ -117,6 +120,8 @@ def delete_clothing_item(db: Session, item_id: int) -> bool:
             "This clothing piece is linked to one or more outfit memories and cannot be deleted safely.",
         )
 
+    image_url = clothing_item.image_url
     db.delete(clothing_item)
     db.commit()
+    delete_uploaded_file(image_url)
     return True

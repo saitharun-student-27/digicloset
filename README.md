@@ -11,6 +11,7 @@ DigiCloset currently includes:
 - adaptive Home experience focused on daily outfit usefulness
 - outfit-memory-first capture flow
 - wardrobe browsing with outfit rails and clothing-piece sections
+- dedicated outfit detail pages
 - piece detail pages
 - shared client-side wardrobe data layer for outfits and clothing
 - outfit lifecycle actions:
@@ -22,6 +23,7 @@ DigiCloset currently includes:
 - mobile-first layout and bottom dock navigation
 - image upload support for outfits and pieces
 - shared 10 MB upload validation across frontend and backend
+- backend-safe image/delete persistence with local upload cleanup
 
 ## Product Philosophy
 
@@ -99,6 +101,18 @@ Wardrobe behaves like a digital closet:
 
 Favorites are featured, not moved. A favorited outfit still remains in the full outfit memory rail.
 
+### Outfit Detail
+
+Each saved look now has a dedicated detail route:
+
+- large outfit image or memory placeholder
+- calm metadata context
+- favorite / mark worn / edit / delete actions
+- grouped piece breakdown
+- links from outfit pieces into piece detail pages
+
+This is where an outfit becomes a remembered look instead of only a rail card.
+
 ### Suggestions
 
 Suggestions is the quieter resurfacing page, not a second Home.
@@ -134,6 +148,7 @@ Each clothing piece has a dedicated detail page:
 - `/outfit-memory` -> Outfit Memory
 - `/wardrobe` -> Wardrobe
 - `/suggestions` -> Suggestions
+- `/outfits/:id` -> Outfit Detail
 - `/pieces/:id` -> Piece Detail
 
 Legacy redirects:
@@ -152,6 +167,7 @@ Legacy redirects:
 - Lucide React
 - route-level lazy loading
 - shared `WardrobeDataProvider` for outfit and clothing state
+- browser verification script for critical shared-state flows
 
 ### Backend
 
@@ -159,6 +175,7 @@ Legacy redirects:
 - SQLAlchemy
 - Pydantic
 - SQLite for local development
+- safe local upload cleanup for outfit and clothing images
 
 ## Repository Structure
 
@@ -181,6 +198,7 @@ server/
     utils/
 docs/
   screenshots/
+scripts/
 ```
 
 ## Screenshots
@@ -250,6 +268,20 @@ cd D:\projects\digicloset
 python -m compileall server\app
 ```
 
+### Shared state browser verification
+
+```powershell
+cd D:\projects\digicloset\client
+node .\scripts\verify-shared-data-layer.mjs
+```
+
+### Orphaned upload audit
+
+```powershell
+cd D:\projects\digicloset
+python scripts\check-orphaned-uploads.py
+```
+
 ## Upload Rules
 
 Current upload policy:
@@ -262,6 +294,7 @@ Current upload policy:
   - webp
 - validation exists in both frontend and backend
 - base64 image persistence is not used
+- local uploaded files are deleted safely when a persisted outfit/piece image is removed or the owning record is deleted
 
 Oversize message:
 
@@ -277,14 +310,18 @@ Oversize message:
 - real piece detail flow
 - deterministic, explainable suggestions
 - faster cross-page outfit and piece mutations through shared client state
+- real Outfit Detail flow for saved looks
+- safer backend persistence for delete and image-removal flows
+- local upload cleanup utilities and orphaned-upload auditing
 
 ## Honest Current Gaps
 
-The biggest remaining product-quality gap is secondary data freshness:
+The biggest remaining product-quality gap is secondary data freshness and historical cleanup:
 
 - core outfit and piece mutations now use shared client state
 - but weather/suggestion-derived content is still fetched separately from the shared wardrobe layer
 - some secondary derived sections could still feel fresher after mutations
+- old orphaned upload files from earlier bugs can now be detected, but are not auto-deleted by default
 
 The highest-impact next refinement would be:
 

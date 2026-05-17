@@ -322,6 +322,19 @@ Do not:
 - introduce heavy frontend state-management libraries without a real scaling need
 - split the same persistent outfit state across many unrelated page-level sources of truth
 
+### 9.7 Backend source-of-truth rule
+Persistent delete, edit, and image-removal behavior must be validated against backend state, not only against immediate frontend appearance.
+
+Do:
+- treat the backend and committed database state as the source of truth
+- ensure delete/update success means the next refresh still reflects the same result
+- revalidate shared frontend state after critical mutations when useful
+
+Do not:
+- fake-delete items or images only in local UI state
+- leave `image_url` values stale in the database after image removal
+- treat a preview-only image removal as if persisted backend removal already happened
+
 ---
 
 ## 10. Allowed Future Phases
@@ -482,6 +495,13 @@ Uploads must:
 ### 15.3 Storage rule
 Current local storage is acceptable for development, but architecture should remain migration-friendly for future object storage.
 
+### 15.3A Upload cleanup rule
+If a local uploaded image is removed or its owning persisted record is deleted:
+- the database state must be updated
+- safe local file cleanup should run for app-owned uploads only
+- external URLs must never be deleted as local files
+- missing files must not make the main mutation falsely fail after the DB commit
+
 ### 15.4 Secrets rule
 Never hardcode secrets or credentials.
 
@@ -511,7 +531,7 @@ Frontend structure must stay responsibility-based:
 ### 16.3 Reuse rule
 If a UI pattern or backend behavior is used more than once, centralize it cleanly.
 
-### 16.4 No ‚Äúmisc dump‚Äù rule
+### 16.4 No ìmisc dumpî rule
 Do not create vague catch-all files that accumulate unrelated logic.
 
 ---

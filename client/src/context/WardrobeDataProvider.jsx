@@ -9,6 +9,7 @@ import {
 import {
   createOutfit,
   deleteOutfit as deleteOutfitRequest,
+  getOutfit,
   getOutfits,
   markOutfitWorn as markOutfitWornRequest,
   toggleFavoriteOutfit,
@@ -48,8 +49,10 @@ export function WardrobeDataProvider({ children }) {
     refreshAll();
   }, []);
 
-  async function refreshOutfits() {
-    setOutfitsLoading(true);
+  async function fetchOutfits({ withLoading = true } = {}) {
+    if (withLoading) {
+      setOutfitsLoading(true);
+    }
     setOutfitsError("");
 
     try {
@@ -64,12 +67,16 @@ export function WardrobeDataProvider({ children }) {
       setOutfitsError(message);
       throw error;
     } finally {
-      setOutfitsLoading(false);
+      if (withLoading) {
+        setOutfitsLoading(false);
+      }
     }
   }
 
-  async function refreshClothing() {
-    setClothingLoading(true);
+  async function fetchClothing({ withLoading = true } = {}) {
+    if (withLoading) {
+      setClothingLoading(true);
+    }
     setClothingError("");
 
     try {
@@ -84,8 +91,36 @@ export function WardrobeDataProvider({ children }) {
       setClothingError(message);
       throw error;
     } finally {
-      setClothingLoading(false);
+      if (withLoading) {
+        setClothingLoading(false);
+      }
     }
+  }
+
+  function upsertOutfitItem(outfit) {
+    if (!outfit?.id) {
+      return;
+    }
+
+    setOutfits((current) => {
+      const exists = current.some((entry) => entry.id === outfit.id);
+
+      if (!exists) {
+        return [outfit, ...current];
+      }
+
+      return current.map((entry) =>
+        entry.id === outfit.id ? { ...entry, ...outfit } : entry,
+      );
+    });
+  }
+
+  async function refreshOutfits() {
+    return fetchOutfits({ withLoading: true });
+  }
+
+  async function refreshClothing() {
+    return fetchClothing({ withLoading: true });
   }
 
   async function refreshAll() {
@@ -122,12 +157,13 @@ export function WardrobeDataProvider({ children }) {
     const createdOutfit = await createOutfit(payload);
 
     if (createdOutfit?.id) {
-      setOutfits((current) => [createdOutfit, ...current]);
+      upsertOutfitItem(createdOutfit);
     } else {
       await refreshOutfits();
     }
 
-    refreshClothing().catch(() => {});
+    fetchOutfits({ withLoading: false }).catch(() => {});
+    fetchClothing({ withLoading: false }).catch(() => {});
     return createdOutfit;
   }
 
@@ -148,13 +184,10 @@ export function WardrobeDataProvider({ children }) {
       const updatedOutfit = response?.id ? response : response?.outfit;
 
       if (updatedOutfit?.id) {
-        setOutfits((current) =>
-          current.map((outfit) =>
-            outfit.id === outfitId ? { ...outfit, ...updatedOutfit } : outfit,
-          ),
-        );
+        upsertOutfitItem(updatedOutfit);
       }
 
+      fetchOutfits({ withLoading: false }).catch(() => {});
       return response;
     } catch (error) {
       setOutfits(previousOutfits);
@@ -182,13 +215,10 @@ export function WardrobeDataProvider({ children }) {
       const updatedOutfit = response?.id ? response : response?.outfit;
 
       if (updatedOutfit?.id) {
-        setOutfits((current) =>
-          current.map((outfit) =>
-            outfit.id === outfitId ? { ...outfit, ...updatedOutfit } : outfit,
-          ),
-        );
+        upsertOutfitItem(updatedOutfit);
       }
 
+      fetchOutfits({ withLoading: false }).catch(() => {});
       return response;
     } catch (error) {
       setOutfits(previousOutfits);
@@ -213,13 +243,10 @@ export function WardrobeDataProvider({ children }) {
       const updatedOutfit = response?.id ? response : response?.outfit;
 
       if (updatedOutfit?.id) {
-        setOutfits((current) =>
-          current.map((outfit) =>
-            outfit.id === outfitId ? { ...outfit, ...updatedOutfit } : outfit,
-          ),
-        );
+        upsertOutfitItem(updatedOutfit);
       }
 
+      fetchOutfits({ withLoading: false }).catch(() => {});
       return response;
     } catch (error) {
       setOutfits(previousOutfits);
@@ -236,7 +263,9 @@ export function WardrobeDataProvider({ children }) {
     setOutfits((current) => current.filter((outfit) => outfit.id !== outfitId));
 
     try {
-      return await deleteOutfitRequest(outfitId);
+      const response = await deleteOutfitRequest(outfitId);
+      fetchOutfits({ withLoading: false }).catch(() => {});
+      return response;
     } catch (error) {
       setOutfits(previousOutfits);
       throw error;
@@ -254,6 +283,7 @@ export function WardrobeDataProvider({ children }) {
       await refreshClothing();
     }
 
+    fetchClothing({ withLoading: false }).catch(() => {});
     return createdPiece;
   }
 
@@ -277,6 +307,7 @@ export function WardrobeDataProvider({ children }) {
         );
       }
 
+      fetchClothing({ withLoading: false }).catch(() => {});
       return response;
     } catch (error) {
       setClothingItems(previousPieces);
@@ -293,12 +324,30 @@ export function WardrobeDataProvider({ children }) {
     setClothingItems((current) => current.filter((item) => item.id !== pieceId));
 
     try {
-      return await deleteClothingItem(pieceId);
+      const response = await deleteClothingItem(pieceId);
+      fetchClothing({ withLoading: false }).catch(() => {});
+      return response;
     } catch (error) {
       setClothingItems(previousPieces);
       throw error;
     } finally {
       finishPieceMutation(pieceId);
+    }
+  }
+
+  function getOutfitById(outfitId) {
+    return outfits.find((outfit) => outfit.id === outfitId) || null;
+  }
+
+  async function fetchOutfitById(outfitId) {
+    beginOutfitMutation(outfitId);
+
+    try {
+      const outfit = await getOutfit(outfitId);
+      upsertOutfitItem(outfit);
+      return outfit;
+    } finally {
+      finishOutfitMutation(outfitId);
     }
   }
 
@@ -313,6 +362,8 @@ export function WardrobeDataProvider({ children }) {
       refreshOutfits,
       refreshClothing,
       refreshAll,
+      getOutfitById,
+      fetchOutfitById,
       createOutfit: createOutfitMemory,
       favoriteOutfit,
       markOutfitWorn,

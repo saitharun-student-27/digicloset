@@ -9,6 +9,7 @@ const Vault = lazy(() => import("./pages/Vault"));
 const Capture = lazy(() => import("./pages/Capture"));
 const Suggestions = lazy(() => import("./pages/Suggestions"));
 const PieceDetail = lazy(() => import("./pages/PieceDetail"));
+const OutfitDetail = lazy(() => import("./pages/OutfitDetail"));
 
 function AppRoute({ children }) {
   return (
@@ -58,6 +59,14 @@ function App() {
         element={
           <AppRoute>
             <PieceDetail />
+          </AppRoute>
+        }
+      />
+      <Route
+        path="/outfits/:id"
+        element={
+          <AppRoute>
+            <OutfitDetail />
           </AppRoute>
         }
       />

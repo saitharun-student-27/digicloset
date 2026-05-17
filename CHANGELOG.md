@@ -410,3 +410,129 @@ DigiCloset now feels more cohesive during repeated use:
 - edits and deletes propagate more consistently
 - shared wardrobe state reduces duplicate fetching without introducing heavy state-management tooling
 
+## 2026-05-17 - Add Outfit Detail page and card-to-detail flow
+
+Commit: pending current checkpoint
+
+### Outfit detail route
+
+- added a dedicated outfit detail route:
+  - `/outfits/:id`
+- added lazy route wiring without breaking:
+  - `/`
+  - `/outfit-memory`
+  - `/wardrobe`
+  - `/suggestions`
+  - `/pieces/:id`
+
+### Outfit detail experience
+
+- added a memory-led Outfit Detail page
+- added:
+  - back navigation
+  - large outfit image / placeholder
+  - calm outfit metadata context
+  - favorite / worn / edit / delete actions
+  - grouped piece breakdown with links to piece detail
+- kept the page mobile-first and avoided turning it into a CRUD-heavy detail screen
+
+### Card-to-detail flow
+
+- updated outfit cards so the primary preview surface now opens:
+  - `/outfits/:id`
+- kept quick actions separate from navigation to avoid nested button/link conflicts
+- clarified the product pattern:
+  - card = preview
+  - detail page = depth + actions
+
+### Shared-state integration
+
+- reused shared provider helpers for:
+  - favorite
+  - mark worn
+  - edit metadata
+  - delete
+- added cached + fetch-backed outfit detail loading behavior
+- fixed deleted or missing outfit routes so they settle into a clean not-found state instead of looping
+
+## 2026-05-17 - Verify shared wardrobe state in a real browser
+
+Commit: pending current checkpoint
+
+### Browser verification tooling
+
+- added Playwright-based verification support for shared wardrobe state flows
+- added reusable verification script:
+  - `client/scripts/verify-shared-data-layer.mjs`
+
+### Verified flows
+
+- favorite on Home -> Wardrobe Favorite Fits
+- mark worn -> Home updates
+- edit title -> Home / Wardrobe / Suggestions update
+- delete outfit -> removal across pages
+- piece detail edit persistence
+- linked piece delete protection
+
+### Result
+
+- DigiCloset now has a repeatable browser verification path for critical cross-page mutation behavior
+
+## 2026-05-17 - Fix backend image/delete persistence and upload cleanup consistency
+
+Commit: pending current checkpoint
+
+### Root issue
+
+- frontend delete/edit actions could look successful while backend image/file cleanup stayed inconsistent
+- local upload paths and SQLite paths were still too dependent on process working directory
+- old orphaned uploads from earlier bugs remained undetectable in the normal product flow
+
+### Backend persistence fixes
+
+- made SQLite database resolution stable relative to the `server` app directory
+- made upload directory resolution stable relative to the `server` app directory
+- added safe local upload cleanup helpers:
+  - `resolve_local_upload_path(image_url)`
+  - `is_safe_upload_path(image_url)`
+  - `delete_uploaded_file(image_url)`
+- ignored external image URLs during file cleanup
+- ensured missing files do not break core DB deletion flows
+
+### Outfit and clothing consistency
+
+- deleting an outfit now:
+  - removes the outfit row
+  - removes outfit-item links
+  - deletes the local uploaded image if it belongs to this app
+- deleting a standalone clothing piece now:
+  - removes the clothing row
+  - deletes the local uploaded image if it belongs to this app
+- deleting a linked clothing piece remains blocked safely
+- outfit image removal via backend update now persists `image_url = null`
+- clothing image removal via backend update now persists `image_url = null`
+
+### Frontend sync improvements
+
+- shared wardrobe provider now silently revalidates outfits/clothing after successful critical mutations
+- reduces the chance of stale cache after delete/update actions
+- keeps backend as the source of truth instead of relying on local-only optimistic state
+
+### Orphaned upload audit
+
+- added developer script:
+  - `scripts/check-orphaned-uploads.py`
+- reports:
+  - orphaned local upload files
+  - DB image URLs whose files are missing
+  - external image URLs
+
+### Verification result
+
+- route-level persistence tests confirmed:
+  - delete outfit with image -> DB row gone, links gone, file gone
+  - delete standalone piece with image -> DB row gone, file gone
+  - linked piece delete -> `409 Conflict`
+  - remove outfit image -> DB null + file gone
+  - remove piece image -> DB null + file gone
+

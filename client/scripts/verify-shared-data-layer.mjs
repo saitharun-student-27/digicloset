@@ -83,6 +83,29 @@ async function cardByTitle(page, title) {
   return card;
 }
 
+async function openOutfitFromHome(page, title, outfitId) {
+  const detailPath = `/outfits/${outfitId}`;
+  const exactTitleLink = page.getByRole("link", { name: title, exact: true }).first();
+
+  if (await exactTitleLink.count()) {
+    await exactTitleLink.click();
+    await page.waitForURL(`**${detailPath}`);
+    return;
+  }
+
+  const titleText = page.getByText(title, { exact: true }).first();
+  await titleText.waitFor({ state: "visible", timeout: 15000 });
+
+  const parentLink = titleText.locator("xpath=ancestor::a[1]").first();
+  if (await parentLink.count()) {
+    await parentLink.click();
+    await page.waitForURL(`**${detailPath}`);
+    return;
+  }
+
+  throw new Error(`Could not open "${title}" from Home.`);
+}
+
 async function openCardActions(card) {
   const toggle = card.getByRole("button", {
     name: /Show outfit actions|Hide outfit actions/,
@@ -116,6 +139,16 @@ async function expectTextNotOnPage(page, text) {
   await page.waitForTimeout(400);
   const count = await page.getByText(text, { exact: true }).count();
   assert(count === 0, `Expected "${text}" to be absent, but it was still visible.`);
+}
+
+async function expectOutfitTitleNotVisible(page, title) {
+  await page.waitForTimeout(500);
+  const headingCount = await page.getByRole("heading", { name: title, exact: true }).count();
+  const linkCount = await page.getByRole("link", { name: title, exact: true }).count();
+  assert(
+    headingCount === 0 && linkCount === 0,
+    `Expected outfit title "${title}" to be absent, but it was still visible.`,
+  );
 }
 
 async function run() {
@@ -225,10 +258,15 @@ async function run() {
 
   await page.goto(APP_URL, { waitUntil: "networkidle" });
 
-  // Flow 1: favorite from Home and verify in Wardrobe
-  const favoriteCard = await cardByTitle(page, titles.favoriteFlow);
-  await openCardActions(favoriteCard);
-  await favoriteCard.getByRole("button", { name: /Favorite/ }).click();
+  // Flow 1: open outfit from Home card into detail, refresh, favorite there, then verify in Wardrobe
+  await openOutfitFromHome(page, titles.favoriteFlow, favoriteFlowOutfit.id);
+  await page.getByRole("heading", { name: titles.favoriteFlow, exact: true }).waitFor({
+    state: "visible",
+    timeout: 15000,
+  });
+  await page.reload({ waitUntil: "networkidle" });
+  await page.waitForURL(`**/outfits/${favoriteFlowOutfit.id}`);
+  await page.getByRole("button", { name: "Favorite" }).click();
   await goTo(page, "Wardrobe", "/wardrobe");
   const favoriteFitsSection = page
     .locator("section")
@@ -238,17 +276,10 @@ async function run() {
     state: "visible",
     timeout: 15000,
   });
-  await page.reload({ waitUntil: "networkidle" });
-  await favoriteFitsSection.getByText(titles.favoriteFlow, { exact: true }).waitFor({
-    state: "visible",
-    timeout: 15000,
-  });
 
-  // Flow 2: mark worn in Suggestions and verify persistence plus Home visibility
-  await goTo(page, "Suggestions", "/suggestions");
-  const wornCard = await cardByTitle(page, titles.wornFlow);
-  await openCardActions(wornCard);
-  await wornCard.getByRole("button", { name: /Worn/ }).click();
+  // Flow 2: mark worn from detail and verify Home visibility plus persistence
+  await page.goto(`${APP_URL}/outfits/${wornFlowOutfit.id}`, { waitUntil: "networkidle" });
+  await page.getByRole("button", { name: "Mark worn" }).click();
   const wornPersisted = await getOutfit(wornFlowOutfit.id);
   assert(wornPersisted?.last_worn_date, "Expected worn outfit to persist a last_worn_date.");
   await goTo(page, "Home", "/");
@@ -256,11 +287,9 @@ async function run() {
   await page.reload({ waitUntil: "networkidle" });
   await expectTextOnPage(page, titles.wornFlow);
 
-  // Flow 3: edit outfit title in Wardrobe and verify Home + Suggestions
-  await goTo(page, "Wardrobe", "/wardrobe");
-  const syncCard = await cardByTitle(page, titles.syncFlow);
-  await openCardActions(syncCard);
-  await syncCard.getByRole("button", { name: /Edit/ }).click();
+  // Flow 3: edit outfit title from detail and verify Home + Suggestions
+  await page.goto(`${APP_URL}/outfits/${syncFlowOutfit.id}`, { waitUntil: "networkidle" });
+  await page.getByRole("button", { name: "Edit" }).click();
   await page.getByText("Update outfit details").waitFor({ state: "visible", timeout: 15000 });
   const titleInput = fieldInput(page, "Title");
   await titleInput.fill(titles.editedSyncFlow);
@@ -273,19 +302,18 @@ async function run() {
   await page.reload({ waitUntil: "networkidle" });
   await expectTextOnPage(page, titles.editedSyncFlow);
 
-  // Flow 4: delete outfit and verify disappearance everywhere
-  await goTo(page, "Wardrobe", "/wardrobe");
-  const deleteCard = await cardByTitle(page, titles.deleteFlow);
+  // Flow 4: delete outfit from detail and verify safe navigation plus disappearance everywhere
+  await page.goto(`${APP_URL}/outfits/${deleteFlowOutfit.id}`, { waitUntil: "networkidle" });
   page.once("dialog", (dialog) => dialog.accept());
-  await openCardActions(deleteCard);
-  await deleteCard.getByRole("button", { name: /Delete/ }).click();
-  await expectTextNotOnPage(page, titles.deleteFlow);
+  await page.getByRole("button", { name: "Delete" }).click();
+  await page.waitForURL("**/wardrobe");
+  await expectOutfitTitleNotVisible(page, titles.deleteFlow);
   await goTo(page, "Home", "/");
-  await expectTextNotOnPage(page, titles.deleteFlow);
+  await expectOutfitTitleNotVisible(page, titles.deleteFlow);
   await goTo(page, "Suggestions", "/suggestions");
-  await expectTextNotOnPage(page, titles.deleteFlow);
+  await expectOutfitTitleNotVisible(page, titles.deleteFlow);
   await page.reload({ waitUntil: "networkidle" });
-  await expectTextNotOnPage(page, titles.deleteFlow);
+  await expectOutfitTitleNotVisible(page, titles.deleteFlow);
 
   // Flow 5: piece detail edit and persistence
   await page.goto(`${APP_URL}/pieces/${standalonePiece.id}`, { waitUntil: "networkidle" });
@@ -301,7 +329,12 @@ async function run() {
   await page.goto(`${APP_URL}/pieces/${standalonePiece.id}`, { waitUntil: "networkidle" });
   await expectTextOnPage(page, pieces.standaloneEdited);
 
-  // Flow 6: linked piece delete protection
+  // Flow 6: open linked piece from outfit detail, then verify delete protection
+  await page.goto(`${APP_URL}/outfits/${linkedOutfit.id}`, { waitUntil: "networkidle" });
+  await page.getByRole("link", { name: new RegExp(pieces.linkedPiece) }).first().click();
+  await page.waitForURL(`**/pieces/${linkedPieceId}`);
+  await expectTextOnPage(page, pieces.linkedPiece);
+
   await page.goto(`${APP_URL}/pieces/${linkedPieceId}`, { waitUntil: "networkidle" });
   page.once("dialog", (dialog) => dialog.accept());
   await page.getByRole("button", { name: "Delete piece" }).click();

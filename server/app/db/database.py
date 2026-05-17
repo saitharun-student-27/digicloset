@@ -7,7 +7,7 @@ from app.core.config import settings
 from app.db.base import Base
 
 
-engine = create_engine(settings.DATABASE_URL, pool_pre_ping=True)
+engine = create_engine(settings.database_url_resolved, pool_pre_ping=True)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
@@ -20,7 +20,7 @@ def get_db() -> Generator[Session, None, None]:
 
 
 def _sync_sqlite_schema() -> None:
-    if not settings.DATABASE_URL.startswith("sqlite"):
+    if not settings.database_url_resolved.startswith("sqlite"):
         return
 
     inspector = inspect(engine)

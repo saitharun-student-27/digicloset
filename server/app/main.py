@@ -39,7 +39,7 @@ def create_app() -> FastAPI:
     app.include_router(suggestions_router, prefix=settings.API_PREFIX)
     app.mount(
         settings.UPLOAD_URL_PREFIX,
-        StaticFiles(directory=settings.UPLOAD_DIR),
+        StaticFiles(directory=settings.upload_dir_path),
         name="uploads",
     )
 

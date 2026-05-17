@@ -258,6 +258,7 @@ function HeroOutfitCard({
   isBusy = false,
 }) {
   const imageUrl = getImageUrl(outfit?.image_url);
+  const detailLink = !isStarterLook && outfit?.id ? `/outfits/${outfit.id}` : null;
 
   if (!outfit) {
     return (
@@ -281,50 +282,104 @@ function HeroOutfitCard({
     <div className="section-surface overflow-hidden">
       <div className="grid gap-0 lg:grid-cols-[0.95fr_1.05fr]">
         <div className="min-h-[280px] bg-[linear-gradient(135deg,#eee6d9_0%,#f8f5ee_100%)] p-3 sm:min-h-[320px]">
-          <div className="h-full overflow-hidden rounded-[1.5rem]">
-            {outfit.image_url ? (
-              <img
-                src={imageUrl}
-                alt={outfit.title}
-                className="h-full min-h-[280px] w-full object-cover sm:min-h-[320px]"
-              />
-            ) : (
-              <div className="flex h-full min-h-[280px] items-center justify-center rounded-[1.5rem] bg-white/55 text-stone sm:min-h-[320px]">
-                <div className="relative m-4 flex h-[190px] w-full max-w-[18rem] items-center justify-center rounded-[1.25rem] border border-white/60 bg-white/50 shadow-inner backdrop-blur-md">
-                  {(outfit.outfit_items || []).slice(0, 4).map((item, index) => (
-                    <div
-                      key={item.id}
-                      className="absolute inset-4 flex items-center justify-center opacity-75"
-                      style={{
-                        transform: `rotate(${index * 4 - 4}deg) translateY(${index * 7}px)`,
-                      }}
-                    >
-                      {item.clothing_item?.image_url ? (
-                        <img
-                          src={getImageUrl(item.clothing_item.image_url)}
-                          alt={item.clothing_item.name}
-                          className="h-24 w-24 object-contain mix-blend-multiply"
-                        />
-                      ) : null}
-                    </div>
-                  ))}
+          {detailLink ? (
+            <Link
+              to={detailLink}
+              className="block h-full overflow-hidden rounded-[1.5rem] focus:outline-none focus-visible:ring-4 focus-visible:ring-sage/20"
+            >
+              {outfit.image_url ? (
+                <img
+                  src={imageUrl}
+                  alt={outfit.title}
+                  className="h-full min-h-[280px] w-full object-cover sm:min-h-[320px]"
+                />
+              ) : (
+                <div className="flex h-full min-h-[280px] items-center justify-center rounded-[1.5rem] bg-white/55 text-stone sm:min-h-[320px]">
+                  <div className="relative m-4 flex h-[190px] w-full max-w-[18rem] items-center justify-center rounded-[1.25rem] border border-white/60 bg-white/50 shadow-inner backdrop-blur-md">
+                    {(outfit.outfit_items || []).slice(0, 4).map((item, index) => (
+                      <div
+                        key={item.id}
+                        className="absolute inset-4 flex items-center justify-center opacity-75"
+                        style={{
+                          transform: `rotate(${index * 4 - 4}deg) translateY(${index * 7}px)`,
+                        }}
+                      >
+                        {item.clothing_item?.image_url ? (
+                          <img
+                            src={getImageUrl(item.clothing_item.image_url)}
+                            alt={item.clothing_item.name}
+                            className="h-24 w-24 object-contain mix-blend-multiply"
+                          />
+                        ) : null}
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
-          </div>
+              )}
+            </Link>
+          ) : (
+            <div className="h-full overflow-hidden rounded-[1.5rem]">
+              {outfit.image_url ? (
+                <img
+                  src={imageUrl}
+                  alt={outfit.title}
+                  className="h-full min-h-[280px] w-full object-cover sm:min-h-[320px]"
+                />
+              ) : (
+                <div className="flex h-full min-h-[280px] items-center justify-center rounded-[1.5rem] bg-white/55 text-stone sm:min-h-[320px]">
+                  <div className="relative m-4 flex h-[190px] w-full max-w-[18rem] items-center justify-center rounded-[1.25rem] border border-white/60 bg-white/50 shadow-inner backdrop-blur-md">
+                    {(outfit.outfit_items || []).slice(0, 4).map((item, index) => (
+                      <div
+                        key={item.id}
+                        className="absolute inset-4 flex items-center justify-center opacity-75"
+                        style={{
+                          transform: `rotate(${index * 4 - 4}deg) translateY(${index * 7}px)`,
+                        }}
+                      >
+                        {item.clothing_item?.image_url ? (
+                          <img
+                            src={getImageUrl(item.clothing_item.image_url)}
+                            alt={item.clothing_item.name}
+                            className="h-24 w-24 object-contain mix-blend-multiply"
+                          />
+                        ) : null}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="p-4 sm:p-6">
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone">
             {isStarterLook ? "Today's starting look" : "Today's fit"}
           </p>
-          <h2 className="mt-2 text-2xl font-semibold text-charcoal">
-            {outfit.title}
-          </h2>
-          <p className="mt-2 text-sm leading-6 text-stone">
-            {outfit.description ||
-              `A strong starting point for ${weatherLabel.toLowerCase()}.`}
-          </p>
+          {detailLink ? (
+            <Link
+              to={detailLink}
+              className="mt-2 block rounded-xl focus:outline-none focus-visible:ring-4 focus-visible:ring-sage/20"
+            >
+              <h2 className="text-2xl font-semibold text-charcoal">
+                {outfit.title}
+              </h2>
+              <p className="mt-2 text-sm leading-6 text-stone">
+                {outfit.description ||
+                  `A strong starting point for ${weatherLabel.toLowerCase()}.`}
+              </p>
+            </Link>
+          ) : (
+            <>
+              <h2 className="mt-2 text-2xl font-semibold text-charcoal">
+                {outfit.title}
+              </h2>
+              <p className="mt-2 text-sm leading-6 text-stone">
+                {outfit.description ||
+                  `A strong starting point for ${weatherLabel.toLowerCase()}.`}
+              </p>
+            </>
+          )}
 
           <div className="mt-5 grid gap-3 sm:grid-cols-3">
             <div className="rounded-2xl bg-ivory p-3">

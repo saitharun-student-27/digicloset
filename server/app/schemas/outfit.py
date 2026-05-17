@@ -47,6 +47,7 @@ class OutfitUpdate(BaseModel):
     occasion: ClothingOccasion | None = None
     season: ClothingSeason | None = None
     style: str | None = Field(default=None, max_length=80)
+    image_url: str | None = Field(default=None, max_length=500)
 
 
 class OutfitItemRead(BaseModel):

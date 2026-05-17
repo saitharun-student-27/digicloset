@@ -7,7 +7,7 @@ from starlette.datastructures import UploadFile as StarletteUploadFile
 from app.models.clothing_item import ClothingItem
 from app.models.outfit import Outfit, OutfitItem
 from app.schemas.outfit import OutfitCreate, OutfitPieceCreate, OutfitUpdate
-from app.utils.upload import save_clothing_image
+from app.utils.upload import delete_uploaded_file, save_clothing_image
 
 
 FORM_FIELDS = ["title", "description", "occasion", "season", "style", "source_type"]
@@ -230,11 +230,15 @@ def update_outfit(
     if outfit is None:
         return None
 
+    previous_image_url = outfit.image_url
     update_data = outfit_in.model_dump(exclude_unset=True)
     for field, value in update_data.items():
         setattr(outfit, field, value)
 
     db.commit()
+    next_image_url = outfit.image_url
+    if previous_image_url != next_image_url:
+        delete_uploaded_file(previous_image_url)
     return get_outfit(db, outfit.id)
 
 
@@ -243,8 +247,10 @@ def delete_outfit(db: Session, outfit_id: int) -> bool:
     if outfit is None:
         return False
 
+    image_url = outfit.image_url
     db.delete(outfit)
     db.commit()
+    delete_uploaded_file(image_url)
     return True
 
 
