@@ -542,3 +542,54 @@ Commit: pending current checkpoint
   - remove outfit image -> DB null + file gone
   - remove piece image -> DB null + file gone
 
+## 2026-05-17 - Add backend auth foundation
+
+Commit: pending current checkpoint
+
+### Scope of this phase
+
+- added backend authentication foundation only
+- did not add frontend login/signup yet
+- did not add `user_id` ownership to wardrobe tables yet
+- did not change outfit/clothing APIs to user-scope yet
+
+### Auth model and schemas
+
+- added `users` table model
+- added auth schemas for:
+  - signup
+  - login
+  - user read
+  - token response
+
+### Password hashing and token utilities
+
+- added secure password hashing using PBKDF2-HMAC SHA-256
+- added JWT-style bearer token creation and verification using HMAC SHA-256
+- added auth settings:
+  - `SECRET_KEY`
+  - `ACCESS_TOKEN_EXPIRE_MINUTES`
+  - `JWT_ALGORITHM`
+
+### Auth service and dependency
+
+- added auth service helpers for:
+  - create user
+  - authenticate user
+  - get user by email
+  - get user by id
+- added `get_current_user` dependency for protected backend use
+
+### Auth routes
+
+- added:
+  - `POST /api/auth/signup`
+  - `POST /api/auth/login`
+  - `GET /api/auth/me`
+- kept wardrobe routes untouched in this phase
+
+### Verification
+
+- backend compile passed
+- signup / duplicate signup / login / wrong-password / me route behavior verified against a clean app instance
+

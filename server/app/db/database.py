@@ -75,6 +75,7 @@ def _sync_sqlite_schema() -> None:
 def create_db_tables() -> None:
     from app.models.clothing_item import ClothingItem  # noqa: F401
     from app.models.outfit import Outfit, OutfitItem  # noqa: F401
+    from app.models.user import User  # noqa: F401
 
     Base.metadata.create_all(bind=engine)
     _sync_sqlite_schema()

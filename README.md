@@ -24,6 +24,11 @@ DigiCloset currently includes:
 - image upload support for outfits and pieces
 - shared 10 MB upload validation across frontend and backend
 - backend-safe image/delete persistence with local upload cleanup
+- backend auth foundation:
+  - users model
+  - signup
+  - login
+  - current-user endpoint
 
 ## Product Philosophy
 
@@ -182,6 +187,12 @@ Legacy redirects:
 - Pydantic
 - SQLite for local development
 - safe local upload cleanup for outfit and clothing images
+- backend auth foundation with:
+  - password hashing
+  - bearer token creation/verification
+  - `POST /api/auth/signup`
+  - `POST /api/auth/login`
+  - `GET /api/auth/me`
 
 ## Repository Structure
 
@@ -274,6 +285,20 @@ cd D:\projects\digicloset
 python -m compileall server\app
 ```
 
+### Backend auth verification
+
+```powershell
+curl.exe -X POST http://127.0.0.1:8000/api/auth/signup ^
+  -H "Content-Type: application/json" ^
+  -d "{\"email\":\"test@example.com\",\"password\":\"password123\",\"display_name\":\"Test User\"}"
+```
+
+```powershell
+curl.exe -X POST http://127.0.0.1:8000/api/auth/login ^
+  -H "Content-Type: application/json" ^
+  -d "{\"email\":\"test@example.com\",\"password\":\"password123\"}"
+```
+
 ### Shared state browser verification
 
 ```powershell
@@ -328,10 +353,12 @@ The biggest remaining product-quality gap is secondary data freshness and histor
 - but weather/suggestion-derived content is still fetched separately from the shared wardrobe layer
 - some secondary derived sections could still feel fresher after mutations
 - old orphaned upload files from earlier bugs can now be detected, but are not auto-deleted by default
+- backend auth exists, but frontend auth and true per-user wardrobe ownership are not wired yet
+- outfits and clothing items are not yet scoped by `user_id`
 
 The highest-impact next refinement would be:
 
-- a small second pass on shared derived suggestion data and lightweight success feedback
+- Phase `3E.2`: add `user_id` ownership to outfits and clothing items, then enforce user-scoped backend filtering
 
 ## Documentation Maintenance
 

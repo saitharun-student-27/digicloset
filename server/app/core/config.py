@@ -12,6 +12,9 @@ class Settings(BaseSettings):
     UPLOAD_URL_PREFIX: str = "/uploads"
     MAX_UPLOAD_SIZE_BYTES: int = 10 * 1024 * 1024
     GEMINI_API_KEY: str | None = None
+    SECRET_KEY: str = "dev-only-change-me-for-hosting"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 7
+    JWT_ALGORITHM: str = "HS256"
 
     model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="allow")
 

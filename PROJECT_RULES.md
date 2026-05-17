@@ -286,6 +286,17 @@ Do not paint the schema into a single-user-only corner.
 ### 8.6 Migration discipline
 Do not add speculative tables without a product reason and a near-term usage path.
 
+### 8.7 Auth sequencing rule
+Authentication foundation may be introduced before full wardrobe ownership, but private-user claims must not be made until backend ownership filtering is actually enforced.
+
+Do:
+- add backend auth in a narrow foundation phase first when needed
+- add `user_id` ownership and service-level filtering as the next step
+
+Do not:
+- imply that wardrobes are private per user before outfit and clothing ownership checks exist
+- ship frontend auth screens as if privacy is complete while backend wardrobe routes are still global
+
 ---
 
 ## 9. Frontend Architecture Boundaries
