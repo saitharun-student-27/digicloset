@@ -12,7 +12,7 @@ from app.schemas.clothing_item import (
 )
 
 
-OutfitSlot = Literal["upper", "lower", "footwear", "outerwear", "accessory"]
+OutfitSlot = Literal["upper", "lower", "footwear", "outerwear", "accessory", "manual_select"]
 OutfitSourceType = Literal["image_upload", "text_input", "manual_build"]
 
 

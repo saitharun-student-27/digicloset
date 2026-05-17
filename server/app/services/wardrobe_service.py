@@ -1,12 +1,13 @@
 from fastapi import Request
 from pydantic import ValidationError
 from starlette.datastructures import UploadFile as StarletteUploadFile
+from sqlalchemy import func
 from sqlalchemy.orm import Session, joinedload
 
 from app.models.clothing_item import ClothingItem
 from app.models.outfit import Outfit, OutfitItem
 from app.schemas.clothing_item import ClothingItemCreate, ClothingItemUpdate
-from app.utils.upload import delete_uploaded_file, save_clothing_image
+from app.utils.upload import delete_uploaded_file, save_clothing_image_for_user
 
 
 FORM_FIELDS = [
@@ -26,7 +27,10 @@ def _clean_optional(value: object) -> object:
     return value
 
 
-async def build_clothing_item_from_request(request: Request) -> ClothingItemCreate:
+async def build_clothing_item_from_request(
+    request: Request,
+    user_id: int | None = None,
+) -> ClothingItemCreate:
     content_type = request.headers.get("content-type", "")
 
     if content_type.startswith("multipart/form-data"):
@@ -40,7 +44,7 @@ async def build_clothing_item_from_request(request: Request) -> ClothingItemCrea
 
         image = form.get("image")
         if isinstance(image, StarletteUploadFile) and image.filename:
-            image_url = await save_clothing_image(image)
+            image_url = await save_clothing_image_for_user(image, user_id=user_id)
             item_in = item_in.model_copy(update={"image_url": image_url})
 
         return item_in
@@ -52,10 +56,15 @@ async def build_clothing_item_from_request(request: Request) -> ClothingItemCrea
     raise ValueError("Content-Type must be application/json or multipart/form-data.")
 
 
-def create_clothing_item(db: Session, item_in: ClothingItemCreate) -> ClothingItem:
+def create_clothing_item(
+    db: Session,
+    item_in: ClothingItemCreate,
+    user_id: int,
+) -> ClothingItem:
     item_data = item_in.model_dump()
     item_data["season"] = item_data.get("season") or "all"
     item_data["occasion"] = item_data.get("occasion") or "casual"
+    item_data["user_id"] = user_id
 
     clothing_item = ClothingItem(**item_data)
     db.add(clothing_item)
@@ -64,16 +73,25 @@ def create_clothing_item(db: Session, item_in: ClothingItemCreate) -> ClothingIt
     return clothing_item
 
 
-def list_clothing_items(db: Session) -> list[ClothingItem]:
-    return db.query(ClothingItem).order_by(ClothingItem.created_at.desc()).all()
+def list_clothing_items(db: Session, user_id: int) -> list[ClothingItem]:
+    return (
+        db.query(ClothingItem)
+        .filter(ClothingItem.user_id == user_id)
+        .order_by(ClothingItem.created_at.desc())
+        .all()
+    )
 
 
-def get_clothing_item(db: Session, item_id: int) -> ClothingItem | None:
-    return db.query(ClothingItem).filter(ClothingItem.id == item_id).first()
+def get_clothing_item(db: Session, item_id: int, user_id: int) -> ClothingItem | None:
+    return (
+        db.query(ClothingItem)
+        .filter(ClothingItem.id == item_id, ClothingItem.user_id == user_id)
+        .first()
+    )
 
 
-def get_outfits_for_clothing_item(db: Session, item_id: int):
-    clothing_item = get_clothing_item(db, item_id)
+def get_outfits_for_clothing_item(db: Session, item_id: int, user_id: int):
+    clothing_item = get_clothing_item(db, item_id, user_id)
     if clothing_item is None:
         return None
 
@@ -83,7 +101,7 @@ def get_outfits_for_clothing_item(db: Session, item_id: int):
         .options(
             joinedload(Outfit.outfit_items).joinedload(OutfitItem.clothing_item),
         )
-        .filter(OutfitItem.clothing_item_id == item_id)
+        .filter(OutfitItem.clothing_item_id == item_id, Outfit.user_id == user_id)
         .order_by(Outfit.created_at.desc())
         .all()
     )
@@ -93,8 +111,9 @@ def update_clothing_item(
     db: Session,
     item_id: int,
     item_in: ClothingItemUpdate,
+    user_id: int,
 ) -> ClothingItem | None:
-    clothing_item = get_clothing_item(db, item_id)
+    clothing_item = get_clothing_item(db, item_id, user_id)
     if clothing_item is None:
         return None
 
@@ -110,12 +129,23 @@ def update_clothing_item(
     return clothing_item
 
 
-def delete_clothing_item(db: Session, item_id: int) -> bool:
-    clothing_item = get_clothing_item(db, item_id)
+def delete_clothing_item(db: Session, item_id: int, user_id: int) -> bool:
+    clothing_item = get_clothing_item(db, item_id, user_id)
     if clothing_item is None:
         return False
 
-    if clothing_item.outfit_items:
+    linked_outfit_count = (
+        db.query(func.count(OutfitItem.id))
+        .join(Outfit, Outfit.id == OutfitItem.outfit_id)
+        .filter(
+            OutfitItem.clothing_item_id == item_id,
+            Outfit.user_id == user_id,
+        )
+        .scalar()
+        or 0
+    )
+
+    if linked_outfit_count > 0:
         raise ValueError(
             "This clothing piece is linked to one or more outfit memories and cannot be deleted safely.",
         )

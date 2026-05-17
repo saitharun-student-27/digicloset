@@ -593,3 +593,95 @@ Commit: pending current checkpoint
 - backend compile passed
 - signup / duplicate signup / login / wrong-password / me route behavior verified against a clean app instance
 
+## 2026-05-17 - Add backend user ownership filtering and local dev backfill
+
+Commit: pending current checkpoint
+
+### Scope of this phase
+
+- added real backend ownership boundaries
+- did not add frontend auth yet
+- did not migrate to PostgreSQL
+- did not change product UX
+
+### Model ownership changes
+
+- added `user_id` to:
+  - `outfits`
+  - `clothing_items`
+- added ownership relationships between:
+  - `User`
+  - `Outfit`
+  - `ClothingItem`
+- kept `outfit_items` ownership derived through outfit and clothing item records
+
+### Local migration / backfill
+
+- added an idempotent local migration script:
+  - `scripts/migrate_user_ownership.py`
+- added startup-safe backfill support for SQLite development
+- created or reused a default local dev user:
+  - `dev@digicloset.local`
+- preserved existing local outfit and clothing data by assigning missing ownership instead of resetting the database
+
+### Backend route protection
+
+- protected wardrobe routes with `get_current_user`:
+  - `GET /api/outfits`
+  - `GET /api/outfits/{id}`
+  - `POST /api/outfits`
+  - `PUT /api/outfits/{id}`
+  - `DELETE /api/outfits/{id}`
+  - `POST /api/outfits/{id}/favorite`
+  - `POST /api/outfits/{id}/worn`
+  - `GET /api/clothing`
+  - `GET /api/clothing/{id}`
+  - `POST /api/clothing`
+  - `PUT /api/clothing/{id}`
+  - `DELETE /api/clothing/{id}`
+  - `GET /api/clothing/{id}/outfits`
+  - `GET /api/suggestions`
+
+### Service-level ownership filtering
+
+- outfits now:
+  - list only current-user outfits
+  - fetch only current-user outfits
+  - create with current-user ownership
+  - block cross-user edits, deletes, favorite, and worn updates
+- clothing items now:
+  - list only current-user pieces
+  - fetch only current-user pieces
+  - create with current-user ownership
+  - block cross-user edits and deletes
+- suggestions now:
+  - use only the authenticated user’s outfits, pieces, favorites, and wear history
+
+### Cross-user protection
+
+- blocked linking another user’s clothing item into a new outfit
+- returned safe not-found behavior for cross-user access attempts
+- kept linked-piece delete protection in place for same-user outfit links
+
+### Upload scope preparation
+
+- prepared new local uploads to support user-scoped paths like:
+  - `uploads/u_{user_id}/...`
+- kept old upload URLs working without bulk file moves
+
+### Verification
+
+- backend compile passed
+- two-user privacy verification passed:
+  - User B could not see User A outfits
+  - User B could not edit or delete User A data
+  - User B could not link User A clothing into a User B outfit
+- missing-token tests returned `401`
+- existing local data remained visible to the default dev user after login
+
+### Temporary state after this phase
+
+- backend privacy boundaries now exist
+- frontend auth is still not wired
+- the app frontend will need Phase `3E.3` before it can call protected wardrobe APIs normally
+

@@ -1,15 +1,25 @@
 from datetime import datetime
+from typing import TYPE_CHECKING
 
-from sqlalchemy import DateTime, String, func
+from sqlalchemy import DateTime, ForeignKey, String, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
+
+if TYPE_CHECKING:
+    from app.models.outfit import OutfitItem
+    from app.models.user import User
 
 
 class ClothingItem(Base):
     __tablename__ = "clothing_items"
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey("users.id"),
+        nullable=False,
+        index=True,
+    )
     name: Mapped[str] = mapped_column(String(120), nullable=False)
     category: Mapped[str] = mapped_column(String(50), nullable=False)
     color: Mapped[str] = mapped_column(String(50), nullable=False)
@@ -39,3 +49,4 @@ class ClothingItem(Base):
         back_populates="clothing_item",
         cascade="all, delete-orphan",
     )
+    user: Mapped["User"] = relationship("User", back_populates="clothing_items")

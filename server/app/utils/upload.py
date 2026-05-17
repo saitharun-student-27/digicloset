@@ -27,16 +27,29 @@ def _safe_filename_stem(filename: str) -> str:
 
 
 async def save_clothing_image(upload_file: UploadFile) -> str:
+    return await save_clothing_image_for_user(upload_file)
+
+
+async def save_clothing_image_for_user(
+    upload_file: UploadFile,
+    user_id: int | None = None,
+) -> str:
     contents = await read_validated_image(upload_file)
     original_name = Path(upload_file.filename or "").name
     extension = Path(original_name).suffix.lower()
     upload_dir = ensure_upload_dir()
+    if user_id is not None:
+        upload_dir = upload_dir / f"u_{user_id}"
+        upload_dir.mkdir(parents=True, exist_ok=True)
     safe_stem = _safe_filename_stem(original_name)
     filename = f"{uuid4().hex}-{safe_stem}{extension}"
     file_path = upload_dir / filename
     file_path.write_bytes(contents)
 
-    return f"{settings.UPLOAD_URL_PREFIX.rstrip('/')}/{filename}"
+    prefix = settings.UPLOAD_URL_PREFIX.rstrip("/")
+    if user_id is not None:
+        return f"{prefix}/u_{user_id}/{filename}"
+    return f"{prefix}/{filename}"
 
 
 async def read_validated_image(upload_file: UploadFile) -> bytes:

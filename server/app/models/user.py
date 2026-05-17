@@ -1,9 +1,14 @@
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 from sqlalchemy import DateTime, String, func
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
+
+if TYPE_CHECKING:
+    from app.models.clothing_item import ClothingItem
+    from app.models.outfit import Outfit
 
 
 class User(Base):
@@ -23,4 +28,9 @@ class User(Base):
         server_default=func.now(),
         onupdate=func.now(),
         nullable=False,
+    )
+    outfits: Mapped[list["Outfit"]] = relationship("Outfit", back_populates="user")
+    clothing_items: Mapped[list["ClothingItem"]] = relationship(
+        "ClothingItem",
+        back_populates="user",
     )

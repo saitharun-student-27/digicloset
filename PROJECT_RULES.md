@@ -297,6 +297,18 @@ Do not:
 - imply that wardrobes are private per user before outfit and clothing ownership checks exist
 - ship frontend auth screens as if privacy is complete while backend wardrobe routes are still global
 
+
+### 8.8 Ownership enforcement rule
+Once backend ownership filtering is introduced:
+- outfits must be filtered by authenticated user ownership
+- clothing items must be filtered by authenticated user ownership
+- suggestions must be filtered by authenticated user ownership
+- routes must derive ownership from `current_user`, never from request body `user_id`
+
+Do not:
+- leave list endpoints global after auth exists
+- allow cross-user outfit-to-piece linking
+- treat frontend auth screens as the privacy boundary instead of backend ownership checks
 ---
 
 ## 9. Frontend Architecture Boundaries
@@ -552,7 +564,7 @@ Frontend structure must stay responsibility-based:
 ### 16.3 Reuse rule
 If a UI pattern or backend behavior is used more than once, centralize it cleanly.
 
-### 16.4 No �misc dump� rule
+### 16.4 No Ã¢â‚¬Å“misc dumpÃ¢â‚¬Â rule
 Do not create vague catch-all files that accumulate unrelated logic.
 
 ---

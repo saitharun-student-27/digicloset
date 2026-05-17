@@ -56,7 +56,7 @@ def _season_for_condition(condition: str) -> list[str]:
     return ["summer", "all"]
 
 
-async def get_suggestions(db: Session):
+async def get_suggestions(db: Session, user_id: int):
     """
     Returns deterministic wardrobe suggestions based on rules + live weather.
     """
@@ -68,7 +68,10 @@ async def get_suggestions(db: Session):
 
     weather_items = (
         db.query(ClothingItem)
-        .filter(ClothingItem.season.in_(matching_seasons))
+        .filter(
+            ClothingItem.user_id == user_id,
+            ClothingItem.season.in_(matching_seasons),
+        )
         .limit(6)
         .all()
     )
@@ -76,12 +79,19 @@ async def get_suggestions(db: Session):
     unworn_outfits = (
         db.query(Outfit)
         .options(joinedload(Outfit.outfit_items).joinedload(OutfitItem.clothing_item))
-        .filter((Outfit.last_worn_date == None) | (Outfit.last_worn_date < one_week_ago))
+        .filter(
+            Outfit.user_id == user_id,
+            (Outfit.last_worn_date == None) | (Outfit.last_worn_date < one_week_ago),
+        )
         .limit(3)
         .all()
     )
 
-    all_clothing = db.query(ClothingItem).all()
+    all_clothing = (
+        db.query(ClothingItem)
+        .filter(ClothingItem.user_id == user_id)
+        .all()
+    )
     all_clothing.sort(key=lambda item: len(item.outfit_items), reverse=True)
     frequent_pieces = all_clothing[:3]
 

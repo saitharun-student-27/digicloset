@@ -8,12 +8,18 @@ from app.db.base import Base
 
 if TYPE_CHECKING:
     from app.models.clothing_item import ClothingItem
+    from app.models.user import User
 
 
 class Outfit(Base):
     __tablename__ = "outfits"
 
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey("users.id"),
+        nullable=False,
+        index=True,
+    )
     title: Mapped[str] = mapped_column(String(160), nullable=False)
     description: Mapped[str | None] = mapped_column(Text, nullable=True)
     occasion: Mapped[str] = mapped_column(String(50), nullable=False)
@@ -40,6 +46,7 @@ class Outfit(Base):
         back_populates="outfit",
         cascade="all, delete-orphan",
     )
+    user: Mapped["User"] = relationship("User", back_populates="outfits")
 
 
 class OutfitItem(Base):

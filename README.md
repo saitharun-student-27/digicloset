@@ -29,6 +29,11 @@ DigiCloset currently includes:
   - signup
   - login
   - current-user endpoint
+- backend user ownership filtering:
+  - outfits scoped by `user_id`
+  - clothing items scoped by `user_id`
+  - suggestions scoped per authenticated user
+  - default dev-user backfill for existing local data
 
 ## Product Philosophy
 
@@ -193,6 +198,11 @@ Legacy redirects:
   - `POST /api/auth/signup`
   - `POST /api/auth/login`
   - `GET /api/auth/me`
+- backend ownership filtering with:
+  - protected outfit routes
+  - protected clothing routes
+  - protected suggestions route
+  - default local dev user migration support
 
 ## Repository Structure
 
@@ -299,6 +309,13 @@ curl.exe -X POST http://127.0.0.1:8000/api/auth/login ^
   -d "{\"email\":\"test@example.com\",\"password\":\"password123\"}"
 ```
 
+### Ownership migration / backfill
+
+```powershell
+cd D:\projects\digicloset\server
+.\venv\Scripts\python.exe ..\scripts\migrate_user_ownership.py
+```
+
 ### Shared state browser verification
 
 ```powershell
@@ -326,6 +343,7 @@ Current upload policy:
 - validation exists in both frontend and backend
 - base64 image persistence is not used
 - local uploaded files are deleted safely when a persisted outfit/piece image is removed or the owning record is deleted
+- new authenticated uploads can be stored under user-scoped local folders like `uploads/u_{user_id}/...`
 
 Oversize message:
 
@@ -344,21 +362,22 @@ Oversize message:
 - real Outfit Detail flow for saved looks
 - safer backend persistence for delete and image-removal flows
 - local upload cleanup utilities and orphaned-upload auditing
+- real backend user ownership boundaries for outfits, clothing items, and suggestions
 
 ## Honest Current Gaps
 
-The biggest remaining product-quality gap is secondary data freshness and historical cleanup:
+The biggest remaining product-quality gap is frontend auth integration and secondary derived freshness:
 
 - core outfit and piece mutations now use shared client state
 - but weather/suggestion-derived content is still fetched separately from the shared wardrobe layer
 - some secondary derived sections could still feel fresher after mutations
 - old orphaned upload files from earlier bugs can now be detected, but are not auto-deleted by default
-- backend auth exists, but frontend auth and true per-user wardrobe ownership are not wired yet
-- outfits and clothing items are not yet scoped by `user_id`
+- backend auth and backend ownership filtering now exist
+- but the current frontend still needs Phase `3E.3` token/session wiring before the app can use protected wardrobe APIs normally
 
 The highest-impact next refinement would be:
 
-- Phase `3E.2`: add `user_id` ownership to outfits and clothing items, then enforce user-scoped backend filtering
+- Phase `3E.3`: add frontend auth context, protected routes, login/signup pages, and bearer-token attachment for wardrobe requests
 
 ## Documentation Maintenance
 

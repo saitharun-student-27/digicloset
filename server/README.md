@@ -11,6 +11,11 @@ Current backend scope includes:
   - `POST /api/auth/signup`
   - `POST /api/auth/login`
   - `GET /api/auth/me`
+- backend ownership filtering:
+  - protected outfit routes
+  - protected clothing routes
+  - protected suggestions route
+  - default dev-user backfill for existing local wardrobe data
 
 ## Setup
 
@@ -54,6 +59,21 @@ curl.exe http://127.0.0.1:8000/api/auth/me ^
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
 ```
 
+## Ownership Migration
+
+Run the idempotent local backfill script from the `server` folder:
+
+```powershell
+.\venv\Scripts\python.exe ..\scripts\migrate_user_ownership.py
+```
+
+This will:
+
+- create or reuse `dev@digicloset.local`
+- backfill `outfits.user_id`
+- backfill `clothing_items.user_id`
+- report any cross-user outfit-item link problems
+
 ## Environment Notes
 
 Important values in `.env` / `.env.example`:
@@ -69,10 +89,8 @@ Important values in `.env` / `.env.example`:
 
 ## Current Boundary
 
-Backend auth exists, but this phase does **not** yet:
+Backend wardrobe APIs are now protected and user-scoped.
 
-- add `user_id` to outfits
-- add `user_id` to clothing items
-- protect wardrobe APIs
-- migrate existing wardrobe data
-```
+Current temporary limitation:
+
+- the frontend app still needs Phase `3E.3` auth wiring before it can call protected wardrobe APIs successfully

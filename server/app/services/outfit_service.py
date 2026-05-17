@@ -7,7 +7,7 @@ from starlette.datastructures import UploadFile as StarletteUploadFile
 from app.models.clothing_item import ClothingItem
 from app.models.outfit import Outfit, OutfitItem
 from app.schemas.outfit import OutfitCreate, OutfitPieceCreate, OutfitUpdate
-from app.utils.upload import delete_uploaded_file, save_clothing_image
+from app.utils.upload import delete_uploaded_file, save_clothing_image_for_user
 
 
 FORM_FIELDS = ["title", "description", "occasion", "season", "style", "source_type"]
@@ -97,7 +97,10 @@ def _generate_outfit_title(outfit_in: OutfitCreate) -> str:
     return f"{_format_value(outfit_in.occasion).title()} outfit with {first_piece}"
 
 
-async def build_outfit_from_request(request: Request) -> OutfitCreate:
+async def build_outfit_from_request(
+    request: Request,
+    user_id: int | None = None,
+) -> OutfitCreate:
     content_type = request.headers.get("content-type", "")
 
     if content_type.startswith("multipart/form-data"):
@@ -126,7 +129,7 @@ async def build_outfit_from_request(request: Request) -> OutfitCreate:
 
         image = form.get("image")
         if isinstance(image, StarletteUploadFile) and image.filename:
-            image_url = await save_clothing_image(image)
+            image_url = await save_clothing_image_for_user(image, user_id=user_id)
             outfit_in = outfit_in.model_copy(update={"image_url": image_url})
 
         return outfit_in
@@ -144,7 +147,28 @@ def _with_outfit_relations(query):
     )
 
 
-def create_outfit(db: Session, outfit_in: OutfitCreate) -> Outfit:
+def _get_user_clothing_items(
+    db: Session,
+    clothing_item_ids: list[int],
+    user_id: int,
+) -> list[ClothingItem]:
+    if not clothing_item_ids:
+        return []
+
+    clothing_items = (
+        db.query(ClothingItem)
+        .filter(
+            ClothingItem.id.in_(clothing_item_ids),
+            ClothingItem.user_id == user_id,
+        )
+        .all()
+    )
+    if len(clothing_items) != len(set(clothing_item_ids)):
+        raise LookupError("One or more selected clothing pieces could not be found.")
+    return clothing_items
+
+
+def create_outfit(db: Session, outfit_in: OutfitCreate, user_id: int) -> Outfit:
     source_type = _derive_outfit_source_type(outfit_in.image_url, outfit_in.source_type)
     title = outfit_in.title or _generate_outfit_title(outfit_in)
     description = outfit_in.description or generate_outfit_description(
@@ -155,6 +179,7 @@ def create_outfit(db: Session, outfit_in: OutfitCreate) -> Outfit:
     )
 
     outfit = Outfit(
+        user_id=user_id,
         title=title,
         description=description,
         occasion=outfit_in.occasion,
@@ -170,6 +195,7 @@ def create_outfit(db: Session, outfit_in: OutfitCreate) -> Outfit:
 
     for index, piece in enumerate(outfit_in.pieces):
         clothing_item = ClothingItem(
+            user_id=user_id,
             name=piece.name,
             category=piece.category,
             color=piece.color,
@@ -191,32 +217,33 @@ def create_outfit(db: Session, outfit_in: OutfitCreate) -> Outfit:
             ),
         )
 
-    for item_id in outfit_in.clothing_item_ids:
+    for clothing_item in _get_user_clothing_items(db, outfit_in.clothing_item_ids, user_id):
         db.add(
             OutfitItem(
                 outfit_id=outfit.id,
-                clothing_item_id=item_id,
+                clothing_item_id=clothing_item.id,
                 slot="manual_select",
                 layer_order=None,
             )
         )
 
     db.commit()
-    return get_outfit(db, outfit.id)
+    return get_outfit(db, outfit.id, user_id)
 
 
-def list_outfits(db: Session) -> list[Outfit]:
+def list_outfits(db: Session, user_id: int) -> list[Outfit]:
     return (
         _with_outfit_relations(db.query(Outfit))
+        .filter(Outfit.user_id == user_id)
         .order_by(Outfit.created_at.desc())
         .all()
     )
 
 
-def get_outfit(db: Session, outfit_id: int) -> Outfit | None:
+def get_outfit(db: Session, outfit_id: int, user_id: int) -> Outfit | None:
     return (
         _with_outfit_relations(db.query(Outfit))
-        .filter(Outfit.id == outfit_id)
+        .filter(Outfit.id == outfit_id, Outfit.user_id == user_id)
         .first()
     )
 
@@ -225,8 +252,9 @@ def update_outfit(
     db: Session,
     outfit_id: int,
     outfit_in: OutfitUpdate,
+    user_id: int,
 ) -> Outfit | None:
-    outfit = get_outfit(db, outfit_id)
+    outfit = get_outfit(db, outfit_id, user_id)
     if outfit is None:
         return None
 
@@ -239,11 +267,11 @@ def update_outfit(
     next_image_url = outfit.image_url
     if previous_image_url != next_image_url:
         delete_uploaded_file(previous_image_url)
-    return get_outfit(db, outfit.id)
+    return get_outfit(db, outfit.id, user_id)
 
 
-def delete_outfit(db: Session, outfit_id: int) -> bool:
-    outfit = get_outfit(db, outfit_id)
+def delete_outfit(db: Session, outfit_id: int, user_id: int) -> bool:
+    outfit = get_outfit(db, outfit_id, user_id)
     if outfit is None:
         return False
 
@@ -254,21 +282,21 @@ def delete_outfit(db: Session, outfit_id: int) -> bool:
     return True
 
 
-def toggle_favorite(db: Session, outfit_id: int) -> Outfit | None:
+def toggle_favorite(db: Session, outfit_id: int, user_id: int) -> Outfit | None:
     """Toggle the favorite status of an outfit."""
-    outfit = get_outfit(db, outfit_id)
+    outfit = get_outfit(db, outfit_id, user_id)
     if outfit is None:
         return None
 
     outfit.is_favorite = not outfit.is_favorite
     db.commit()
     db.refresh(outfit)
-    return get_outfit(db, outfit.id)
+    return get_outfit(db, outfit.id, user_id)
 
 
-def mark_worn(db: Session, outfit_id: int) -> Outfit | None:
+def mark_worn(db: Session, outfit_id: int, user_id: int) -> Outfit | None:
     """Mark an outfit as worn today."""
-    outfit = get_outfit(db, outfit_id)
+    outfit = get_outfit(db, outfit_id, user_id)
     if outfit is None:
         return None
 
@@ -276,4 +304,4 @@ def mark_worn(db: Session, outfit_id: int) -> Outfit | None:
     outfit.last_worn_date = datetime.now(timezone.utc)
     db.commit()
     db.refresh(outfit)
-    return get_outfit(db, outfit.id)
+    return get_outfit(db, outfit.id, user_id)
