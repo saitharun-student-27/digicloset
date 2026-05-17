@@ -195,6 +195,16 @@ It should not feel like:
 - checking a database
 - managing a catalog
 
+### 6.4 Today's Fit truthfulness rule
+`Today's Fit` should represent a real same-day outfit memory when one exists.
+
+Do:
+- show a real outfit saved today as `Today's Fit`
+- let recommendations lead when no same-day outfit memory exists
+
+Do not:
+- force a fake `Today's Fit` card when the user did not actually save a look that day
+
 ---
 
 ## 7. Wardrobe Page Rules

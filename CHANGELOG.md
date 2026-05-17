@@ -290,6 +290,12 @@ Commit: `3e0befe`
 - reduced forced rediscovery on low-data accounts
 - demoted history-heavy resurfacing until enough real usage existed
 
+### Home rule refinement
+
+- corrected `Today’s Fit` so it now appears only when a real outfit was saved that day
+- stopped forcing a synthetic “today” hero card when no outfit was actually added that day
+- let recommendation and starting-point rails lead the page when there is no fresh same-day outfit memory
+
 ### Wardrobe improvements
 
 - corrected favorites behavior so favorite outfits remain:

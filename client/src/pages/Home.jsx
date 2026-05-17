@@ -57,6 +57,25 @@ function getDaysSince(value) {
   return Math.max(0, Math.floor((Date.now() - date.getTime()) / (1000 * 60 * 60 * 24)));
 }
 
+function getLocalDayKey() {
+  const now = new Date();
+  return `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`;
+}
+
+function isSameCalendarDay(value) {
+  const date = parseDate(value);
+  if (!date) {
+    return false;
+  }
+
+  const now = new Date();
+  return (
+    date.getFullYear() === now.getFullYear() &&
+    date.getMonth() === now.getMonth() &&
+    date.getDate() === now.getDate()
+  );
+}
+
 function isRecentCreation(outfit) {
   const created = parseDate(outfit.created_at);
   if (!created) {
@@ -96,7 +115,49 @@ function scoreDailyFit(outfit, preferredSeason) {
     score += 3;
   }
 
+  if (isSameCalendarDay(outfit.last_worn_date)) {
+    score -= 8;
+  }
+
   return score;
+}
+
+function pickDailyOutfit(outfits, preferredSeason) {
+  if (outfits.length === 0) {
+    return null;
+  }
+
+  const ranked = [...outfits].sort((left, right) => {
+    const scoreDifference =
+      scoreDailyFit(right, preferredSeason) - scoreDailyFit(left, preferredSeason);
+
+    if (scoreDifference !== 0) {
+      return scoreDifference;
+    }
+
+    return (left.id || 0) - (right.id || 0);
+  });
+
+  const topScore = scoreDailyFit(ranked[0], preferredSeason);
+  const candidatePool = ranked.filter(
+    (outfit) => topScore - scoreDailyFit(outfit, preferredSeason) <= 2,
+  );
+  const rotationPool = candidatePool.slice(0, Math.min(3, candidatePool.length));
+
+  if (rotationPool.length === 1) {
+    return rotationPool[0];
+  }
+
+  const daySeed = getLocalDayKey()
+    .split("-")
+    .map((value) => Number(value))
+    .reduce((total, value) => total + value, 0);
+  const index = daySeed % rotationPool.length;
+  return rotationPool[index];
+}
+
+function sortByNewest(left, right) {
+  return parseDate(right.created_at) - parseDate(left.created_at);
 }
 
 function sortByVisualQuality(items) {
@@ -656,22 +717,29 @@ export default function Home() {
   }, [closetHasSupport, outfits]);
 
   const todaysFit = useMemo(() => {
-    if (outfits.length === 0) {
-      return starterLooks[0] || null;
+    const todaysUploads = [...outfits]
+      .filter((outfit) => isSameCalendarDay(outfit.created_at))
+      .sort((left, right) => {
+        const imageDifference = Number(Boolean(right.image_url)) - Number(Boolean(left.image_url));
+        if (imageDifference !== 0) {
+          return imageDifference;
+        }
+
+        return sortByNewest(left, right);
+      });
+
+    if (todaysUploads.length > 0) {
+      return todaysUploads[0];
     }
 
-    return [...outfits].sort(
-      (left, right) =>
-        scoreDailyFit(right, preferredSeason) -
-        scoreDailyFit(left, preferredSeason),
-    )[0];
-  }, [outfits, preferredSeason, starterLooks]);
+    return null;
+  }, [outfits]);
 
   const recentMemories = useMemo(
     () =>
       [...outfits]
         .filter((outfit) => outfit.id !== todaysFit?.id)
-        .sort((left, right) => parseDate(right.created_at) - parseDate(left.created_at))
+        .sort(sortByNewest)
         .slice(0, 6),
     [outfits, todaysFit],
   );
@@ -731,7 +799,7 @@ export default function Home() {
 
   const goodStartingPoints = useMemo(() => {
     if (outfits.length === 0) {
-      return starterLooks.slice(1);
+      return starterLooks;
     }
 
     const realStartingPoints = [...outfits]
@@ -856,16 +924,18 @@ export default function Home() {
 
       {!isLoading && !error ? (
         <div className="mt-5 space-y-5 sm:mt-7 sm:space-y-7">
-          <HeroOutfitCard
-            outfit={todaysFit}
-            weatherLabel={weatherLabel}
-            isStarterLook={Boolean(todaysFit?.synthetic)}
-            onFavorite={handleFavorite}
-            onMarkWorn={handleMarkWorn}
-            onEdit={setEditingOutfit}
-            onDelete={handleDelete}
-            isBusy={todaysFit?.synthetic ? false : isOutfitPending(todaysFit?.id)}
-          />
+          {todaysFit ? (
+            <HeroOutfitCard
+              outfit={todaysFit}
+              weatherLabel={weatherLabel}
+              isStarterLook={Boolean(todaysFit?.synthetic)}
+              onFavorite={handleFavorite}
+              onMarkWorn={handleMarkWorn}
+              onEdit={setEditingOutfit}
+              onDelete={handleDelete}
+              isBusy={todaysFit?.synthetic ? false : isOutfitPending(todaysFit?.id)}
+            />
+          ) : null}
 
           {goodStartingPoints.length > 0 ? (
             <RailSurface

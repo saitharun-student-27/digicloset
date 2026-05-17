@@ -60,7 +60,7 @@ Home is now adaptive instead of fixed.
 Depending on how much wardrobe data exists, it can show:
 
 - a daily wardrobe brief
-- Today's Fit
+- Today's Fit only when an outfit was actually saved that day
 - deterministic starting looks from real closet pieces
 - Good Starting Points
 - Favorite Fits
@@ -70,6 +70,12 @@ Depending on how much wardrobe data exists, it can show:
 Home is designed to answer:
 
 > What can I wear today?
+
+Important Home rule:
+
+- if you saved an outfit today, that real saved look becomes `Today’s Fit`
+- if you did not save an outfit today, DigiCloset does not force a fake “today” card
+- in that case, recommendations and starting points lead the page instead
 
 ### Outfit Memory
 
