@@ -11,6 +11,7 @@ const Capture = lazy(() => import("./pages/Capture"));
 const Suggestions = lazy(() => import("./pages/Suggestions"));
 const PieceDetail = lazy(() => import("./pages/PieceDetail"));
 const OutfitDetail = lazy(() => import("./pages/OutfitDetail"));
+const AuthWelcome = lazy(() => import("./pages/AuthWelcome"));
 const Login = lazy(() => import("./pages/Login"));
 const Signup = lazy(() => import("./pages/Signup"));
 
@@ -35,6 +36,14 @@ function PublicRoute({ children }) {
 function App() {
   return (
     <Routes>
+      <Route
+        path="/welcome"
+        element={
+          <PublicRoute>
+            <AuthWelcome />
+          </PublicRoute>
+        }
+      />
       <Route
         path="/login"
         element={
@@ -104,6 +113,7 @@ function App() {
         path="/capture"
         element={<Navigate to="/outfit-memory" replace />}
       />
+      <Route path="*" element={<Navigate to="/welcome" replace />} />
     </Routes>
   );
 }

@@ -32,7 +32,7 @@ export default function AppShell({ children }) {
 
   function handleLogout() {
     logout();
-    navigate("/login", {
+    navigate("/welcome", {
       replace: true,
       state: { message: "Signed out." },
     });

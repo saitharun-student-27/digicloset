@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
+import AuthShell from "../components/AuthShell.jsx";
 import { useAuth } from "../context/AuthContext.jsx";
 
 function getFriendlySignupError(error) {
@@ -19,6 +20,9 @@ function getFriendlySignupError(error) {
 
   return "Could not create your account right now.";
 }
+
+const inputClass =
+  "mt-2 h-[3.35rem] w-full rounded-[1.15rem] border border-black/10 bg-[#fffdf9] px-4 text-base text-charcoal outline-none transition placeholder:text-stone/60 focus:border-sage focus:ring-4 focus:ring-sage/10";
 
 export default function Signup() {
   const navigate = useNavigate();
@@ -59,74 +63,82 @@ export default function Signup() {
   }
 
   return (
-    <main className="flex min-h-[100vh] min-h-[100dvh] items-center justify-center bg-[linear-gradient(180deg,#f8f5ee_0%,#eee6d9_100%)] px-4 py-8">
-      <div className="w-full max-w-md rounded-[2rem] border border-black/5 bg-white/88 p-5 shadow-soft backdrop-blur sm:p-7">
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone">
-          DigiCloset
-        </p>
-        <h1 className="mt-3 text-3xl font-semibold text-charcoal">Create your wardrobe</h1>
-        <p className="mt-3 text-sm leading-6 text-stone">
-          Start a private closet built around complete looks, not scattered inventory rows.
-        </p>
-
+    <AuthShell
+      backTo="/welcome"
+      backLabel="Back to welcome"
+      title="Create your DigiCloset"
+      subtitle="Start saving complete looks and building a calm memory of your personal wardrobe."
+      footer={
+        <>
+          Already have a closet?{" "}
+          <Link
+            to="/login"
+            className="font-medium text-charcoal underline-offset-4 hover:underline"
+          >
+            Log in
+          </Link>
+        </>
+      }
+    >
+      <div className="min-h-[2.75rem]">
         {formError ? (
-          <p className="mt-4 rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">
+          <p className="rounded-[1.25rem] border border-red-100 bg-red-50 px-4 py-3 text-sm leading-6 text-red-700">
             {formError}
           </p>
         ) : null}
-
-        <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
-          <label className="block">
-            <span className="text-sm font-medium text-charcoal">Display name</span>
-            <input
-              type="text"
-              value={displayName}
-              onChange={(event) => setDisplayName(event.target.value)}
-              autoComplete="name"
-              className="mt-2 h-12 w-full rounded-2xl border border-black/10 bg-ivory px-4 text-sm text-charcoal outline-none transition focus:border-sage focus:ring-4 focus:ring-sage/15"
-            />
-          </label>
-
-          <label className="block">
-            <span className="text-sm font-medium text-charcoal">Email</span>
-            <input
-              type="email"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              autoComplete="email"
-              required
-              className="mt-2 h-12 w-full rounded-2xl border border-black/10 bg-ivory px-4 text-sm text-charcoal outline-none transition focus:border-sage focus:ring-4 focus:ring-sage/15"
-            />
-          </label>
-
-          <label className="block">
-            <span className="text-sm font-medium text-charcoal">Password</span>
-            <input
-              type="password"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              autoComplete="new-password"
-              required
-              className="mt-2 h-12 w-full rounded-2xl border border-black/10 bg-ivory px-4 text-sm text-charcoal outline-none transition focus:border-sage focus:ring-4 focus:ring-sage/15"
-            />
-          </label>
-
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="inline-flex h-12 w-full items-center justify-center rounded-full bg-charcoal px-5 text-sm font-medium text-ivory transition hover:bg-softblack disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {isSubmitting ? "Creating account..." : "Create account"}
-          </button>
-        </form>
-
-        <p className="mt-5 text-sm text-stone">
-          Already have an account?{" "}
-          <Link to="/login" className="font-medium text-charcoal underline-offset-4 hover:underline">
-            Sign in
-          </Link>
-        </p>
       </div>
-    </main>
+
+      <form className="mt-1 space-y-4" onSubmit={handleSubmit}>
+        <label className="block">
+          <span className="text-[0.98rem] font-medium text-charcoal">
+            Display name
+          </span>
+          <input
+            type="text"
+            value={displayName}
+            onChange={(event) => setDisplayName(event.target.value)}
+            autoComplete="name"
+            placeholder="How should DigiCloset address you?"
+            className={inputClass}
+          />
+        </label>
+
+        <label className="block">
+          <span className="text-[0.98rem] font-medium text-charcoal">Email</span>
+          <input
+            type="email"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            autoComplete="email"
+            placeholder="Enter your email"
+            required
+            className={inputClass}
+          />
+        </label>
+
+        <label className="block">
+          <span className="text-[0.98rem] font-medium text-charcoal">
+            Password
+          </span>
+          <input
+            type="password"
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            autoComplete="new-password"
+            placeholder="Create your password"
+            required
+            className={inputClass}
+          />
+        </label>
+
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="inline-flex h-[3.35rem] w-full items-center justify-center rounded-full bg-[#11110f] px-5 text-base font-medium text-ivory shadow-[0_18px_30px_rgba(17,17,15,0.22)] transition hover:bg-charcoal disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {isSubmitting ? "Creating..." : "Create My Closet"}
+        </button>
+      </form>
+    </AuthShell>
   );
 }

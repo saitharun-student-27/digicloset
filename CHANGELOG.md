@@ -794,3 +794,93 @@ Commit: pending current checkpoint
   - frontend-visible user data isolation
   - dev-user data restoration after logging back in
 
+## 2026-05-18 - Redesign auth screens to match DigiCloset reference mood
+
+Commit: pending current checkpoint
+
+### Phase 3E.3B visual redesign
+
+- introduced a dedicated auth visual system instead of plain functional auth screens
+- added a shared auth shell for:
+  - warm ivory / linen background
+  - editorial DigiCloset lockup
+  - black pill CTA styling
+  - calmer mobile-first form rhythm
+- redesigned:
+  - `Login`
+  - `Signup`
+- kept auth behavior unchanged while moving the visual tone closer to the generated DigiCloset reference
+
+### What this changed emotionally
+
+- auth no longer felt like a generic product utility screen
+- the entry experience now better matched the app’s theme:
+  - calm
+  - premium
+  - wardrobe-memory-first
+
+## 2026-05-18 - Correct auth flow into separate mobile-style welcome, login, and signup screens
+
+Commit: pending current checkpoint
+
+### Phase 3E.3C correction
+
+- replaced the desktop-leaning auth composition with a true mobile-style auth flow
+- added a dedicated public welcome route:
+  - `/welcome`
+- kept:
+  - `/login`
+  - `/signup`
+- updated protected-route fallback so unauthenticated users now land on `/welcome`
+
+### Welcome screen
+
+- added a standalone welcome screen inspired by the left-side reference phone
+- included:
+  - DigiCloset lockup
+  - `YOUR WARDROBE, remembered.`
+  - wardrobe-inspired soft visual scene
+  - curved lower ivory panel
+  - `Open My Closet`
+  - `Create New Closet`
+
+### Login and signup correction
+
+- added back-arrow navigation from:
+  - login -> welcome
+  - signup -> welcome
+- tightened mobile spacing so primary CTAs sit more like real phone screens
+- kept signup clearly reachable from both:
+  - welcome
+  - login
+- kept signup visually aligned with login
+
+### Dev-helper correction
+
+- removed the prominent dev credentials card
+- replaced it with a tiny development-only helper:
+  - `Local dev account available`
+  - optional `Fill dev login`
+- stopped showing the dev password openly by default
+
+### Verification
+
+- frontend build passed
+- browser QA passed for:
+  - welcome -> login
+  - welcome -> signup
+  - login -> signup
+  - signup -> login
+  - invalid login error
+  - dev login
+  - refresh persistence
+  - logout -> welcome
+  - protected route redirect after logout
+  - signup new user
+  - duplicate signup error
+- responsive browser checks passed for:
+  - `360 x 800`
+  - `390 x 844`
+  - `414 x 896`
+  - desktop
+

@@ -386,11 +386,27 @@ Do:
 - gate protected routes calmly
 - preserve intended-route redirects after login
 - keep login and signup screens simple, premium, and mobile-first
+- treat public auth entry as its own small product flow when needed
+- keep signup visibly reachable from every auth entry screen
 
 Do not:
 - introduce refresh-token complexity early
 - turn auth into a large onboarding system
 - let auth UI overshadow the main wardrobe product
+
+### 9.6B Auth screen visual rule
+Auth screens should feel like calm standalone mobile screens, not desktop marketing panels.
+
+Do:
+- use a warm ivory / linen visual system
+- keep auth pages centered in a phone-like frame on larger screens
+- keep welcome, login, and signup clearly separated when the product benefits from that structure
+- keep dev helpers tiny and development-only
+
+Do not:
+- expose dev credentials as a prominent production-like UI block
+- let auth screens read like ecommerce, SaaS dashboard, or shopping flows
+- rely on a large desktop split layout as the primary auth presentation
 
 ### 9.7 Backend source-of-truth rule
 Persistent delete, edit, and image-removal behavior must be validated against backend state, not only against immediate frontend appearance.

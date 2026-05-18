@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
+import AuthShell from "../components/AuthShell.jsx";
 import { useAuth } from "../context/AuthContext.jsx";
 
 function getFriendlyAuthError(error) {
@@ -13,6 +14,9 @@ function getFriendlyAuthError(error) {
   return "Invalid email or password.";
 }
 
+const inputClass =
+  "mt-2 h-[3.35rem] w-full rounded-[1.15rem] border border-black/10 bg-[#fffdf9] px-4 text-base text-charcoal outline-none transition placeholder:text-stone/60 focus:border-sage focus:ring-4 focus:ring-sage/10";
+
 export default function Login() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -21,6 +25,7 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState("");
+  const [showDevFill, setShowDevFill] = useState(false);
 
   const redirectTarget = location.state?.from || "/";
   const helperMessage = location.state?.message || "";
@@ -44,84 +49,108 @@ export default function Login() {
     }
   }
 
+  function fillDevLogin() {
+    setEmail("dev@digicloset.local");
+    setPassword("devpassword123");
+  }
+
   return (
-    <main className="flex min-h-[100vh] min-h-[100dvh] items-center justify-center bg-[linear-gradient(180deg,#f8f5ee_0%,#eee6d9_100%)] px-4 py-8">
-      <div className="w-full max-w-md rounded-[2rem] border border-black/5 bg-white/88 p-5 shadow-soft backdrop-blur sm:p-7">
-        <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone">
-          DigiCloset
+    <AuthShell
+      backTo="/welcome"
+      backLabel="Back to welcome"
+      title={
+        <>
+          Welcome back
+          <br />
+          to your wardrobe.
+        </>
+      }
+      subtitle="Open your private wardrobe memory and come back to the looks that worked."
+      footer={
+        <>
+          Don&apos;t have a closet yet?{" "}
+          <Link
+            to="/signup"
+            className="font-medium text-charcoal underline-offset-4 hover:underline"
+          >
+            Create your DigiCloset
+          </Link>
+        </>
+      }
+    >
+      {helperMessage ? (
+        <p className="rounded-[1.25rem] border border-brass/15 bg-[#f6f0e7] px-4 py-3 text-sm leading-6 text-stone">
+          {helperMessage}
         </p>
-        <h1 className="mt-3 text-3xl font-semibold text-charcoal">Welcome back</h1>
-        <p className="mt-3 text-sm leading-6 text-stone">
-          Sign in to open your private wardrobe and continue from your saved outfit memories.
+      ) : null}
+
+      {authError ? (
+        <p className="mt-3 rounded-[1.25rem] border border-brass/15 bg-[#f6f0e7] px-4 py-3 text-sm leading-6 text-stone">
+          {authError}
         </p>
+      ) : null}
 
-        {helperMessage ? (
-          <p className="mt-4 rounded-2xl bg-ivory px-4 py-3 text-sm text-stone">
-            {helperMessage}
-          </p>
-        ) : null}
-
-        {authError ? (
-          <p className="mt-4 rounded-2xl bg-ivory px-4 py-3 text-sm text-stone">
-            {authError}
-          </p>
-        ) : null}
-
+      <div className="min-h-[2.75rem]">
         {formError ? (
-          <p className="mt-4 rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">
+          <p className="mt-2 rounded-[1.25rem] border border-red-100 bg-red-50 px-4 py-3 text-sm leading-6 text-red-700">
             {formError}
           </p>
         ) : null}
-
-        <form className="mt-6 space-y-4" onSubmit={handleSubmit}>
-          <label className="block">
-            <span className="text-sm font-medium text-charcoal">Email</span>
-            <input
-              type="email"
-              value={email}
-              onChange={(event) => setEmail(event.target.value)}
-              autoComplete="email"
-              required
-              className="mt-2 h-12 w-full rounded-2xl border border-black/10 bg-ivory px-4 text-sm text-charcoal outline-none transition focus:border-sage focus:ring-4 focus:ring-sage/15"
-            />
-          </label>
-
-          <label className="block">
-            <span className="text-sm font-medium text-charcoal">Password</span>
-            <input
-              type="password"
-              value={password}
-              onChange={(event) => setPassword(event.target.value)}
-              autoComplete="current-password"
-              required
-              className="mt-2 h-12 w-full rounded-2xl border border-black/10 bg-ivory px-4 text-sm text-charcoal outline-none transition focus:border-sage focus:ring-4 focus:ring-sage/15"
-            />
-          </label>
-
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="inline-flex h-12 w-full items-center justify-center rounded-full bg-charcoal px-5 text-sm font-medium text-ivory transition hover:bg-softblack disabled:cursor-not-allowed disabled:opacity-60"
-          >
-            {isSubmitting ? "Signing in..." : "Sign in"}
-          </button>
-        </form>
-
-        {import.meta.env.DEV ? (
-          <div className="mt-5 rounded-2xl bg-ivory px-4 py-3 text-sm text-stone">
-            <p className="font-medium text-charcoal">Local dev account</p>
-            <p className="mt-1">dev@digicloset.local</p>
-            <p>devpassword123</p>
-          </div>
-        ) : null}
-
-        <p className="mt-5 text-sm text-stone">
-          New here?{" "}
-          <Link to="/signup" className="font-medium text-charcoal underline-offset-4 hover:underline">
-            Create an account
-          </Link>
-        </p>
       </div>
-    </main>
+
+      <form className="mt-1 space-y-4" onSubmit={handleSubmit}>
+        <label className="block">
+          <span className="text-[0.98rem] font-medium text-charcoal">Email</span>
+          <input
+            type="email"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            autoComplete="email"
+            placeholder="Enter your email"
+            required
+            className={inputClass}
+          />
+        </label>
+
+        <label className="block">
+          <span className="text-[0.98rem] font-medium text-charcoal">Password</span>
+          <input
+            type="password"
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            autoComplete="current-password"
+            placeholder="Enter your password"
+            required
+            className={inputClass}
+          />
+        </label>
+
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="inline-flex h-[3.35rem] w-full items-center justify-center rounded-full bg-[#11110f] px-5 text-base font-medium text-ivory shadow-[0_18px_30px_rgba(17,17,15,0.22)] transition hover:bg-charcoal disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {isSubmitting ? "Opening..." : "Open My Closet"}
+        </button>
+      </form>
+
+      {import.meta.env.DEV ? (
+        <div className="mt-4 text-center text-xs leading-5 text-stone/75">
+          <p>Local dev account available.</p>
+          <button
+            type="button"
+            onClick={() => {
+              setShowDevFill((current) => !current);
+              if (!showDevFill) {
+                fillDevLogin();
+              }
+            }}
+            className="mt-1 text-[0.76rem] font-medium text-stone underline-offset-4 hover:text-charcoal hover:underline"
+          >
+            {showDevFill ? "Hide dev helper" : "Fill dev login"}
+          </button>
+        </div>
+      ) : null}
+    </AuthShell>
   );
 }

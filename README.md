@@ -12,6 +12,7 @@ DigiCloset currently includes:
 - outfit-memory-first capture flow
 - wardrobe browsing with outfit rails and clothing-piece sections
 - frontend authentication flow
+  - welcome screen
   - login
   - signup
   - protected routes
@@ -171,6 +172,7 @@ Each clothing piece has a dedicated detail page:
 
 ## Routes
 
+- `/welcome` -> Welcome
 - `/login` -> Login
 - `/signup` -> Signup
 - `/` -> Home
@@ -227,6 +229,8 @@ Recent auth and ownership phases:
 - `3E.2` backend user ownership migration and filtering
 - `3E.2.1` dev-user password reset utility
 - `3E.3` frontend auth context, login/signup, protected routes, and bearer-token wiring
+- `3E.3B` auth reference-matched visual redesign
+- `3E.3C` auth screen correction into separate mobile-style welcome/login/signup screens
 
 Next planned auth-adjacent phase:
 
@@ -366,7 +370,8 @@ http://127.0.0.1:5173
 
 Expected auth behavior now:
 
-- unauthenticated visits to protected routes redirect to `/login`
+- unauthenticated visits to protected routes redirect to `/welcome`
+- `/welcome` acts as the first-entry auth screen
 - successful login restores access to:
   - Home
   - Outfit Memory
@@ -376,6 +381,9 @@ Expected auth behavior now:
   - Piece Detail
 - refresh keeps the session active when the token is still valid
 - logout clears the session and wardrobe state
+- signup is reachable from both:
+  - `/welcome`
+  - `/login`
 
 ### Shared state browser verification
 
@@ -426,6 +434,7 @@ Oversize message:
 - real backend user ownership boundaries for outfits, clothing items, and suggestions
 - working frontend auth flow for protected wardrobe APIs
 - private user-scoped wardrobe loading after login
+- separate mobile-style auth entry screens that match the calmer DigiCloset editorial mood more closely
 
 ## Honest Current Gaps
 
@@ -437,6 +446,7 @@ The biggest remaining product-quality gap is user-scoped upload polish and secon
 - old orphaned upload files from earlier bugs can now be detected, but are not auto-deleted by default
 - local dev access to the backfilled dev user now has a dedicated reset utility for safe frontend-auth testing
 - uploads are not yet fully polished as a user-scoped product surface from the frontend point of view
+- signup is now visually present and reachable, but the auth entry flow could still use one more tiny spacing pass if we later want even tighter parity with the reference image
 
 The highest-impact next refinement would be:
 

@@ -29,7 +29,7 @@ export default function ProtectedRoute({ children }) {
   if (!isAuthenticated) {
     return (
       <Navigate
-        to="/login"
+        to="/welcome"
         replace
         state={{ from: `${location.pathname}${location.search}` }}
       />

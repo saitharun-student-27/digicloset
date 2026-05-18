@@ -109,7 +109,7 @@ Backend wardrobe APIs are protected and user-scoped.
 
 Current frontend/backend auth state:
 
-- frontend login/signup now exists
+- frontend welcome/login/signup now exists
 - protected frontend routes now attach bearer tokens automatically
 - local dev testing can use:
   - email: `dev@digicloset.local`
