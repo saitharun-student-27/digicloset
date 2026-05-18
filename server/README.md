@@ -117,4 +117,32 @@ Current frontend/backend auth state:
 
 Next backend-adjacent phase:
 
-- Phase `3E.4`: tighten user-scoped upload behavior and finish auth-aware app QA
+- Phase `3E.5`: PostgreSQL migration planning and hosted deployment readiness
+
+## User-Scoped Upload QA Notes
+
+Current verified behavior:
+
+- new authenticated outfit uploads can save under:
+  - `uploads/u_{user_id}/...`
+- new authenticated clothing uploads can save under:
+  - `uploads/u_{user_id}/...`
+- old top-level local upload URLs still work
+- local delete cleanup still removes safe app-owned files
+- external URLs remain untouched by local cleanup
+
+## Orphaned Upload Audit
+
+Run:
+
+```powershell
+cd D:\projects\digicloset
+python scripts\check-orphaned-uploads.py
+```
+
+The audit now checks:
+
+- DB-referenced local image paths
+- missing local files
+- orphaned local files
+- nested user-scoped upload directories

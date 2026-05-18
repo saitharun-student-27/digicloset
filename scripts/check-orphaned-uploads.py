@@ -36,7 +36,7 @@ def main() -> int:
     upload_dir = ensure_upload_dir()
     disk_files = {
         path.resolve()
-        for path in upload_dir.iterdir()
+        for path in upload_dir.rglob("*")
         if path.is_file() and path.name != ".gitkeep"
     }
     image_urls = collect_db_image_urls()

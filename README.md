@@ -234,7 +234,7 @@ Recent auth and ownership phases:
 
 Next planned auth-adjacent phase:
 
-- `3E.4` user-scoped upload polish, broader auth-aware QA, and secondary derived-data freshness tightening
+- `3E.5` PostgreSQL migration planning and hosted deployment readiness
 
 ## Repository Structure
 
@@ -399,6 +399,11 @@ cd D:\projects\digicloset
 python scripts\check-orphaned-uploads.py
 ```
 
+This audit now scans both:
+
+- old top-level local uploads
+- nested user-scoped folders such as `uploads/u_{user_id}/...`
+
 ## Upload Rules
 
 Current upload policy:
@@ -413,6 +418,7 @@ Current upload policy:
 - base64 image persistence is not used
 - local uploaded files are deleted safely when a persisted outfit/piece image is removed or the owning record is deleted
 - new authenticated uploads can be stored under user-scoped local folders like `uploads/u_{user_id}/...`
+- old pre-user-scope upload URLs remain compatible
 
 Oversize message:
 
@@ -435,22 +441,23 @@ Oversize message:
 - working frontend auth flow for protected wardrobe APIs
 - private user-scoped wardrobe loading after login
 - separate mobile-style auth entry screens that match the calmer DigiCloset editorial mood more closely
+- verified user-scoped upload isolation across authenticated users
+- verified logout/login switching without stale wardrobe leakage
 
 ## Honest Current Gaps
 
-The biggest remaining product-quality gap is user-scoped upload polish and secondary derived freshness:
+The biggest remaining product-quality gap is hosted-readiness planning and secondary derived freshness:
 
 - core outfit and piece mutations now use shared client state
 - but weather/suggestion-derived content is still fetched separately from the shared wardrobe layer
 - some secondary derived sections could still feel fresher after mutations
 - old orphaned upload files from earlier bugs can now be detected, but are not auto-deleted by default
 - local dev access to the backfilled dev user now has a dedicated reset utility for safe frontend-auth testing
-- uploads are not yet fully polished as a user-scoped product surface from the frontend point of view
 - signup is now visually present and reachable, but the auth entry flow could still use one more tiny spacing pass if we later want even tighter parity with the reference image
 
 The highest-impact next refinement would be:
 
-- Phase `3E.4`: user-scoped upload handling polish, full auth/app QA, and tightening secondary derived freshness after auth-aware mutations
+- Phase `3E.5`: PostgreSQL migration planning and hosted deployment readiness
 
 ## Documentation Maintenance
 

@@ -588,6 +588,15 @@ If a local uploaded image is removed or its owning persisted record is deleted:
 - external URLs must never be deleted as local files
 - missing files must not make the main mutation falsely fail after the DB commit
 
+### 15.3B Upload audit rule
+Developer upload-audit tooling must understand both:
+- legacy top-level local uploads
+- nested user-scoped upload folders such as `uploads/u_{user_id}/...`
+
+Do not:
+- report a clean upload state by scanning only the top level of the upload directory
+- treat historical compatibility and user-scoped upload paths as separate unsupported worlds
+
 ### 15.4 Secrets rule
 Never hardcode secrets or credentials.
 

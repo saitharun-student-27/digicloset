@@ -4,6 +4,65 @@ All notable changes to DigiCloset are documented here in chronological order.
 
 This changelog tracks the product from the original full-stack scaffold to the current outfit-memory-first, mobile-first wardrobe experience.
 
+## 2026-05-19 - Verify user-scoped uploads and full authenticated app isolation
+
+Commit: pending current checkpoint
+
+### Phase 3E.4 scope
+
+- verified user-scoped uploads for authenticated outfit and clothing creation
+- verified old upload URL compatibility for earlier dev data
+- verified logout/login switching against the shared wardrobe provider
+- verified image cleanup behavior after authenticated delete flows
+- verified full auth-aware browser behavior across protected app pages
+
+### Upload verification
+
+- confirmed new outfit uploads save under:
+  - `uploads/u_{user_id}/...`
+- confirmed new clothing uploads save under:
+  - `uploads/u_{user_id}/...`
+- confirmed old top-level upload URLs still render correctly
+- confirmed external URLs remain ignored by local cleanup
+- confirmed safe file cleanup still works for nested user-scoped upload paths
+
+### Isolation verification
+
+- confirmed User B cannot see User A uploaded outfits
+- confirmed User B cannot see User A clothing pieces
+- confirmed User B cannot open User A outfit or piece ids
+- confirmed cross-user clothing-item linking is blocked safely
+- confirmed suggestions remain user-scoped after auth
+
+### Auth-aware app QA
+
+- confirmed unauthenticated app entry goes to:
+  - `/welcome`
+- confirmed:
+  - login
+  - signup
+  - refresh persistence
+  - logout
+  - protected-route redirect after logout
+- confirmed authenticated access to:
+  - Home
+  - Wardrobe
+  - Outfit Memory
+  - Suggestions
+  - Outfit Detail
+  - Piece Detail
+
+### Orphaned upload audit fix
+
+- fixed `scripts/check-orphaned-uploads.py` so it now scans nested upload folders instead of only top-level files
+- this makes orphan reporting accurate for user-scoped upload directories like:
+  - `uploads/u_{user_id}/...`
+
+### Result
+
+- DigiCloset now has verified user-scoped upload behavior and a clean end-to-end auth/app QA pass
+- historical orphan files remain detectable, but no new orphan files were introduced by the Phase `3E.4` tests
+
 ## 2026-03-15 - Initial commit - DigiCloset full-stack app
 
 Commit: `31fee73`
