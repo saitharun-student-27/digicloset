@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 
 import AppShell from "./components/AppShell";
 import LoadingState from "./components/LoadingState";
+import ProtectedRoute, { PublicOnlyRoute } from "./components/ProtectedRoute";
 
 const Home = lazy(() => import("./pages/Home"));
 const Vault = lazy(() => import("./pages/Vault"));
@@ -10,18 +11,46 @@ const Capture = lazy(() => import("./pages/Capture"));
 const Suggestions = lazy(() => import("./pages/Suggestions"));
 const PieceDetail = lazy(() => import("./pages/PieceDetail"));
 const OutfitDetail = lazy(() => import("./pages/OutfitDetail"));
+const Login = lazy(() => import("./pages/Login"));
+const Signup = lazy(() => import("./pages/Signup"));
 
 function AppRoute({ children }) {
   return (
-    <AppShell>
+    <ProtectedRoute>
+      <AppShell>
+        <Suspense fallback={<LoadingState />}>{children}</Suspense>
+      </AppShell>
+    </ProtectedRoute>
+  );
+}
+
+function PublicRoute({ children }) {
+  return (
+    <PublicOnlyRoute>
       <Suspense fallback={<LoadingState />}>{children}</Suspense>
-    </AppShell>
+    </PublicOnlyRoute>
   );
 }
 
 function App() {
   return (
     <Routes>
+      <Route
+        path="/login"
+        element={
+          <PublicRoute>
+            <Login />
+          </PublicRoute>
+        }
+      />
+      <Route
+        path="/signup"
+        element={
+          <PublicRoute>
+            <Signup />
+          </PublicRoute>
+        }
+      />
       <Route
         path="/"
         element={

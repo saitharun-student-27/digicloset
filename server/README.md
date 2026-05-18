@@ -16,6 +16,9 @@ Current backend scope includes:
   - protected clothing routes
   - protected suggestions route
   - default dev-user backfill for existing local wardrobe data
+- backend-ready support for frontend auth:
+  - bearer-token current-user access
+  - dev login for local private-wardrobe testing
 
 ## Setup
 
@@ -102,8 +105,16 @@ Important values in `.env` / `.env.example`:
 
 ## Current Boundary
 
-Backend wardrobe APIs are now protected and user-scoped.
+Backend wardrobe APIs are protected and user-scoped.
 
-Current temporary limitation:
+Current frontend/backend auth state:
 
-- the frontend app still needs Phase `3E.3` auth wiring before it can call protected wardrobe APIs successfully
+- frontend login/signup now exists
+- protected frontend routes now attach bearer tokens automatically
+- local dev testing can use:
+  - email: `dev@digicloset.local`
+  - password: `devpassword123`
+
+Next backend-adjacent phase:
+
+- Phase `3E.4`: tighten user-scoped upload behavior and finish auth-aware app QA

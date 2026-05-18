@@ -11,6 +11,12 @@ DigiCloset currently includes:
 - adaptive Home experience focused on daily outfit usefulness
 - outfit-memory-first capture flow
 - wardrobe browsing with outfit rails and clothing-piece sections
+- frontend authentication flow
+  - login
+  - signup
+  - protected routes
+  - session persistence
+  - logout
 - dedicated outfit detail pages
 - piece detail pages
 - shared client-side wardrobe data layer for outfits and clothing
@@ -34,6 +40,11 @@ DigiCloset currently includes:
   - clothing items scoped by `user_id`
   - suggestions scoped per authenticated user
   - default dev-user backfill for existing local data
+- authenticated frontend session wiring:
+  - bearer token storage in localStorage
+  - Authorization header attachment
+  - auth-aware wardrobe fetch gating
+  - protected route redirects
 
 ## Product Philosophy
 
@@ -160,6 +171,8 @@ Each clothing piece has a dedicated detail page:
 
 ## Routes
 
+- `/login` -> Login
+- `/signup` -> Signup
 - `/` -> Home
 - `/outfit-memory` -> Outfit Memory
 - `/wardrobe` -> Wardrobe
@@ -182,6 +195,7 @@ Legacy redirects:
 - Tailwind CSS
 - Lucide React
 - route-level lazy loading
+- `AuthContext` for user + session state
 - shared `WardrobeDataProvider` for outfit and clothing state
 - browser verification script for critical shared-state flows
 
@@ -199,10 +213,24 @@ Legacy redirects:
   - `POST /api/auth/login`
   - `GET /api/auth/me`
 - backend ownership filtering with:
-  - protected outfit routes
-  - protected clothing routes
-  - protected suggestions route
-  - default local dev user migration support
+- protected outfit routes
+- protected clothing routes
+- protected suggestions route
+- default local dev user migration support
+  - frontend-compatible dev auth testing support
+
+## Current Phase Roadmap
+
+Recent auth and ownership phases:
+
+- `3E.1` backend auth foundation
+- `3E.2` backend user ownership migration and filtering
+- `3E.2.1` dev-user password reset utility
+- `3E.3` frontend auth context, login/signup, protected routes, and bearer-token wiring
+
+Next planned auth-adjacent phase:
+
+- `3E.4` user-scoped upload polish, broader auth-aware QA, and secondary derived-data freshness tightening
 
 ## Repository Structure
 
@@ -328,6 +356,27 @@ Local development login after reset:
 - email: `dev@digicloset.local`
 - password: `devpassword123`
 
+### Frontend auth flow
+
+Open the app:
+
+```text
+http://127.0.0.1:5173
+```
+
+Expected auth behavior now:
+
+- unauthenticated visits to protected routes redirect to `/login`
+- successful login restores access to:
+  - Home
+  - Outfit Memory
+  - Wardrobe
+  - Suggestions
+  - Outfit Detail
+  - Piece Detail
+- refresh keeps the session active when the token is still valid
+- logout clears the session and wardrobe state
+
 ### Shared state browser verification
 
 ```powershell
@@ -375,22 +424,23 @@ Oversize message:
 - safer backend persistence for delete and image-removal flows
 - local upload cleanup utilities and orphaned-upload auditing
 - real backend user ownership boundaries for outfits, clothing items, and suggestions
+- working frontend auth flow for protected wardrobe APIs
+- private user-scoped wardrobe loading after login
 
 ## Honest Current Gaps
 
-The biggest remaining product-quality gap is frontend auth integration and secondary derived freshness:
+The biggest remaining product-quality gap is user-scoped upload polish and secondary derived freshness:
 
 - core outfit and piece mutations now use shared client state
 - but weather/suggestion-derived content is still fetched separately from the shared wardrobe layer
 - some secondary derived sections could still feel fresher after mutations
 - old orphaned upload files from earlier bugs can now be detected, but are not auto-deleted by default
-- backend auth and backend ownership filtering now exist
-- but the current frontend still needs Phase `3E.3` token/session wiring before the app can use protected wardrobe APIs normally
 - local dev access to the backfilled dev user now has a dedicated reset utility for safe frontend-auth testing
+- uploads are not yet fully polished as a user-scoped product surface from the frontend point of view
 
 The highest-impact next refinement would be:
 
-- Phase `3E.3`: add frontend auth context, protected routes, login/signup pages, and bearer-token attachment for wardrobe requests
+- Phase `3E.4`: user-scoped upload handling polish, full auth/app QA, and tightening secondary derived freshness after auth-aware mutations
 
 ## Documentation Maintenance
 

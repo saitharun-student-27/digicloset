@@ -1,5 +1,7 @@
-import { Box, Home as HomeIcon, Sparkles, Plus } from "lucide-react";
-import { NavLink } from "react-router-dom";
+import { Box, Home as HomeIcon, LogOut, Plus, Sparkles } from "lucide-react";
+import { NavLink, useNavigate } from "react-router-dom";
+
+import { useAuth } from "../context/AuthContext.jsx";
 
 const navigationItems = [
   {
@@ -25,10 +27,42 @@ const navigationItems = [
 ];
 
 export default function AppShell({ children }) {
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
+
+  function handleLogout() {
+    logout();
+    navigate("/login", {
+      replace: true,
+      state: { message: "Signed out." },
+    });
+  }
+
+  const profileLabel = user?.display_name || user?.email || "Signed in";
+
   return (
     <div className="relative min-h-[100vh] min-h-[100dvh] bg-ivory pb-[var(--bottom-dock-clearance)] text-charcoal">
+      <div className="sticky top-0 z-40 px-3 pt-[max(0.75rem,env(safe-area-inset-top))] sm:px-4">
+        <div className="mx-auto flex max-w-7xl justify-end">
+          <div className="flex items-center gap-2 rounded-full border border-white/40 bg-white/80 px-2 py-2 shadow-soft backdrop-blur-xl">
+            <span className="max-w-[10rem] truncate px-2 text-xs font-medium text-stone sm:max-w-none">
+              {profileLabel}
+            </span>
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="inline-flex h-10 min-h-[var(--touch-target-min)] min-w-[var(--touch-target-min)] items-center justify-center rounded-full bg-ivory px-3 text-sm font-medium text-charcoal transition hover:bg-linen"
+              aria-label="Log out"
+            >
+              <LogOut className="h-4 w-4 sm:mr-2" />
+              <span className="hidden sm:inline">Log out</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
       {children}
-      
+
       {/* Floating Bottom Dock Navigation */}
       <div className="pointer-events-none fixed bottom-[max(0.75rem,env(safe-area-inset-bottom))] left-0 right-0 z-50 flex justify-center px-3 sm:px-4">
         <nav className="pointer-events-auto flex items-center gap-1.5 rounded-[2rem] border border-white/20 bg-white/78 p-2 shadow-soft backdrop-blur-xl">

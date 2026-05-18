@@ -712,3 +712,85 @@ Commit: pending current checkpoint
 - `GET /api/auth/me` passed
 - existing outfit and clothing counts remained unchanged
 
+## 2026-05-18 - Add frontend auth context, login/signup, and protected routes
+
+Commit: pending current checkpoint
+
+### Scope of this phase
+
+- completed the frontend side of auth for the existing backend ownership system
+- did not add OAuth, password reset, refresh tokens, or product-feature expansion
+- kept the focus on making protected wardrobe APIs usable again from the app
+
+### Frontend auth foundation
+
+- added `AuthContext` to manage:
+  - user
+  - token
+  - auth loading
+  - session restore
+  - login
+  - signup
+  - logout
+- added auth service helpers for:
+  - `signup`
+  - `login`
+  - `getMe`
+
+### Token and API wiring
+
+- added localStorage token persistence using:
+  - `digicloset_access_token`
+- attached bearer token headers centrally in the shared axios client
+- added shared 401 handling to:
+  - clear session state
+  - avoid infinite redirect loops
+  - push the app back toward login when the session is no longer valid
+
+### Protected route behavior
+
+- added public routes:
+  - `/login`
+  - `/signup`
+- wrapped protected app routes so:
+  - unauthenticated users are redirected to login
+  - authenticated users can return to the route they originally asked for
+- preserved lazy route loading and legacy route redirects
+
+### Wardrobe data auth gating
+
+- updated `WardrobeDataProvider` so it:
+  - waits for auth resolution before fetching outfits and clothing
+  - clears wardrobe state on logout
+  - clears wardrobe state when 401 invalidates the session
+  - fetches user-scoped wardrobe data only after successful auth
+
+### Login and signup UX
+
+- added a mobile-first login screen with calm DigiCloset tone
+- added a mobile-first signup screen with simple validation
+- kept the auth flow visually aligned with the rest of the app instead of turning it into a separate product
+- included local dev helper credentials subtly on the login screen during development
+
+### App shell auth behavior
+
+- added a compact signed-in identity + logout control to the top shell
+- kept the bottom dock unchanged
+- made logout a quiet supporting action instead of a primary navigation item
+
+### Verification
+
+- production frontend build passed
+- end-to-end browser auth QA passed for:
+  - no-token redirect to login
+  - dev user login
+  - session persistence on refresh
+  - wardrobe loading after login
+  - outfit detail access
+  - piece detail access
+  - logout
+  - protected route redirect after logout
+  - signup for a new user
+  - frontend-visible user data isolation
+  - dev-user data restoration after logging back in
+

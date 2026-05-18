@@ -320,6 +320,18 @@ Development-only user reset helpers are allowed when they:
 Do not:
 - turn a dev reset helper into a public password reset system
 - weaken production auth logic for development convenience
+
+### 8.10 Auth-to-ownership coherence rule
+Once backend ownership filtering is active and frontend auth is introduced:
+- protected product routes must require authenticated session state
+- bearer tokens must be attached centrally, not ad hoc per page
+- wardrobe data must not fetch before auth resolution completes
+- logout must clear user-scoped wardrobe state
+
+Do not:
+- fetch private wardrobe data before the session is known
+- treat a cached frontend session as valid without backend verification
+- leave stale user wardrobe data visible after logout or 401 expiry
 ---
 
 ## 9. Frontend Architecture Boundaries
@@ -365,6 +377,20 @@ Do:
 Do not:
 - introduce heavy frontend state-management libraries without a real scaling need
 - split the same persistent outfit state across many unrelated page-level sources of truth
+
+### 9.6A Frontend auth rule
+Frontend auth should stay lightweight and product-serving.
+
+Do:
+- keep auth state in a focused shared context
+- gate protected routes calmly
+- preserve intended-route redirects after login
+- keep login and signup screens simple, premium, and mobile-first
+
+Do not:
+- introduce refresh-token complexity early
+- turn auth into a large onboarding system
+- let auth UI overshadow the main wardrobe product
 
 ### 9.7 Backend source-of-truth rule
 Persistent delete, edit, and image-removal behavior must be validated against backend state, not only against immediate frontend appearance.

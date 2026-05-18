@@ -15,6 +15,7 @@ import {
   toggleFavoriteOutfit,
   updateOutfit as updateOutfitRequest,
 } from "../services/outfitService";
+import { useAuth } from "./AuthContext.jsx";
 
 const WardrobeDataContext = createContext(null);
 
@@ -36,18 +37,35 @@ function updatePendingMap(currentMap, id, delta) {
 }
 
 export function WardrobeDataProvider({ children }) {
+  const { isAuthenticated, isAuthLoading } = useAuth();
   const [outfits, setOutfits] = useState([]);
   const [clothingItems, setClothingItems] = useState([]);
-  const [outfitsLoading, setOutfitsLoading] = useState(true);
-  const [clothingLoading, setClothingLoading] = useState(true);
+  const [outfitsLoading, setOutfitsLoading] = useState(false);
+  const [clothingLoading, setClothingLoading] = useState(false);
   const [outfitsError, setOutfitsError] = useState("");
   const [clothingError, setClothingError] = useState("");
   const [pendingOutfitMap, setPendingOutfitMap] = useState({});
   const [pendingPieceMap, setPendingPieceMap] = useState({});
 
   useEffect(() => {
-    refreshAll();
-  }, []);
+    if (isAuthLoading) {
+      return;
+    }
+
+    if (!isAuthenticated) {
+      setOutfits([]);
+      setClothingItems([]);
+      setOutfitsError("");
+      setClothingError("");
+      setOutfitsLoading(false);
+      setClothingLoading(false);
+      setPendingOutfitMap({});
+      setPendingPieceMap({});
+      return;
+    }
+
+    refreshAll().catch(() => {});
+  }, [isAuthenticated, isAuthLoading]);
 
   async function fetchOutfits({ withLoading = true } = {}) {
     if (withLoading) {
@@ -60,6 +78,10 @@ export function WardrobeDataProvider({ children }) {
       setOutfits(data);
       return data;
     } catch (error) {
+      if (error?.response?.status === 401) {
+        setOutfits([]);
+        return [];
+      }
       const message = getErrorMessage(
         error,
         "Could not load outfit memories right now.",
@@ -84,6 +106,10 @@ export function WardrobeDataProvider({ children }) {
       setClothingItems(data);
       return data;
     } catch (error) {
+      if (error?.response?.status === 401) {
+        setClothingItems([]);
+        return [];
+      }
       const message = getErrorMessage(
         error,
         "Could not load wardrobe pieces right now.",
