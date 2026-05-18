@@ -309,6 +309,17 @@ Do not:
 - leave list endpoints global after auth exists
 - allow cross-user outfit-to-piece linking
 - treat frontend auth screens as the privacy boundary instead of backend ownership checks
+
+### 8.9 Development auth utility rule
+Development-only user reset helpers are allowed when they:
+- use the existing password hashing system
+- avoid exposing `password_hash`
+- do not wipe or reassign wardrobe data
+- are clearly marked as local-development-only
+
+Do not:
+- turn a dev reset helper into a public password reset system
+- weaken production auth logic for development convenience
 ---
 
 ## 9. Frontend Architecture Boundaries
@@ -564,7 +575,7 @@ Frontend structure must stay responsibility-based:
 ### 16.3 Reuse rule
 If a UI pattern or backend behavior is used more than once, centralize it cleanly.
 
-### 16.4 No Ã¢â‚¬Å“misc dumpÃ¢â‚¬Â rule
+### 16.4 No "misc dump" rule
 Do not create vague catch-all files that accumulate unrelated logic.
 
 ---

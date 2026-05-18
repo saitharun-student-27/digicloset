@@ -685,3 +685,30 @@ Commit: pending current checkpoint
 - frontend auth is still not wired
 - the app frontend will need Phase `3E.3` before it can call protected wardrobe APIs normally
 
+## 2026-05-18 - Add dev user password reset utility
+
+Commit: pending current checkpoint
+
+### Scope of this phase
+
+- added a development-only password reset utility for the backfilled default dev user
+- did not change production auth behavior
+- did not modify wardrobe ownership
+- did not wipe or reset data
+
+### Utility added
+
+- added:
+  - `scripts/reset_dev_user_password.py`
+- behavior:
+  - finds `dev@digicloset.local`
+  - resets password using the existing password hashing helper
+  - creates the dev user if missing
+  - does not expose `password_hash`
+
+### Verification
+
+- login for `dev@digicloset.local` with `devpassword123` passed
+- `GET /api/auth/me` passed
+- existing outfit and clothing counts remained unchanged
+

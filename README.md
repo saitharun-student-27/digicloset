@@ -316,6 +316,18 @@ cd D:\projects\digicloset\server
 .\venv\Scripts\python.exe ..\scripts\migrate_user_ownership.py
 ```
 
+### Dev user password reset
+
+```powershell
+cd D:\projects\digicloset\server
+.\venv\Scripts\python.exe ..\scripts\reset_dev_user_password.py
+```
+
+Local development login after reset:
+
+- email: `dev@digicloset.local`
+- password: `devpassword123`
+
 ### Shared state browser verification
 
 ```powershell
@@ -374,6 +386,7 @@ The biggest remaining product-quality gap is frontend auth integration and secon
 - old orphaned upload files from earlier bugs can now be detected, but are not auto-deleted by default
 - backend auth and backend ownership filtering now exist
 - but the current frontend still needs Phase `3E.3` token/session wiring before the app can use protected wardrobe APIs normally
+- local dev access to the backfilled dev user now has a dedicated reset utility for safe frontend-auth testing
 
 The highest-impact next refinement would be:
 

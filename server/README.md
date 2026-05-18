@@ -74,6 +74,19 @@ This will:
 - backfill `clothing_items.user_id`
 - report any cross-user outfit-item link problems
 
+## Dev User Password Reset
+
+Local-only reset utility:
+
+```powershell
+.\venv\Scripts\python.exe ..\scripts\reset_dev_user_password.py
+```
+
+After reset, the default dev login is:
+
+- email: `dev@digicloset.local`
+- password: `devpassword123`
+
 ## Environment Notes
 
 Important values in `.env` / `.env.example`:
