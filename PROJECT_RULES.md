@@ -264,6 +264,21 @@ Do not:
 - auto-mutate old stored categories without an explicit migration plan
 - turn category management into a large taxonomy-admin system
 
+### 7.6 Wardrobe search rule
+Wardrobe search should help users rediscover outfits and pieces quickly without making the page feel operational or table-like.
+
+Do:
+- keep search lightweight and frontend-first when already-loaded wardrobe data is enough
+- search across outfit memories and supporting pieces together
+- use normalized category labels and section names in matching
+- preserve the normal closet layout when search is inactive
+- keep search-empty states calm and useful
+
+Do not:
+- introduce heavy backend search infrastructure before it is needed
+- let search mode turn Wardrobe into an admin dashboard
+- overload the page with advanced filters before basic search is solid
+
 ---
 
 ## 8. Backend Architecture Boundaries

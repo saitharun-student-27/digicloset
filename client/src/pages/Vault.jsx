@@ -1,4 +1,4 @@
-import { Plus, Sparkles } from "lucide-react";
+import { Plus, Search, Sparkles, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -8,6 +8,11 @@ import OutfitEditModal from "../components/OutfitEditModal";
 import OutfitShowcaseCard from "../components/OutfitShowcaseCard";
 import { useWardrobeData } from "../context/WardrobeDataProvider.jsx";
 import { getWardrobeSection, wardrobeSections } from "../utils/outfitUtils";
+import {
+  formatCategoryLabel,
+  getCategorySection,
+  normalizeCategory,
+} from "../utils/wardrobeTaxonomy";
 
 function RailSection({
   id,
@@ -51,6 +56,87 @@ function RailSection({
   );
 }
 
+function normalizeSearchText(value) {
+  return String(value || "")
+    .toLowerCase()
+    .trim()
+    .replace(/[_-]+/g, " ")
+    .replace(/[^\w\s]/g, " ")
+    .replace(/\s+/g, " ");
+}
+
+function buildSearchTerms(query) {
+  return normalizeSearchText(query)
+    .split(" ")
+    .filter(Boolean);
+}
+
+function matchesSearch(haystack, query) {
+  const normalizedHaystack = normalizeSearchText(haystack);
+  const terms = buildSearchTerms(query);
+
+  if (terms.length === 0) {
+    return true;
+  }
+
+  return terms.every((term) => normalizedHaystack.includes(term));
+}
+
+function collectPieceSearchText(item) {
+  const normalizedCategory = normalizeCategory(item.category);
+  const categoryLabel = formatCategoryLabel(item.category);
+  const section = getCategorySection(item.category);
+
+  return [
+    item.name,
+    item.category,
+    normalizedCategory,
+    categoryLabel,
+    section,
+    item.color,
+    item.season,
+    item.occasion,
+    item.style,
+    item.formality_level,
+    item.source_type,
+  ]
+    .filter(Boolean)
+    .join(" ");
+}
+
+function collectOutfitSearchText(outfit) {
+  const pieceSearchText = (outfit.outfit_items || [])
+    .flatMap((piece) => {
+      const clothingItem = piece?.clothing_item || {};
+      return [
+        clothingItem.name,
+        clothingItem.category,
+        normalizeCategory(clothingItem.category),
+        formatCategoryLabel(clothingItem.category),
+        getCategorySection(clothingItem.category),
+        clothingItem.color,
+      ];
+    })
+    .filter(Boolean)
+    .join(" ");
+
+  return [
+    outfit.title,
+    outfit.description,
+    outfit.occasion,
+    outfit.season,
+    outfit.style,
+    outfit.source_type,
+    pieceSearchText,
+  ]
+    .filter(Boolean)
+    .join(" ");
+}
+
+function sectionIdForLabel(label) {
+  return label.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+}
+
 export default function Vault() {
   const navigate = useNavigate();
   const {
@@ -72,6 +158,7 @@ export default function Vault() {
   const [editingOutfit, setEditingOutfit] = useState(null);
   const [isSavingEdit, setIsSavingEdit] = useState(false);
   const [pageError, setPageError] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
 
   async function handleDeleteClothing(item) {
     if (!window.confirm(`Delete "${item.name}"?`)) {
@@ -157,11 +244,29 @@ export default function Vault() {
 
   const favoriteOutfits = outfits.filter((outfit) => outfit.is_favorite);
   const allOutfitMemories = outfits;
+  const trimmedSearch = searchQuery.trim();
+  const isSearchActive = trimmedSearch.length > 0;
+  const matchingOutfits = useMemo(
+    () =>
+      outfits.filter((outfit) =>
+        matchesSearch(collectOutfitSearchText(outfit), trimmedSearch),
+      ),
+    [outfits, trimmedSearch],
+  );
+  const matchingPieces = useMemo(
+    () =>
+      clothingItems.filter((item) =>
+        matchesSearch(collectPieceSearchText(item), trimmedSearch),
+      ),
+    [clothingItems, trimmedSearch],
+  );
+  const hasSearchMatches =
+    matchingOutfits.length > 0 || matchingPieces.length > 0;
   const sectionLinks = [
     { id: "favorite-fits", label: "Favorite Fits" },
     { id: "outfit-memories", label: "Outfit Memories" },
     ...wardrobeSections.map((section) => ({
-      id: section.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+      id: sectionIdForLabel(section),
       label: section,
     })),
   ];
@@ -220,89 +325,181 @@ export default function Vault() {
         </div>
       </div>
 
-      <div className="sticky top-3 z-20 mb-5 -mx-4 bg-ivory/95 px-4 py-2 backdrop-blur sm:-mx-5 sm:px-5 lg:static lg:mx-0 lg:bg-transparent lg:px-0 lg:py-0 lg:backdrop-blur-0">
-        <div className="memory-rail pb-1 lg:pb-3">
-          {sectionLinks.map((section) => (
+      <section className="section-surface mb-5 p-4 sm:p-5">
+        <div className="relative">
+          <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-stone" />
+          <input
+            type="search"
+            value={searchQuery}
+            onChange={(event) => setSearchQuery(event.target.value)}
+            placeholder="Search outfits, pieces, colors, categories..."
+            className="h-12 min-h-[var(--touch-target-min)] w-full rounded-full border border-black/10 bg-white pl-11 pr-12 text-sm text-charcoal shadow-soft outline-none transition placeholder:text-stone/70 focus:border-sage/40 focus:ring-4 focus:ring-sage/10"
+            aria-label="Search outfits, pieces, colors, and categories"
+          />
+          {isSearchActive ? (
             <button
-              key={section.id}
               type="button"
-              onClick={() =>
-                document.getElementById(section.id)?.scrollIntoView({
-                  behavior: "smooth",
-                  block: "start",
-                })
-              }
-              className="flex h-10 min-h-[var(--touch-target-min)] items-center justify-center rounded-full bg-white px-4 text-xs font-medium text-charcoal shadow-soft"
+              onClick={() => setSearchQuery("")}
+              className="absolute right-1.5 top-1/2 flex h-9 min-h-[var(--touch-target-min)] w-9 -translate-y-1/2 items-center justify-center rounded-full bg-ivory text-charcoal transition hover:bg-linen"
+              aria-label="Clear wardrobe search"
             >
-              {section.label}
+              <X className="h-4 w-4" />
             </button>
-          ))}
+          ) : null}
         </div>
-      </div>
+        <p className="mt-3 text-sm leading-6 text-stone">
+          Search by outfit title, color, category, season, occasion, or the pieces
+          inside a saved look.
+        </p>
+      </section>
 
-      <div className="space-y-5 sm:space-y-6">
-        <RailSection
-          id="favorite-fits"
-          title="Favorite Fits"
-          description="The combinations you already trust most, featured here without removing them from the rest of your saved outfit memories."
-          items={favoriteOutfits}
-          emptyMessage="Favorite a few outfit memories and this rail will quietly keep them within easy reach."
-          cardClassName="memory-rail-card"
-          renderItem={(outfit) => (
-            <OutfitShowcaseCard
-              outfit={outfit}
-              onFavorite={handleFavorite}
-              onMarkWorn={handleMarkWorn}
-              onEdit={setEditingOutfit}
-              onDelete={handleDeleteOutfit}
-              isBusy={isOutfitPending(outfit.id)}
-              showMeta={false}
-              supportingText="Saved as a trusted combination."
+      {!isSearchActive ? (
+        <div className="sticky top-3 z-20 mb-5 -mx-4 bg-ivory/95 px-4 py-2 backdrop-blur sm:-mx-5 sm:px-5 lg:static lg:mx-0 lg:bg-transparent lg:px-0 lg:py-0 lg:backdrop-blur-0">
+          <div className="memory-rail pb-1 lg:pb-3">
+            {sectionLinks.map((section) => (
+              <button
+                key={section.id}
+                type="button"
+                onClick={() =>
+                  document.getElementById(section.id)?.scrollIntoView({
+                    behavior: "smooth",
+                    block: "start",
+                  })
+                }
+                className="flex h-10 min-h-[var(--touch-target-min)] items-center justify-center rounded-full bg-white px-4 text-xs font-medium text-charcoal shadow-soft"
+              >
+                {section.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <div className="mb-5 rounded-[1.5rem] bg-linen px-4 py-3 text-sm text-stone">
+          {matchingOutfits.length} outfit
+          {matchingOutfits.length === 1 ? "" : "s"} and {matchingPieces.length} piece
+          {matchingPieces.length === 1 ? "" : "s"} match "
+          <span className="font-medium text-charcoal">{trimmedSearch}</span>".
+        </div>
+      )}
+
+      {isSearchActive ? (
+        hasSearchMatches ? (
+          <div className="space-y-5 sm:space-y-6">
+            <RailSection
+              id="matching-outfits"
+              title="Matching Outfit Memories"
+              description="Saved looks that match your search through titles, notes, occasions, seasons, styles, or the pieces inside them."
+              items={matchingOutfits}
+              emptyMessage="No matching outfit memories."
+              cardClassName="memory-rail-card"
+              renderItem={(outfit) => (
+                <OutfitShowcaseCard
+                  outfit={outfit}
+                  onFavorite={handleFavorite}
+                  onMarkWorn={handleMarkWorn}
+                  onEdit={setEditingOutfit}
+                  onDelete={handleDeleteOutfit}
+                  isBusy={isOutfitPending(outfit.id)}
+                  showMeta={false}
+                />
+              )}
             />
-          )}
-        />
 
-        <RailSection
-          id="outfit-memories"
-          title="All Outfit Memories"
-          description="Your full saved rotation lives here. Favorites stay featured above, but they still belong to the main wardrobe memory flow."
-          items={allOutfitMemories}
-          emptyMessage="No outfit memories yet. Save a complete look first and the wardrobe will organize itself around real combinations."
-          cardClassName="memory-rail-card"
-          renderItem={(outfit) => (
-            <OutfitShowcaseCard
-              outfit={outfit}
-              onFavorite={handleFavorite}
-              onMarkWorn={handleMarkWorn}
-              onEdit={setEditingOutfit}
-              onDelete={handleDeleteOutfit}
-              isBusy={isOutfitPending(outfit.id)}
-              showMeta={false}
+            <RailSection
+              id="matching-pieces"
+              title="Matching Wardrobe Pieces"
+              description="Pieces that match by name, color, category, section, season, occasion, style, or formality."
+              items={matchingPieces}
+              emptyMessage="No matching wardrobe pieces."
+              cardClassName="piece-rail-card"
+              renderItem={(item) => (
+                <ClothingCard
+                  item={item}
+                  onEdit={() => navigate(`/pieces/${item.id}`)}
+                  onDelete={handleDeleteClothing}
+                  isBusy={isPiecePending(item.id)}
+                  showActions={false}
+                />
+              )}
             />
-          )}
-        />
-
-        {wardrobeSections.map((section) => (
+          </div>
+        ) : (
+          <section className="section-surface p-5 sm:p-6">
+            <div className="rounded-[1.5rem] border border-dashed border-black/10 bg-white px-5 py-8 text-center">
+              <h2 className="font-serif text-2xl text-charcoal">
+                No matching wardrobe memories.
+              </h2>
+              <p className="mt-3 text-sm leading-6 text-stone">
+                Try a color, category, outfit title, or occasion.
+              </p>
+            </div>
+          </section>
+        )
+      ) : (
+        <div className="space-y-5 sm:space-y-6">
           <RailSection
-            key={section}
-            id={section.toLowerCase().replace(/[^a-z0-9]+/g, "-")}
-            title={section}
-            description="Supporting pieces grouped calmly by section, so the closet stays easy to scan on mobile."
-            items={groupedItems[section]}
-            emptyMessage={`No ${section.toLowerCase()} saved yet. Add pieces through outfit memory and DigiCloset will place them here automatically.`}
-            cardClassName="piece-rail-card"
-            renderItem={(item) => (
-              <ClothingCard
-                item={item}
-                onEdit={() => navigate(`/pieces/${item.id}`)}
-                onDelete={handleDeleteClothing}
-                isBusy={isPiecePending(item.id)}
-                showActions={false}
+            id="favorite-fits"
+            title="Favorite Fits"
+            description="The combinations you already trust most, featured here without removing them from the rest of your saved outfit memories."
+            items={favoriteOutfits}
+            emptyMessage="Favorite a few outfit memories and this rail will quietly keep them within easy reach."
+            cardClassName="memory-rail-card"
+            renderItem={(outfit) => (
+              <OutfitShowcaseCard
+                outfit={outfit}
+                onFavorite={handleFavorite}
+                onMarkWorn={handleMarkWorn}
+                onEdit={setEditingOutfit}
+                onDelete={handleDeleteOutfit}
+                isBusy={isOutfitPending(outfit.id)}
+                showMeta={false}
+                supportingText="Saved as a trusted combination."
               />
             )}
           />
-        ))}
-      </div>
+
+          <RailSection
+            id="outfit-memories"
+            title="All Outfit Memories"
+            description="Your full saved rotation lives here. Favorites stay featured above, but they still belong to the main wardrobe memory flow."
+            items={allOutfitMemories}
+            emptyMessage="No outfit memories yet. Save a complete look first and the wardrobe will organize itself around real combinations."
+            cardClassName="memory-rail-card"
+            renderItem={(outfit) => (
+              <OutfitShowcaseCard
+                outfit={outfit}
+                onFavorite={handleFavorite}
+                onMarkWorn={handleMarkWorn}
+                onEdit={setEditingOutfit}
+                onDelete={handleDeleteOutfit}
+                isBusy={isOutfitPending(outfit.id)}
+                showMeta={false}
+              />
+            )}
+          />
+
+          {wardrobeSections.map((section) => (
+            <RailSection
+              key={section}
+              id={sectionIdForLabel(section)}
+              title={section}
+              description="Supporting pieces grouped calmly by section, so the closet stays easy to scan on mobile."
+              items={groupedItems[section]}
+              emptyMessage={`No ${section.toLowerCase()} saved yet. Add pieces through outfit memory and DigiCloset will place them here automatically.`}
+              cardClassName="piece-rail-card"
+              renderItem={(item) => (
+                <ClothingCard
+                  item={item}
+                  onEdit={() => navigate(`/pieces/${item.id}`)}
+                  onDelete={handleDeleteClothing}
+                  isBusy={isPiecePending(item.id)}
+                  showActions={false}
+                />
+              )}
+            />
+          ))}
+        </div>
+      )}
 
       <OutfitEditModal
         outfit={editingOutfit}

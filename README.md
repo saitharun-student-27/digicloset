@@ -120,6 +120,7 @@ Secondary tools exist, but remain clearly secondary:
 
 Wardrobe behaves like a digital closet:
 
+- calm search across outfits, pieces, colors, categories, and occasions
 - Favorite Fits
 - All Outfit Memories
 - Western upperwear
@@ -246,10 +247,11 @@ Recent auth and ownership phases:
 Recent wardrobe-information phase:
 
 - `3F.1` searchable category picker + Indian/western wardrobe taxonomy
+- `3F.2` wardrobe search + lightweight filtering
 
 Next planned wardrobe-information phase:
 
-- `3F.2` wardrobe search/filtering built on top of normalized taxonomy
+- `3F.3` lightweight wardrobe filtering/sorting refinement built on top of search and normalized taxonomy
 
 ## Repository Structure
 
@@ -460,10 +462,11 @@ Oversize message:
 - verified logout/login switching without stale wardrobe leakage
 - stronger mixed-wardrobe category support with readable labels and safer grouping
 - better support for Indian traditional, western, and Indo-western clothing types
+- fast frontend Wardrobe search without leaving the closet-style layout behind
 
 ## Honest Current Gaps
 
-The biggest remaining product-quality gap is now hosted-readiness planning plus richer discovery on top of the new taxonomy:
+The biggest remaining product-quality gap is now hosted-readiness planning plus deeper wardrobe discovery beyond the new search baseline:
 
 - core outfit and piece mutations now use shared client state
 - but weather/suggestion-derived content is still fetched separately from the shared wardrobe layer
@@ -471,11 +474,11 @@ The biggest remaining product-quality gap is now hosted-readiness planning plus 
 - old orphaned upload files from earlier bugs can now be detected, but are not auto-deleted by default
 - local dev access to the backfilled dev user now has a dedicated reset utility for safe frontend-auth testing
 - signup is now visually present and reachable, but the auth entry flow could still use one more tiny spacing pass if we later want even tighter parity with the reference image
-- taxonomy is now much stronger, but we still do not have full wardrobe search/filter tools built on top of it
+- taxonomy and search are now much stronger, but Wardrobe still does not yet have lightweight filter/sort refinement for denser closets
 
 The highest-impact next refinement would be:
 
-- Phase `3F.2`: wardrobe search/filtering built on the normalized taxonomy without turning DigiCloset into an inventory dashboard
+- Phase `3F.3`: lightweight filter/sort refinement built on the normalized taxonomy and new Wardrobe search, without turning DigiCloset into an inventory dashboard
 
 ## Documentation Maintenance
 

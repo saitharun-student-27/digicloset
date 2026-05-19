@@ -65,7 +65,7 @@ Commit: `9021157`
 
 ## 2026-05-19 - Add searchable category taxonomy for Indian and western wardrobes
 
-Commit: pending current checkpoint
+Commit: `0b56ff6`
 
 ### Phase 3F.1 scope
 
@@ -141,6 +141,76 @@ Commit: pending current checkpoint
 - DigiCloset now handles mixed Indian and western wardrobes more realistically
 - category entry is faster and more forgiving
 - wardrobe sections and outfit breakdowns are more reliable and readable
+
+## 2026-05-19 - Add wardrobe search and lightweight filtering
+
+Commit: pending current checkpoint
+
+### Phase 3F.2 scope
+
+- added a mobile-friendly search bar to Wardrobe
+- added frontend-only matching across saved outfits and wardrobe pieces
+- preserved the normal closet layout when search is empty
+- added a calm search-results mode and empty state
+
+### Search behavior
+
+- search now matches outfit memories by:
+  - title
+  - description
+  - occasion
+  - season
+  - style
+  - source type
+  - linked piece names
+  - linked piece categories
+- search now matches wardrobe pieces by:
+  - name
+  - category
+  - normalized category label
+  - category section
+  - color
+  - season
+  - occasion
+  - style
+  - formality level
+
+### Taxonomy-aware matching
+
+- search uses shared taxonomy helpers so queries like:
+  - `t shirt`
+  - `saree`
+  - `footwear`
+  - `indian`
+  match normalized categories and wardrobe sections more naturally
+- no database values are rewritten during search
+
+### Search active mode
+
+- when search is empty:
+  - Wardrobe stays in its normal rail-and-section closet layout
+- when search is active:
+  - Wardrobe shows:
+    - `Matching Outfit Memories`
+    - `Matching Wardrobe Pieces`
+- added a calm empty state:
+  - `No matching wardrobe memories.`
+  - `Try a color, category, outfit title, or occasion.`
+
+### Safety and QA
+
+- search only uses the authenticated user’s already-loaded wardrobe data
+- no backend search endpoint was introduced
+- verified:
+  - no-token redirect
+  - authenticated search behavior
+  - clear-search return to normal layout
+  - empty-state behavior
+  - new-user isolation from dev-user wardrobe data
+
+### Result
+
+- DigiCloset now makes growing wardrobes easier to navigate without turning Wardrobe into a dashboard or admin table
 
 ## 2026-03-15 - Initial commit - DigiCloset full-stack app
 
