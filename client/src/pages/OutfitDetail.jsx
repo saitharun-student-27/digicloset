@@ -18,7 +18,13 @@ import OutfitEditModal from "../components/OutfitEditModal";
 import { useWardrobeData } from "../context/WardrobeDataProvider.jsx";
 import { getImageUrl } from "../services/clothingService";
 import { formatValue } from "../utils/outfitUtils";
-import { formatCategoryLabel } from "../utils/wardrobeTaxonomy";
+import {
+  formatCategoryLabel,
+  formatColorLabel,
+  formatOccasionLabel,
+  formatSeasonLabel,
+  formatStyleLabel,
+} from "../utils/wardrobeTaxonomy";
 
 const pieceSectionMap = {
   upper: "Upperwear",
@@ -411,14 +417,14 @@ export default function OutfitDetail() {
 
             <div className="mt-5 flex flex-wrap gap-2">
               <span className="rounded-full bg-ivory px-3 py-1 text-[11px] font-medium capitalize text-stone">
-                {formatValue(outfit.occasion)}
+                {formatOccasionLabel(outfit.occasion)}
               </span>
               <span className="rounded-full bg-ivory px-3 py-1 text-[11px] font-medium capitalize text-stone">
-                {formatValue(outfit.season)}
+                {formatSeasonLabel(outfit.season)}
               </span>
               {outfit.style ? (
                 <span className="rounded-full bg-ivory px-3 py-1 text-[11px] font-medium capitalize text-stone">
-                  {formatValue(outfit.style)}
+                  {formatStyleLabel(outfit.style)}
                 </span>
               ) : null}
             </div>
@@ -523,7 +529,7 @@ export default function OutfitDetail() {
                             {piece?.name}
                           </p>
                           <p className="mt-1 text-xs capitalize leading-5 text-stone">
-                            {[piece?.color, formatCategoryLabel(piece?.category)]
+                            {[formatColorLabel(piece?.color), formatCategoryLabel(piece?.category)]
                               .filter(Boolean)
                               .join(" · ")}
                           </p>
@@ -552,17 +558,17 @@ export default function OutfitDetail() {
           {[
             {
               label: "Occasion",
-              value: formatValue(outfit.occasion),
+              value: formatOccasionLabel(outfit.occasion),
               icon: Layers3,
             },
             {
               label: "Season",
-              value: formatValue(outfit.season),
+              value: formatSeasonLabel(outfit.season),
               icon: CalendarDays,
             },
             {
               label: "Style",
-              value: outfit.style ? formatValue(outfit.style) : "Not set",
+              value: outfit.style ? formatStyleLabel(outfit.style) : "Not set",
               icon: Sparkles,
             },
             {

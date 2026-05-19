@@ -1,4 +1,6 @@
 import {
+  getOccasionOptions,
+  getSeasonOptions,
   formatCategoryLabel,
   getCategoryOptions,
   getCategorySection,
@@ -6,17 +8,9 @@ import {
   wardrobeSections,
 } from "./wardrobeTaxonomy";
 
-export const seasons = ["summer", "winter", "rainy", "all"];
+export const seasons = getSeasonOptions();
 
-export const occasions = [
-  "casual",
-  "formal",
-  "college",
-  "party",
-  "sports",
-  "travel",
-  "traditional",
-];
+export const occasions = getOccasionOptions();
 
 export const categories = getCategoryOptions();
 

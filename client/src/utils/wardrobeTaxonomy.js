@@ -121,13 +121,7 @@ const categoryGroups = [
   {
     key: "drapes",
     label: "Drapes",
-    categories: [
-      "dupatta",
-      "stole",
-      "scarf",
-      "shawl",
-      "saree_pallu",
-    ],
+    categories: ["dupatta", "stole", "scarf", "shawl", "saree_pallu"],
   },
   {
     key: "footwear",
@@ -207,7 +201,7 @@ const categoryGroups = [
   },
 ];
 
-const aliasEntries = {
+const categoryAliases = {
   tee: "t_shirt",
   tshirt: "t_shirt",
   "t-shirt": "t_shirt",
@@ -287,7 +281,7 @@ const aliasEntries = {
   "clutch bag": "clutch",
 };
 
-const labelOverrides = {
+const categoryLabelOverrides = {
   t_shirt: "T-shirt",
   crop_top: "Crop top",
   tank_top: "Tank top",
@@ -327,6 +321,195 @@ const labelOverrides = {
   hair_accessory: "Hair accessory",
 };
 
+const colorOptions = [
+  "black",
+  "white",
+  "off_white",
+  "cream",
+  "beige",
+  "brown",
+  "tan",
+  "camel",
+  "grey",
+  "charcoal",
+  "navy",
+  "blue",
+  "sky_blue",
+  "denim_blue",
+  "green",
+  "olive",
+  "sage",
+  "mint",
+  "red",
+  "maroon",
+  "burgundy",
+  "pink",
+  "blush",
+  "peach",
+  "yellow",
+  "mustard",
+  "orange",
+  "purple",
+  "lavender",
+  "gold",
+  "silver",
+  "multicolor",
+];
+
+const colorAliases = {
+  gray: "grey",
+  "dark grey": "charcoal",
+  "dark gray": "charcoal",
+  "navy blue": "navy",
+  "light blue": "sky_blue",
+  denim: "denim_blue",
+  "off white": "off_white",
+  "off-white": "off_white",
+  ivory: "off_white",
+  neutral: "beige",
+  nude: "beige",
+  wine: "burgundy",
+  mehroon: "maroon",
+  "mehroon color": "maroon",
+  golden: "gold",
+  multi: "multicolor",
+  "multi color": "multicolor",
+  "multi-colour": "multicolor",
+};
+
+const seasonOptions = ["all", "summer", "winter", "rainy", "spring", "autumn"];
+
+const seasonAliases = {
+  "all season": "all",
+  "all seasons": "all",
+  everyday: "all",
+  "year round": "all",
+  monsoon: "rainy",
+  rain: "rainy",
+  fall: "autumn",
+};
+
+const occasionOptions = [
+  "casual",
+  "daily",
+  "college",
+  "formal",
+  "interview",
+  "office",
+  "dinner",
+  "party",
+  "travel",
+  "sports",
+  "gym",
+  "wedding",
+  "festival",
+  "traditional",
+  "date",
+  "vacation",
+];
+
+const occasionAliases = {
+  everyday: "daily",
+  "daily wear": "daily",
+  "casual wear": "casual",
+  campus: "college",
+  class: "college",
+  work: "office",
+  workplace: "office",
+  job: "office",
+  marriage: "wedding",
+  festive: "festival",
+  ethnic: "traditional",
+  function: "traditional",
+  workout: "gym",
+  "date night": "date",
+  trip: "travel",
+  holiday: "vacation",
+};
+
+const styleOptions = [
+  "minimal",
+  "classic",
+  "streetwear",
+  "ethnic",
+  "traditional",
+  "indo_western",
+  "smart_casual",
+  "sporty",
+  "relaxed",
+  "layered",
+  "formal",
+  "casual",
+  "elegant",
+  "boho",
+  "vintage",
+  "modern",
+  "monochrome",
+];
+
+const styleAliases = {
+  "smart casual": "smart_casual",
+  "smart-casual": "smart_casual",
+  "indo western": "indo_western",
+  "indo-western": "indo_western",
+  indian: "ethnic",
+  desi: "ethnic",
+  "traditional wear": "traditional",
+  classy: "elegant",
+  sports: "sporty",
+  comfy: "relaxed",
+  comfort: "relaxed",
+  "black white": "monochrome",
+  "black and white": "monochrome",
+};
+
+const formalityOptions = ["low", "medium", "high"];
+
+const formalityAliases = {
+  casual: "low",
+  relaxed: "low",
+  "semi formal": "medium",
+  "semi-formal": "medium",
+  "smart casual": "medium",
+  formal: "high",
+  "very formal": "high",
+};
+
+const fieldConfigs = {
+  color: {
+    options: colorOptions,
+    aliases: colorAliases,
+    labelOverrides: {
+      off_white: "Off white",
+      sky_blue: "Sky blue",
+      denim_blue: "Denim blue",
+    },
+  },
+  season: {
+    options: seasonOptions,
+    aliases: seasonAliases,
+    labelOverrides: {
+      all: "All season",
+    },
+  },
+  occasion: {
+    options: occasionOptions,
+    aliases: occasionAliases,
+  },
+  style: {
+    options: styleOptions,
+    aliases: styleAliases,
+    labelOverrides: {
+      indo_western: "Indo-western",
+      smart_casual: "Smart casual",
+    },
+  },
+  formality: {
+    options: formalityOptions,
+    aliases: formalityAliases,
+  },
+};
+
 const canonicalCategorySet = new Set(
   categoryGroups.flatMap((group) => group.categories),
 );
@@ -337,7 +520,7 @@ const categorySectionMap = Object.fromEntries(
   ),
 );
 
-function sanitizeCategoryInput(value) {
+function sanitizeInput(value) {
   return String(value || "")
     .toLowerCase()
     .trim()
@@ -347,52 +530,15 @@ function sanitizeCategoryInput(value) {
     .replace(/\s+/g, " ");
 }
 
-function slugifyCategory(value) {
-  return sanitizeCategoryInput(value).replace(/\s+/g, "_");
+function slugifyValue(value) {
+  return sanitizeInput(value).replace(/\s+/g, "_");
 }
 
-function buildSearchTerms(category) {
-  const label = formatCategoryLabel(category).toLowerCase();
-  const baseTerms = [
-    category,
-    category.replace(/_/g, " "),
-    label,
-  ];
-  const aliasTerms = Object.entries(aliasEntries)
-    .filter(([, canonical]) => canonical === category)
-    .map(([alias]) => alias);
+export function formatFieldLabel(value) {
+  const normalized = slugifyValue(value);
 
-  return [...new Set([...baseTerms, ...aliasTerms])];
-}
-
-export function normalizeCategory(value) {
-  const cleaned = sanitizeCategoryInput(value);
-  if (!cleaned) {
-    return "other";
-  }
-
-  const directCanonical = cleaned.replace(/\s+/g, "_");
-  if (canonicalCategorySet.has(directCanonical)) {
-    return directCanonical;
-  }
-
-  if (aliasEntries[cleaned]) {
-    return aliasEntries[cleaned];
-  }
-
-  return slugifyCategory(cleaned);
-}
-
-export function getCategorySection(value) {
-  const normalized = normalizeCategory(value);
-  return categorySectionMap[normalized] || "Other";
-}
-
-export function formatCategoryLabel(value) {
-  const normalized = normalizeCategory(value);
-
-  if (labelOverrides[normalized]) {
-    return labelOverrides[normalized];
+  if (!normalized) {
+    return "";
   }
 
   return normalized
@@ -403,29 +549,61 @@ export function formatCategoryLabel(value) {
     .join(" ");
 }
 
-export function getCategoryOptions() {
-  return [...canonicalCategorySet];
+function normalizeWithConfig(value, config, emptyValue = "") {
+  const cleaned = sanitizeInput(value);
+
+  if (!cleaned) {
+    return emptyValue;
+  }
+
+  const directCanonical = cleaned.replace(/\s+/g, "_");
+  if (config.options.includes(directCanonical)) {
+    return directCanonical;
+  }
+
+  if (config.aliases[cleaned]) {
+    return config.aliases[cleaned];
+  }
+
+  return slugifyValue(cleaned);
 }
 
-export function getGroupedCategoryOptions() {
-  return categoryGroups.map((group) => ({
-    key: group.key,
-    label: group.label,
-    options: group.categories.map((category) => ({
-      value: category,
-      label: formatCategoryLabel(category),
-      section: group.label,
-    })),
-  }));
+function formatWithConfig(value, config, normalizeFn) {
+  const normalized = normalizeFn(value);
+
+  if (!normalized) {
+    return "";
+  }
+
+  if (config.labelOverrides?.[normalized]) {
+    return config.labelOverrides[normalized];
+  }
+
+  return formatFieldLabel(normalized);
 }
 
-export function getCategorySuggestions(input) {
-  const cleanedInput = sanitizeCategoryInput(input);
-  const options = getCategoryOptions().map((category) => ({
-    value: category,
-    label: formatCategoryLabel(category),
-    section: getCategorySection(category),
-    terms: buildSearchTerms(category),
+function buildTermsForField(value, config, normalizeFn, formatFn) {
+  const normalized = normalizeFn(value);
+
+  if (!normalized) {
+    return [];
+  }
+
+  const label = formatFn(normalized).toLowerCase();
+  const baseTerms = [normalized, normalized.replace(/_/g, " "), label];
+  const aliasTerms = Object.entries(config.aliases)
+    .filter(([, canonical]) => canonical === normalized)
+    .map(([alias]) => alias);
+
+  return [...new Set([...baseTerms, ...aliasTerms])];
+}
+
+function getSuggestionsForField(input, config, normalizeFn, formatFn) {
+  const cleanedInput = sanitizeInput(input);
+  const options = config.options.map((option) => ({
+    value: option,
+    label: formatFn(option),
+    terms: buildTermsForField(option, config, normalizeFn, formatFn),
   }));
 
   if (!cleanedInput) {
@@ -434,7 +612,7 @@ export function getCategorySuggestions(input) {
 
   return options
     .map((option) => {
-      const directAlias = aliasEntries[cleanedInput] === option.value;
+      const directAlias = config.aliases[cleanedInput] === option.value;
       const exactTerm = option.terms.some((term) => term === cleanedInput);
       const startsWithTerm = option.terms.some((term) =>
         term.startsWith(cleanedInput),
@@ -462,6 +640,213 @@ export function getCategorySuggestions(input) {
 
       return left.label.localeCompare(right.label);
     });
+}
+
+function getFieldConfig(field) {
+  return fieldConfigs[field];
+}
+
+export function normalizeCategory(value) {
+  const cleaned = sanitizeInput(value);
+  if (!cleaned) {
+    return "other";
+  }
+
+  const directCanonical = cleaned.replace(/\s+/g, "_");
+  if (canonicalCategorySet.has(directCanonical)) {
+    return directCanonical;
+  }
+
+  if (categoryAliases[cleaned]) {
+    return categoryAliases[cleaned];
+  }
+
+  return slugifyValue(cleaned);
+}
+
+export function getCategorySection(value) {
+  const normalized = normalizeCategory(value);
+  return categorySectionMap[normalized] || "Other";
+}
+
+export function formatCategoryLabel(value) {
+  const normalized = normalizeCategory(value);
+
+  if (categoryLabelOverrides[normalized]) {
+    return categoryLabelOverrides[normalized];
+  }
+
+  return formatFieldLabel(normalized);
+}
+
+export function getCategoryOptions() {
+  return [...canonicalCategorySet];
+}
+
+export function getGroupedCategoryOptions() {
+  return categoryGroups.map((group) => ({
+    key: group.key,
+    label: group.label,
+    options: group.categories.map((category) => ({
+      value: category,
+      label: formatCategoryLabel(category),
+      section: group.label,
+    })),
+  }));
+}
+
+export function getCategorySuggestions(input) {
+  const cleanedInput = sanitizeInput(input);
+  const options = getCategoryOptions().map((category) => ({
+    value: category,
+    label: formatCategoryLabel(category),
+    section: getCategorySection(category),
+    terms: getCategorySearchTerms(category),
+  }));
+
+  if (!cleanedInput) {
+    return options;
+  }
+
+  return options
+    .map((option) => {
+      const directAlias = categoryAliases[cleanedInput] === option.value;
+      const exactTerm = option.terms.some((term) => term === cleanedInput);
+      const startsWithTerm = option.terms.some((term) =>
+        term.startsWith(cleanedInput),
+      );
+      const includesTerm = option.terms.some((term) =>
+        term.includes(cleanedInput),
+      );
+
+      let score = -1;
+      if (directAlias || exactTerm) {
+        score = 3;
+      } else if (startsWithTerm) {
+        score = 2;
+      } else if (includesTerm) {
+        score = 1;
+      }
+
+      return { ...option, score };
+    })
+    .filter((option) => option.score > 0)
+    .sort((left, right) => {
+      if (right.score !== left.score) {
+        return right.score - left.score;
+      }
+
+      return left.label.localeCompare(right.label);
+    });
+}
+
+export function getCategorySearchTerms(value) {
+  const normalized = normalizeCategory(value);
+  const label = formatCategoryLabel(normalized).toLowerCase();
+  const baseTerms = [normalized, normalized.replace(/_/g, " "), label];
+  const aliasTerms = Object.entries(categoryAliases)
+    .filter(([, canonical]) => canonical === normalized)
+    .map(([alias]) => alias);
+
+  return [...new Set([...baseTerms, ...aliasTerms])];
+}
+
+export function normalizeColor(value) {
+  return normalizeWithConfig(value, fieldConfigs.color);
+}
+
+export function normalizeSeason(value) {
+  return normalizeWithConfig(value, fieldConfigs.season, "all");
+}
+
+export function normalizeOccasion(value) {
+  return normalizeWithConfig(value, fieldConfigs.occasion, "casual");
+}
+
+export function normalizeStyle(value) {
+  return normalizeWithConfig(value, fieldConfigs.style);
+}
+
+export function normalizeFormality(value) {
+  return normalizeWithConfig(value, fieldConfigs.formality);
+}
+
+export function formatColorLabel(value) {
+  return formatWithConfig(value, fieldConfigs.color, normalizeColor);
+}
+
+export function formatSeasonLabel(value) {
+  return formatWithConfig(value, fieldConfigs.season, normalizeSeason);
+}
+
+export function formatOccasionLabel(value) {
+  return formatWithConfig(value, fieldConfigs.occasion, normalizeOccasion);
+}
+
+export function formatStyleLabel(value) {
+  return formatWithConfig(value, fieldConfigs.style, normalizeStyle);
+}
+
+export function formatFormalityLabel(value) {
+  return formatWithConfig(value, fieldConfigs.formality, normalizeFormality);
+}
+
+export function getColorOptions() {
+  return [...fieldConfigs.color.options];
+}
+
+export function getSeasonOptions() {
+  return [...fieldConfigs.season.options];
+}
+
+export function getOccasionOptions() {
+  return [...fieldConfigs.occasion.options];
+}
+
+export function getStyleOptions() {
+  return [...fieldConfigs.style.options];
+}
+
+export function getFormalityOptions() {
+  return [...fieldConfigs.formality.options];
+}
+
+export function getFieldSuggestions(field, input) {
+  const config = getFieldConfig(field);
+
+  if (!config) {
+    return [];
+  }
+
+  const helpers = {
+    color: [normalizeColor, formatColorLabel],
+    season: [normalizeSeason, formatSeasonLabel],
+    occasion: [normalizeOccasion, formatOccasionLabel],
+    style: [normalizeStyle, formatStyleLabel],
+    formality: [normalizeFormality, formatFormalityLabel],
+  };
+
+  const [normalizeFn, formatFn] = helpers[field];
+  return getSuggestionsForField(input, config, normalizeFn, formatFn);
+}
+
+export function getFieldSearchTerms(field, value) {
+  const config = getFieldConfig(field);
+
+  if (!config) {
+    return [];
+  }
+
+  const helpers = {
+    color: [normalizeColor, formatColorLabel],
+    season: [normalizeSeason, formatSeasonLabel],
+    occasion: [normalizeOccasion, formatOccasionLabel],
+    style: [normalizeStyle, formatStyleLabel],
+    formality: [normalizeFormality, formatFormalityLabel],
+  };
+
+  const [normalizeFn, formatFn] = helpers[field];
+  return buildTermsForField(value, config, normalizeFn, formatFn);
 }
 
 export const wardrobeSections = categoryGroups.map((group) => group.label);

@@ -212,6 +212,81 @@ Commit: pending current checkpoint
 
 - DigiCloset now makes growing wardrobes easier to navigate without turning Wardrobe into a dashboard or admin table
 
+## 2026-05-19 - Add autosuggest metadata fields and chip inputs
+
+Commit: pending current checkpoint
+
+### Phase 3F.3 scope
+
+- extended the shared wardrobe taxonomy beyond categories into:
+  - color
+  - season
+  - occasion
+  - style
+  - formality
+- added reusable autosuggest and chip-input components
+- integrated normalized metadata entry into piece and outfit flows
+- kept Capture lightweight while making common inputs cleaner and more consistent
+
+### Taxonomy additions
+
+- added deterministic normalization for inputs such as:
+  - `off white` -> `off_white`
+  - `mehroon` -> `maroon`
+  - `monsoon` -> `rainy`
+  - `marriage` -> `wedding`
+  - `indo western` -> `indo_western`
+  - `smart casual` -> `smart_casual`
+- preserved unknown values safely instead of crashing or rewriting old records
+- added readable field labels such as:
+  - `Off white`
+  - `All season`
+  - `Wedding`
+  - `Indo-western`
+  - `Smart casual`
+
+### UI integration
+
+- added reusable:
+  - `AutosuggestField`
+  - `ChipSelect`
+- integrated them into:
+  - `ClothingForm`
+  - `Capture` Quick Add Piece
+  - `PieceDetail` edit flow
+  - `OutfitMemoryForm`
+  - `OutfitEditModal`
+- kept `CategoryPicker` in place for category-specific entry
+
+### Display and search cleanup
+
+- cleaned metadata labels across:
+  - clothing cards
+  - piece detail
+  - outfit cards
+  - outfit detail
+  - scan-result previews
+- updated Wardrobe search so normalized metadata is discoverable through user-friendly queries like:
+  - `off white`
+  - `monsoon`
+  - `indo western`
+  - `smart casual`
+  - `wedding`
+
+### Backend alignment
+
+- widened backend season and occasion schema acceptance so normalized frontend values can persist safely
+- did not change:
+  - auth
+  - ownership logic
+  - product scope
+
+### Result
+
+- DigiCloset now collects cleaner metadata without making forms feel heavier
+- metadata displays more gracefully across the app
+- wardrobe search stays aligned with what users naturally type
+
 ## 2026-03-15 - Initial commit - DigiCloset full-stack app
 
 Commit: `31fee73`

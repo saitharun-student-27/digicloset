@@ -1,24 +1,24 @@
 import { ImagePlus, Plus, Shirt, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
+import AutosuggestField from "./AutosuggestField.jsx";
 import CategoryPicker from "./CategoryPicker.jsx";
+import ChipSelect from "./ChipSelect.jsx";
 import {
   ACCEPTED_IMAGE_INPUT,
   validateImageFile,
 } from "../utils/uploadValidation";
-import { normalizeCategory } from "../utils/wardrobeTaxonomy";
-
-const seasons = ["summer", "winter", "rainy", "all"];
-
-const occasions = [
-  "casual",
-  "formal",
-  "college",
-  "party",
-  "sports",
-  "travel",
-  "traditional",
-];
+import {
+  formatFormalityLabel,
+  formatSeasonLabel,
+  normalizeCategory,
+  normalizeColor,
+  normalizeFormality,
+  normalizeOccasion,
+  normalizeSeason,
+  normalizeStyle,
+} from "../utils/wardrobeTaxonomy";
+import { seasons } from "../utils/outfitUtils";
 
 const initialFormState = {
   name: "",
@@ -52,24 +52,6 @@ function TextInput({ id, name, value, onChange, placeholder, required = false })
   );
 }
 
-function SelectInput({ id, name, value, onChange, options }) {
-  return (
-    <select
-      id={id}
-      name={name}
-      value={value}
-      onChange={onChange}
-      className="mt-2 h-11 w-full rounded-xl border border-black/10 bg-ivory px-3 text-sm capitalize text-charcoal outline-none transition focus:border-sage focus:bg-white focus:ring-4 focus:ring-sage/10"
-    >
-      {options.map((option) => (
-        <option key={option} value={option}>
-          {option.replace("_", " ")}
-        </option>
-      ))}
-    </select>
-  );
-}
-
 export default function ClothingForm({ onSubmit, isSubmitting }) {
   const [formData, setFormData] = useState(initialFormState);
   const [imageFile, setImageFile] = useState(null);
@@ -100,16 +82,16 @@ export default function ClothingForm({ onSubmit, isSubmitting }) {
     const payload = new FormData();
     payload.append("name", formData.name);
     payload.append("category", normalizeCategory(formData.category));
-    payload.append("color", formData.color);
-    payload.append("season", formData.season);
-    payload.append("occasion", formData.occasion);
+    payload.append("color", normalizeColor(formData.color));
+    payload.append("season", normalizeSeason(formData.season));
+    payload.append("occasion", normalizeOccasion(formData.occasion));
 
     if (formData.style.trim()) {
-      payload.append("style", formData.style.trim());
+      payload.append("style", normalizeStyle(formData.style));
     }
 
     if (formData.formality_level.trim()) {
-      payload.append("formality_level", formData.formality_level.trim());
+      payload.append("formality_level", normalizeFormality(formData.formality_level));
     }
 
     if (imageFile) {
@@ -172,14 +154,19 @@ export default function ClothingForm({ onSubmit, isSubmitting }) {
 
         <div>
           <FieldLabel htmlFor="color">Color</FieldLabel>
-          <TextInput
+          <div className="mt-2">
+            <AutosuggestField
             id="color"
             name="color"
+            field="color"
             value={formData.color}
-            onChange={handleChange}
-            placeholder="white"
+            onChange={(value) =>
+              setFormData((current) => ({ ...current, color: value }))
+            }
+            placeholder="Search color"
             required
           />
+          </div>
         </div>
 
         <div>
@@ -197,46 +184,62 @@ export default function ClothingForm({ onSubmit, isSubmitting }) {
 
         <div>
           <FieldLabel htmlFor="season">Season</FieldLabel>
-          <SelectInput
-            id="season"
-            name="season"
+          <div className="mt-2">
+            <ChipSelect
             value={formData.season}
-            onChange={handleChange}
+            onChange={(season) =>
+              setFormData((current) => ({ ...current, season }))
+            }
             options={seasons}
+            formatOption={formatSeasonLabel}
           />
+          </div>
         </div>
 
         <div>
           <FieldLabel htmlFor="occasion">Occasion</FieldLabel>
-          <SelectInput
+          <div className="mt-2">
+            <AutosuggestField
             id="occasion"
             name="occasion"
+            field="occasion"
             value={formData.occasion}
-            onChange={handleChange}
-            options={occasions}
+            onChange={(occasion) =>
+              setFormData((current) => ({ ...current, occasion }))
+            }
+            placeholder="Search occasion"
           />
+          </div>
         </div>
 
         <div>
           <FieldLabel htmlFor="style">Style</FieldLabel>
-          <TextInput
+          <div className="mt-2">
+            <AutosuggestField
             id="style"
             name="style"
+            field="style"
             value={formData.style}
-            onChange={handleChange}
-            placeholder="classic"
+            onChange={(style) =>
+              setFormData((current) => ({ ...current, style }))
+            }
+            placeholder="Search style"
           />
+          </div>
         </div>
 
         <div className="md:col-span-2">
           <FieldLabel htmlFor="formality_level">Formality level</FieldLabel>
-          <TextInput
-            id="formality_level"
-            name="formality_level"
-            value={formData.formality_level}
-            onChange={handleChange}
-            placeholder="high"
-          />
+          <div className="mt-2">
+            <ChipSelect
+              value={formData.formality_level}
+              onChange={(formality_level) =>
+                setFormData((current) => ({ ...current, formality_level }))
+              }
+              options={["", "low", "medium", "high"]}
+              formatOption={formatFormalityLabel}
+            />
+          </div>
         </div>
 
         <div className="md:col-span-2">

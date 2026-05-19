@@ -3,7 +3,10 @@ import { Link } from "react-router-dom";
 
 import { getImageUrl } from "../services/clothingService";
 import { getWardrobeSection } from "../utils/outfitUtils";
-import { formatCategoryLabel } from "../utils/wardrobeTaxonomy";
+import {
+  formatCategoryLabel,
+  formatColorLabel,
+} from "../utils/wardrobeTaxonomy";
 
 export default function ClothingCard({
   item,
@@ -55,7 +58,7 @@ export default function ClothingCard({
 
             {item.color ? (
               <span className="rounded-full bg-ivory px-3 py-1 text-[11px] font-medium capitalize text-stone">
-                {item.color}
+                {formatColorLabel(item.color)}
               </span>
             ) : null}
           </div>

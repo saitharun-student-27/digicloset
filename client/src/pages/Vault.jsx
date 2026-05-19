@@ -9,9 +9,9 @@ import OutfitShowcaseCard from "../components/OutfitShowcaseCard";
 import { useWardrobeData } from "../context/WardrobeDataProvider.jsx";
 import { getWardrobeSection, wardrobeSections } from "../utils/outfitUtils";
 import {
-  formatCategoryLabel,
+  getCategorySearchTerms,
   getCategorySection,
-  normalizeCategory,
+  getFieldSearchTerms,
 } from "../utils/wardrobeTaxonomy";
 
 function RailSection({
@@ -83,21 +83,20 @@ function matchesSearch(haystack, query) {
 }
 
 function collectPieceSearchText(item) {
-  const normalizedCategory = normalizeCategory(item.category);
-  const categoryLabel = formatCategoryLabel(item.category);
-  const section = getCategorySection(item.category);
-
   return [
     item.name,
-    item.category,
-    normalizedCategory,
-    categoryLabel,
-    section,
+    ...getCategorySearchTerms(item.category),
+    getCategorySection(item.category),
     item.color,
+    ...getFieldSearchTerms("color", item.color),
     item.season,
+    ...getFieldSearchTerms("season", item.season),
     item.occasion,
+    ...getFieldSearchTerms("occasion", item.occasion),
     item.style,
+    ...getFieldSearchTerms("style", item.style),
     item.formality_level,
+    ...getFieldSearchTerms("formality", item.formality_level),
     item.source_type,
   ]
     .filter(Boolean)
@@ -110,11 +109,10 @@ function collectOutfitSearchText(outfit) {
       const clothingItem = piece?.clothing_item || {};
       return [
         clothingItem.name,
-        clothingItem.category,
-        normalizeCategory(clothingItem.category),
-        formatCategoryLabel(clothingItem.category),
+        ...getCategorySearchTerms(clothingItem.category),
         getCategorySection(clothingItem.category),
         clothingItem.color,
+        ...getFieldSearchTerms("color", clothingItem.color),
       ];
     })
     .filter(Boolean)
@@ -124,8 +122,11 @@ function collectOutfitSearchText(outfit) {
     outfit.title,
     outfit.description,
     outfit.occasion,
+    ...getFieldSearchTerms("occasion", outfit.occasion),
     outfit.season,
+    ...getFieldSearchTerms("season", outfit.season),
     outfit.style,
+    ...getFieldSearchTerms("style", outfit.style),
     outfit.source_type,
     pieceSearchText,
   ]

@@ -12,19 +12,27 @@ import {
 } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
 
+import AutosuggestField from "./AutosuggestField.jsx";
 import CategoryPicker from "./CategoryPicker.jsx";
+import ChipSelect from "./ChipSelect.jsx";
 import {
   emptyPiece,
   formatValue,
   generateOutfitNote,
   generateOutfitTitle,
-  occasions,
   parseOutfitDescription,
   roles,
   seasons,
-  titleCase,
 } from "../utils/outfitUtils";
-import { normalizeCategory } from "../utils/wardrobeTaxonomy";
+import {
+  formatOccasionLabel,
+  formatSeasonLabel,
+  normalizeCategory,
+  normalizeColor,
+  normalizeOccasion,
+  normalizeSeason,
+  normalizeStyle,
+} from "../utils/wardrobeTaxonomy";
 import {
   ACCEPTED_IMAGE_INPUT,
   validateImageFile,
@@ -284,14 +292,11 @@ function PiecesEditor({ pieces, updatePiece, removePiece, addPiece }) {
                 placeholder="Maroon Shirt"
                 required
               />
-              <TextInput
-                name="color"
+              <AutosuggestField
+                field="color"
                 value={piece.color}
-                onChange={(event) =>
-                  updatePiece(index, "color", event.target.value)
-                }
-                placeholder="maroon"
-                required
+                onChange={(color) => updatePiece(index, "color", color)}
+                placeholder="Search color"
               />
               <CategoryPicker
                 value={piece.category}
@@ -339,7 +344,7 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
         .map((piece) => ({
           name: piece.name.trim(),
           category: normalizeCategory(piece.category),
-          color: piece.color.trim(),
+          color: normalizeColor(piece.color),
           role: piece.role,
         }))
         .filter((piece) => piece.name && piece.color),
@@ -529,9 +534,9 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
 
     const payload = {
       title: formData.title.trim() || generatedTitle,
-      style: formData.style.trim(),
-      occasion: formData.occasion,
-      season: formData.season,
+      style: normalizeStyle(formData.style),
+      occasion: normalizeOccasion(formData.occasion),
+      season: normalizeSeason(formData.season),
       imagePreviewUrl,
       imageFile,
       imageName,
@@ -755,11 +760,13 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
               <label className="mb-2 block text-sm font-medium text-charcoal">
                 Occasion
               </label>
-              <SelectInput
-                name="occasion"
+              <AutosuggestField
+                field="occasion"
                 value={formData.occasion}
-                onChange={handleChange}
-                options={occasions}
+                onChange={(occasion) =>
+                  setFormData((current) => ({ ...current, occasion }))
+                }
+                placeholder="Search occasion"
               />
             </div>
 
@@ -767,11 +774,13 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
               <label className="mb-2 block text-sm font-medium text-charcoal">
                 Season
               </label>
-              <SelectInput
-                name="season"
+              <ChipSelect
                 value={formData.season}
-                onChange={handleChange}
+                onChange={(season) =>
+                  setFormData((current) => ({ ...current, season }))
+                }
                 options={seasons}
+                formatOption={formatSeasonLabel}
               />
             </div>
 
@@ -779,11 +788,13 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
               <label className="mb-2 block text-sm font-medium text-charcoal">
                 Style or aesthetic
               </label>
-              <TextInput
-                name="style"
+              <AutosuggestField
+                field="style"
                 value={formData.style}
-                onChange={handleChange}
-                placeholder="minimal, classic, relaxed"
+                onChange={(style) =>
+                  setFormData((current) => ({ ...current, style }))
+                }
+                placeholder="Search style"
               />
             </div>
           </div>
@@ -838,15 +849,11 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
             />
             <PreviewBadge
               label="Occasion"
-              value={titleCase(formData.occasion)}
+              value={formatOccasionLabel(formData.occasion)}
             />
             <PreviewBadge
               label="Season"
-              value={
-                formData.season === "all"
-                  ? "All-season"
-                  : titleCase(formData.season)
-              }
+              value={formatSeasonLabel(formData.season)}
             />
           </div>
 

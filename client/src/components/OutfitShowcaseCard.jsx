@@ -12,7 +12,10 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 
 import { getImageUrl } from "../services/clothingService";
-import { formatValue } from "../utils/outfitUtils";
+import {
+  formatOccasionLabel,
+  formatSeasonLabel,
+} from "../utils/wardrobeTaxonomy";
 
 function ActionButton({
   icon: Icon,
@@ -266,7 +269,7 @@ export default function OutfitShowcaseCard({
                 Season
               </p>
               <p className="text-sm font-medium capitalize text-charcoal">
-                {formatValue(outfit.season)}
+                {formatSeasonLabel(outfit.season)}
               </p>
             </div>
             <div className="rounded-2xl bg-ivory p-3">
@@ -275,17 +278,17 @@ export default function OutfitShowcaseCard({
                 Occasion
               </p>
               <p className="text-sm font-medium capitalize text-charcoal">
-                {formatValue(outfit.occasion)}
+                {formatOccasionLabel(outfit.occasion)}
               </p>
             </div>
           </div>
         ) : (
           <div className="mt-4 flex flex-wrap gap-2">
             <span className="rounded-full bg-ivory px-3 py-1 text-[11px] font-medium capitalize text-stone">
-              {formatValue(outfit.season || "all")}
+              {formatSeasonLabel(outfit.season || "all")}
             </span>
             <span className="rounded-full bg-ivory px-3 py-1 text-[11px] font-medium capitalize text-stone">
-              {formatValue(outfit.occasion || "casual")}
+              {formatOccasionLabel(outfit.occasion || "casual")}
             </span>
           </div>
         )}

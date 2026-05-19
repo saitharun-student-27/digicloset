@@ -8,6 +8,9 @@ Current backend scope includes:
 - deterministic suggestions
 - safe local upload handling
 - category validation that supports expanded normalized wardrobe categories
+- metadata validation that now accepts normalized values for:
+  - season
+  - occasion
 - backend auth foundation:
   - `POST /api/auth/signup`
   - `POST /api/auth/login`
@@ -120,6 +123,13 @@ Current category-taxonomy boundary:
 
 - frontend now normalizes category input for Indian, western, and Indo-western wardrobes
 - backend clothing schemas accept expanded canonical category strings and safe custom category values
+- frontend now also normalizes wardrobe metadata such as:
+  - color
+  - season
+  - occasion
+  - style
+  - formality
+- backend season and occasion schemas accept these normalized values safely
 - old category records are not auto-rewritten by the backend
 
 Next backend-adjacent phase:

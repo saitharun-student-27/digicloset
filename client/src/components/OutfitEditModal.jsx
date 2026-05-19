@@ -1,7 +1,15 @@
 import { X } from "lucide-react";
 import { useEffect, useState } from "react";
 
-import { formatValue, occasions, seasons } from "../utils/outfitUtils";
+import AutosuggestField from "./AutosuggestField.jsx";
+import ChipSelect from "./ChipSelect.jsx";
+import { seasons } from "../utils/outfitUtils";
+import {
+  formatSeasonLabel,
+  normalizeOccasion,
+  normalizeSeason,
+  normalizeStyle,
+} from "../utils/wardrobeTaxonomy";
 
 const inputClass =
   "h-11 w-full rounded-xl border border-black/10 bg-white px-3 text-sm text-charcoal outline-none transition focus:border-sage focus:ring-4 focus:ring-sage/10";
@@ -69,7 +77,12 @@ export default function OutfitEditModal({
           className="mt-6 space-y-4"
           onSubmit={(event) => {
             event.preventDefault();
-            onSubmit(formData);
+            onSubmit({
+              ...formData,
+              occasion: normalizeOccasion(formData.occasion),
+              season: normalizeSeason(formData.season),
+              style: normalizeStyle(formData.style),
+            });
           }}
         >
           <div>
@@ -110,44 +123,34 @@ export default function OutfitEditModal({
               <label className="mb-2 block text-sm font-medium text-charcoal">
                 Occasion
               </label>
-              <select
-                className={inputClass}
+              <AutosuggestField
+                field="occasion"
                 value={formData.occasion}
-                onChange={(event) =>
+                onChange={(occasion) =>
                   setFormData((current) => ({
                     ...current,
-                    occasion: event.target.value,
+                    occasion,
                   }))
                 }
-              >
-                {occasions.map((option) => (
-                  <option key={option} value={option}>
-                    {formatValue(option)}
-                  </option>
-                ))}
-              </select>
+                placeholder="Search occasion"
+              />
             </div>
 
             <div>
               <label className="mb-2 block text-sm font-medium text-charcoal">
                 Season
               </label>
-              <select
-                className={inputClass}
+              <ChipSelect
                 value={formData.season}
-                onChange={(event) =>
+                onChange={(season) =>
                   setFormData((current) => ({
                     ...current,
-                    season: event.target.value,
+                    season,
                   }))
                 }
-              >
-                {seasons.map((option) => (
-                  <option key={option} value={option}>
-                    {formatValue(option)}
-                  </option>
-                ))}
-              </select>
+                options={seasons}
+                formatOption={formatSeasonLabel}
+              />
             </div>
           </div>
 
@@ -155,13 +158,13 @@ export default function OutfitEditModal({
             <label className="mb-2 block text-sm font-medium text-charcoal">
               Style
             </label>
-            <input
-              className={inputClass}
+            <AutosuggestField
+              field="style"
               value={formData.style}
-              onChange={(event) =>
+              onChange={(style) =>
                 setFormData((current) => ({
                   ...current,
-                  style: event.target.value,
+                  style,
                 }))
               }
               placeholder="minimal, classic, streetwear"

@@ -22,6 +22,12 @@ DigiCloset currently includes:
 - piece detail pages
 - searchable category entry for clothing and outfit-piece flows
 - shared wardrobe taxonomy for Indian, western, and Indo-western categories
+- autosuggest/chip metadata inputs for:
+  - color
+  - season
+  - occasion
+  - style
+  - formality
 - shared client-side wardrobe data layer for outfits and clothing
 - outfit lifecycle actions:
   - favorite / unfavorite
@@ -137,6 +143,16 @@ Wardrobe behaves like a digital closet:
 - Activewear
 - Other
 
+Wardrobe search is now normalization-aware, so searches like:
+
+- `off white`
+- `monsoon`
+- `smart casual`
+- `indo western`
+- `wedding`
+
+can still find normalized stored values without needing raw underscore strings.
+
 Favorites are featured, not moved. A favorited outfit still remains in the full outfit memory rail.
 
 ### Outfit Detail
@@ -210,6 +226,11 @@ Legacy redirects:
 - `AuthContext` for user + session state
 - shared `WardrobeDataProvider` for outfit and clothing state
 - shared wardrobe taxonomy helpers for category normalization, grouping, and labels
+- shared wardrobe taxonomy helpers for:
+  - category normalization
+  - category grouping
+  - metadata normalization for color / season / occasion / style / formality
+  - readable display labels
 - browser verification script for critical shared-state flows
 
 ### Backend
@@ -248,10 +269,11 @@ Recent wardrobe-information phase:
 
 - `3F.1` searchable category picker + Indian/western wardrobe taxonomy
 - `3F.2` wardrobe search + lightweight filtering
+- `3F.3` field autosuggest + chip inputs for wardrobe metadata cleanup
 
 Next planned wardrobe-information phase:
 
-- `3F.3` lightweight wardrobe filtering/sorting refinement built on top of search and normalized taxonomy
+- `3F.4` lightweight wardrobe filtering/sorting refinement built on top of search and normalized taxonomy
 
 ## Repository Structure
 
@@ -463,6 +485,8 @@ Oversize message:
 - stronger mixed-wardrobe category support with readable labels and safer grouping
 - better support for Indian traditional, western, and Indo-western clothing types
 - fast frontend Wardrobe search without leaving the closet-style layout behind
+- cleaner metadata entry through normalized autosuggest and chip inputs
+- more readable color / season / occasion / style labels across the app
 
 ## Honest Current Gaps
 
@@ -474,11 +498,11 @@ The biggest remaining product-quality gap is now hosted-readiness planning plus 
 - old orphaned upload files from earlier bugs can now be detected, but are not auto-deleted by default
 - local dev access to the backfilled dev user now has a dedicated reset utility for safe frontend-auth testing
 - signup is now visually present and reachable, but the auth entry flow could still use one more tiny spacing pass if we later want even tighter parity with the reference image
-- taxonomy and search are now much stronger, but Wardrobe still does not yet have lightweight filter/sort refinement for denser closets
+- taxonomy, metadata entry, and search are now much stronger, but Wardrobe still does not yet have lightweight filter/sort refinement for denser closets
 
 The highest-impact next refinement would be:
 
-- Phase `3F.3`: lightweight filter/sort refinement built on the normalized taxonomy and new Wardrobe search, without turning DigiCloset into an inventory dashboard
+- Phase `3F.4`: lightweight filter/sort refinement built on the normalized taxonomy and new Wardrobe search, without turning DigiCloset into an inventory dashboard
 
 ## Documentation Maintenance
 

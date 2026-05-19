@@ -9,7 +9,9 @@ import {
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
+import AutosuggestField from "../components/AutosuggestField.jsx";
 import CategoryPicker from "../components/CategoryPicker.jsx";
+import ChipSelect from "../components/ChipSelect.jsx";
 import EmptyState from "../components/EmptyState";
 import ErrorState from "../components/ErrorState";
 import LoadingState from "../components/LoadingState";
@@ -20,7 +22,15 @@ import { useWardrobeData } from "../context/WardrobeDataProvider.jsx";
 import { api } from "../lib/api";
 import {
   formatCategoryLabel,
+  formatColorLabel,
+  formatOccasionLabel,
+  formatSeasonLabel,
+  formatStyleLabel,
   normalizeCategory,
+  normalizeColor,
+  normalizeOccasion,
+  normalizeSeason,
+  normalizeStyle,
 } from "../utils/wardrobeTaxonomy";
 import {
   ACCEPTED_IMAGE_INPUT,
@@ -222,10 +232,10 @@ export default function Capture() {
       const formData = new FormData();
       formData.append("name", singleForm.name);
       formData.append("category", normalizeCategory(singleForm.category));
-      formData.append("color", singleForm.color);
-      formData.append("season", singleForm.season);
-      formData.append("occasion", singleForm.occasion);
-      formData.append("style", singleForm.style);
+      formData.append("color", normalizeColor(singleForm.color));
+      formData.append("season", normalizeSeason(singleForm.season));
+      formData.append("occasion", normalizeOccasion(singleForm.occasion));
+      formData.append("style", normalizeStyle(singleForm.style));
       formData.append("source_type", "manual_piece");
 
       if (singleImage) {
@@ -308,10 +318,10 @@ export default function Capture() {
       const formData = new FormData();
       formData.append("name", scanResult.name);
       formData.append("category", normalizeCategory(scanResult.category));
-      formData.append("color", scanResult.color);
-      formData.append("season", scanResult.season || "all");
-      formData.append("occasion", scanResult.occasion || "casual");
-      formData.append("style", scanResult.style || "");
+      formData.append("color", normalizeColor(scanResult.color));
+      formData.append("season", normalizeSeason(scanResult.season || "all"));
+      formData.append("occasion", normalizeOccasion(scanResult.occasion || "casual"));
+      formData.append("style", normalizeStyle(scanResult.style || ""));
       formData.append("source_type", "image_upload");
 
       if (scanImage) {
@@ -329,8 +339,6 @@ export default function Capture() {
 
   const inputClass =
     "w-full rounded-xl border border-black/10 bg-white px-3 py-2.5 text-sm text-charcoal outline-none transition focus:border-charcoal/30";
-  const selectClass =
-    "w-full rounded-xl border border-black/10 bg-ivory px-3 py-2.5 text-sm text-charcoal outline-none transition focus:border-charcoal/30";
 
   return (
     <main className="mx-auto w-full max-w-6xl px-4 py-5 sm:px-5 sm:py-6 lg:px-6 lg:py-8">
@@ -436,16 +444,16 @@ export default function Capture() {
                   <label className="mb-1 block text-xs font-bold uppercase tracking-widest text-stone">
                     Color
                   </label>
-                  <input
-                    className={inputClass}
+                  <AutosuggestField
+                    field="color"
                     value={singleForm.color}
-                    onChange={(event) =>
+                    onChange={(color) =>
                       setSingleForm((current) => ({
                         ...current,
-                        color: event.target.value,
+                        color,
                       }))
                     }
-                    placeholder="e.g. navy blue"
+                    placeholder="Search color"
                   />
                 </div>
                 <div>
@@ -468,21 +476,49 @@ export default function Capture() {
                   <label className="mb-1 block text-xs font-bold uppercase tracking-widest text-stone">
                     Season
                   </label>
-                  <select
-                    className={selectClass}
+                  <ChipSelect
                     value={singleForm.season}
-                    onChange={(event) =>
+                    onChange={(season) =>
                       setSingleForm((current) => ({
                         ...current,
-                        season: event.target.value,
+                        season,
                       }))
                     }
-                  >
-                    <option value="all">All Seasons</option>
-                    <option value="summer">Summer</option>
-                    <option value="winter">Winter</option>
-                    <option value="rainy">Rainy</option>
-                  </select>
+                    options={["all", "summer", "winter", "rainy", "spring", "autumn"]}
+                    formatOption={formatSeasonLabel}
+                  />
+                </div>
+                <div>
+                  <label className="mb-1 block text-xs font-bold uppercase tracking-widest text-stone">
+                    Occasion
+                  </label>
+                  <AutosuggestField
+                    field="occasion"
+                    value={singleForm.occasion}
+                    onChange={(occasion) =>
+                      setSingleForm((current) => ({
+                        ...current,
+                        occasion,
+                      }))
+                    }
+                    placeholder="Search occasion"
+                  />
+                </div>
+                <div>
+                  <label className="mb-1 block text-xs font-bold uppercase tracking-widest text-stone">
+                    Style
+                  </label>
+                  <AutosuggestField
+                    field="style"
+                    value={singleForm.style}
+                    onChange={(style) =>
+                      setSingleForm((current) => ({
+                        ...current,
+                        style,
+                      }))
+                    }
+                    placeholder="Search style"
+                  />
                 </div>
               </div>
 
@@ -571,14 +607,28 @@ export default function Capture() {
                     </div>
                     <div>
                       <p className="text-xs text-stone">Color</p>
-                      <p className="font-medium capitalize text-charcoal">
-                        {scanResult.color}
+                      <p className="font-medium text-charcoal">
+                        {formatColorLabel(scanResult.color)}
                       </p>
                     </div>
                     <div>
                       <p className="text-xs text-stone">Occasion</p>
-                      <p className="font-medium capitalize text-charcoal">
-                        {scanResult.occasion}
+                      <p className="font-medium text-charcoal">
+                        {formatOccasionLabel(scanResult.occasion)}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-stone">Season</p>
+                      <p className="font-medium text-charcoal">
+                        {formatSeasonLabel(scanResult.season || "all")}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-stone">Style</p>
+                      <p className="font-medium text-charcoal">
+                        {scanResult.style
+                          ? formatStyleLabel(scanResult.style)
+                          : "Not set"}
                       </p>
                     </div>
                   </div>

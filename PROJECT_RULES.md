@@ -279,6 +279,27 @@ Do not:
 - let search mode turn Wardrobe into an admin dashboard
 - overload the page with advanced filters before basic search is solid
 
+### 7.7 Metadata normalization rule
+Small wardrobe metadata fields should become cleaner through shared normalization before they become more complex.
+
+Do:
+- normalize common free-text inputs such as:
+  - color
+  - season
+  - occasion
+  - style
+  - formality
+- prefer lightweight autosuggest for open-but-common fields
+- prefer compact chip selection for small fixed sets like season or formality
+- keep unknown values safe and readable instead of rejecting them aggressively
+- use readable labels in the UI instead of raw underscore values
+
+Do not:
+- turn metadata entry into a heavy taxonomy-management experience
+- force every field into a large modal or admin-style picker
+- auto-rewrite old stored values without an explicit migration plan
+- make Capture feel form-heavy just to gain cleaner metadata
+
 ---
 
 ## 8. Backend Architecture Boundaries

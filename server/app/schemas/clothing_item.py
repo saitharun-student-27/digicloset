@@ -5,16 +5,8 @@ from pydantic import BaseModel, ConfigDict, Field
 
 
 ClothingCategory = Annotated[str, Field(min_length=1, max_length=50)]
-ClothingSeason = Literal["summer", "winter", "rainy", "all"]
-ClothingOccasion = Literal[
-    "casual",
-    "formal",
-    "college",
-    "party",
-    "sports",
-    "travel",
-    "traditional",
-]
+ClothingSeason = Annotated[str, Field(min_length=1, max_length=30)]
+ClothingOccasion = Annotated[str, Field(min_length=1, max_length=40)]
 ClothingSourceType = Literal[
     "manual_piece",
     "outfit_breakdown",

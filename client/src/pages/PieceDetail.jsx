@@ -2,23 +2,30 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
+import AutosuggestField from "../components/AutosuggestField.jsx";
+import CategoryPicker from "../components/CategoryPicker.jsx";
+import ChipSelect from "../components/ChipSelect.jsx";
 import EmptyState from "../components/EmptyState";
 import ErrorState from "../components/ErrorState";
 import LoadingState from "../components/LoadingState";
 import OutfitEditModal from "../components/OutfitEditModal";
 import OutfitShowcaseCard from "../components/OutfitShowcaseCard";
-import CategoryPicker from "../components/CategoryPicker.jsx";
 import { useWardrobeData } from "../context/WardrobeDataProvider.jsx";
 import { getImageUrl } from "../services/clothingService";
-import {
-  formatValue,
-  getWardrobeSection,
-  occasions,
-  seasons,
-} from "../utils/outfitUtils";
+import { formatValue, getWardrobeSection, seasons } from "../utils/outfitUtils";
 import {
   formatCategoryLabel,
+  formatColorLabel,
+  formatFormalityLabel,
+  formatOccasionLabel,
+  formatSeasonLabel,
+  formatStyleLabel,
   normalizeCategory,
+  normalizeColor,
+  normalizeFormality,
+  normalizeOccasion,
+  normalizeSeason,
+  normalizeStyle,
 } from "../utils/wardrobeTaxonomy";
 
 const inputClass =
@@ -76,7 +83,15 @@ function PieceEditModal({ item, isOpen, isSaving, onClose, onSubmit }) {
           className="mt-6 space-y-4"
           onSubmit={(event) => {
             event.preventDefault();
-            onSubmit(formData);
+            onSubmit({
+              ...formData,
+              category: normalizeCategory(formData.category),
+              color: normalizeColor(formData.color),
+              season: normalizeSeason(formData.season),
+              occasion: normalizeOccasion(formData.occasion),
+              style: normalizeStyle(formData.style),
+              formality_level: normalizeFormality(formData.formality_level),
+            });
           }}
         >
           <div className="grid gap-4 sm:grid-cols-2">
@@ -99,15 +114,16 @@ function PieceEditModal({ item, isOpen, isSaving, onClose, onSubmit }) {
               <label className="mb-2 block text-sm font-medium text-charcoal">
                 Color
               </label>
-              <input
-                className={inputClass}
+              <AutosuggestField
+                field="color"
                 value={formData.color}
-                onChange={(event) =>
+                onChange={(color) =>
                   setFormData((current) => ({
                     ...current,
-                    color: event.target.value,
+                    color,
                   }))
                 }
+                placeholder="Search color"
               />
             </div>
             <div>
@@ -130,57 +146,48 @@ function PieceEditModal({ item, isOpen, isSaving, onClose, onSubmit }) {
               <label className="mb-2 block text-sm font-medium text-charcoal">
                 Season
               </label>
-              <select
-                className={inputClass}
+              <ChipSelect
                 value={formData.season}
-                onChange={(event) =>
+                onChange={(season) =>
                   setFormData((current) => ({
                     ...current,
-                    season: event.target.value,
+                    season,
                   }))
                 }
-              >
-                {seasons.map((season) => (
-                  <option key={season} value={season}>
-                    {formatValue(season)}
-                  </option>
-                ))}
-              </select>
+                options={seasons}
+                formatOption={formatSeasonLabel}
+              />
             </div>
             <div>
               <label className="mb-2 block text-sm font-medium text-charcoal">
                 Occasion
               </label>
-              <select
-                className={inputClass}
+              <AutosuggestField
+                field="occasion"
                 value={formData.occasion}
-                onChange={(event) =>
+                onChange={(occasion) =>
                   setFormData((current) => ({
                     ...current,
-                    occasion: event.target.value,
+                    occasion,
                   }))
                 }
-              >
-                {occasions.map((occasion) => (
-                  <option key={occasion} value={occasion}>
-                    {formatValue(occasion)}
-                  </option>
-                ))}
-              </select>
+                placeholder="Search occasion"
+              />
             </div>
             <div>
               <label className="mb-2 block text-sm font-medium text-charcoal">
                 Formality level
               </label>
-              <input
-                className={inputClass}
+              <ChipSelect
                 value={formData.formality_level}
-                onChange={(event) =>
+                onChange={(formality_level) =>
                   setFormData((current) => ({
                     ...current,
-                    formality_level: event.target.value,
+                    formality_level,
                   }))
                 }
+                options={["", "low", "medium", "high"]}
+                formatOption={formatFormalityLabel}
               />
             </div>
           </div>
@@ -189,15 +196,16 @@ function PieceEditModal({ item, isOpen, isSaving, onClose, onSubmit }) {
             <label className="mb-2 block text-sm font-medium text-charcoal">
               Style
             </label>
-            <input
-              className={inputClass}
+            <AutosuggestField
+              field="style"
               value={formData.style}
-              onChange={(event) =>
+              onChange={(style) =>
                 setFormData((current) => ({
                   ...current,
-                  style: event.target.value,
+                  style,
                 }))
               }
+              placeholder="Search style"
             />
           </div>
 
@@ -287,10 +295,7 @@ export default function PieceDetail() {
     setIsSavingPiece(true);
     try {
       setActionError("");
-      await updatePiece(item.id, {
-        ...payload,
-        category: normalizeCategory(payload.category),
-      });
+      await updatePiece(item.id, payload);
       setIsEditingPiece(false);
     } catch (saveError) {
       setActionError(
@@ -429,18 +434,23 @@ export default function PieceDetail() {
                 Section: {getWardrobeSection(item.category)}
               </p>
             </div>
-            <span className="w-fit rounded-full bg-ivory px-4 py-2 text-sm font-medium capitalize text-charcoal">
-              {item.color}
+            <span className="w-fit rounded-full bg-ivory px-4 py-2 text-sm font-medium text-charcoal">
+              {formatColorLabel(item.color)}
             </span>
           </div>
 
           <div className="mt-6 grid gap-3 sm:grid-cols-2">
             {[
               ["Category", formatCategoryLabel(item.category)],
-              ["Season", formatValue(item.season || "all")],
-              ["Occasion", formatValue(item.occasion || "casual")],
-              ["Style", item.style || "Not set"],
-              ["Formality", item.formality_level || "Not set"],
+              ["Season", formatSeasonLabel(item.season || "all")],
+              ["Occasion", formatOccasionLabel(item.occasion || "casual")],
+              ["Style", item.style ? formatStyleLabel(item.style) : "Not set"],
+              [
+                "Formality",
+                item.formality_level
+                  ? formatFormalityLabel(item.formality_level)
+                  : "Not set",
+              ],
               ["Source", formatValue(item.source_type)],
             ].map(([label, value]) => (
               <div key={label} className="rounded-2xl bg-ivory p-4">
