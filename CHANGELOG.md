@@ -144,7 +144,7 @@ Commit: `0b56ff6`
 
 ## 2026-05-19 - Add wardrobe search and lightweight filtering
 
-Commit: pending current checkpoint
+Commit: `a1bcda0`
 
 ### Phase 3F.2 scope
 
@@ -214,7 +214,7 @@ Commit: pending current checkpoint
 
 ## 2026-05-19 - Add autosuggest metadata fields and chip inputs
 
-Commit: pending current checkpoint
+Commit: `4ac1cf3`
 
 ### Phase 3F.3 scope
 
@@ -639,7 +639,7 @@ The repo now reflects the actual current DigiCloset product state instead of onl
 
 ## 2026-05-15 - Add shared client data layer and faster mutations
 
-Commit: see git history for the latest Phase 3D.3 checkpoint
+Commit: `0ef658f`
 
 ### Why this phase happened
 
@@ -701,7 +701,7 @@ DigiCloset now feels more cohesive during repeated use:
 
 ## 2026-05-17 - Add Outfit Detail page and card-to-detail flow
 
-Commit: pending current checkpoint
+Commit: `f87af2c`
 
 ### Outfit detail route
 
@@ -746,7 +746,7 @@ Commit: pending current checkpoint
 
 ## 2026-05-17 - Verify shared wardrobe state in a real browser
 
-Commit: pending current checkpoint
+Commit: `fae8121`
 
 ### Browser verification tooling
 
@@ -769,7 +769,7 @@ Commit: pending current checkpoint
 
 ## 2026-05-17 - Fix backend image/delete persistence and upload cleanup consistency
 
-Commit: pending current checkpoint
+Commit: `f87af2c`
 
 ### Root issue
 
@@ -827,7 +827,7 @@ Commit: pending current checkpoint
 
 ## 2026-05-17 - Add backend auth foundation
 
-Commit: pending current checkpoint
+Commit: `0cc48cb`
 
 ### Scope of this phase
 
@@ -878,7 +878,7 @@ Commit: pending current checkpoint
 
 ## 2026-05-17 - Add backend user ownership filtering and local dev backfill
 
-Commit: pending current checkpoint
+Commit: `fbe32c5`
 
 ### Scope of this phase
 
@@ -970,7 +970,7 @@ Commit: pending current checkpoint
 
 ## 2026-05-18 - Add dev user password reset utility
 
-Commit: pending current checkpoint
+Commit: `9768ad2`
 
 ### Scope of this phase
 
@@ -997,7 +997,7 @@ Commit: pending current checkpoint
 
 ## 2026-05-18 - Add frontend auth context, login/signup, and protected routes
 
-Commit: pending current checkpoint
+Commit: `ceab689`
 
 ### Scope of this phase
 
@@ -1079,7 +1079,7 @@ Commit: pending current checkpoint
 
 ## 2026-05-18 - Redesign auth screens to match DigiCloset reference mood
 
-Commit: pending current checkpoint
+Commit: `7a901a8`
 
 ### Phase 3E.3B visual redesign
 
@@ -1104,7 +1104,7 @@ Commit: pending current checkpoint
 
 ## 2026-05-18 - Correct auth flow into separate mobile-style welcome, login, and signup screens
 
-Commit: pending current checkpoint
+Commit: `7a901a8`
 
 ### Phase 3E.3C correction
 

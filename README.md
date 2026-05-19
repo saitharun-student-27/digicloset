@@ -512,6 +512,13 @@ When the product changes meaningfully, update:
 - `CHANGELOG.md` for release history
 - `docs/screenshots/` for UI screenshots
 
+Checkpoint discipline:
+
+- after each completed phase, update the relevant markdown docs first
+- then create a local git commit
+- then push that checkpoint to the GitHub repo
+- avoid leaving stale `pending checkpoint` notes behind in the changelog
+
 To refresh screenshots with headless Edge:
 
 ```powershell

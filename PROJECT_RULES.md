@@ -626,6 +626,26 @@ Do not leave large mixed-purpose changes uncommitted for long.
 ### 14.4 Refactor rule
 When changing direction, commit architectural checkpoints before adding more features on top.
 
+### 14.5 Phase checkpoint rule
+At the end of every meaningful product or engineering phase:
+- update the relevant markdown documentation
+  - `CHANGELOG.md`
+  - `README.md`
+  - `PROJECT_RULES.md` when a rule or permanent direction changed
+  - `server/README.md` when backend behavior or setup changed
+- record the phase honestly:
+  - what changed
+  - what was verified
+  - what the next phase is
+- create a local git commit for the checkpoint
+- push the checkpoint to the main remote branch unless intentionally paused
+
+Do not:
+- leave a completed phase undocumented
+- leave stale `pending checkpoint` placeholders behind in release notes
+- treat local-only commits as the normal end state for a finished phase
+- skip documentation updates when the product behavior changed
+
 ---
 
 ## 15. Upload and Security Rules
