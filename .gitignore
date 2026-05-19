@@ -24,3 +24,6 @@ server/uploads/*
 
 # Local Codex workspace artifacts
 .agent/
+
+# Local reference assets
+references/
