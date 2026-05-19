@@ -21,6 +21,7 @@ import {
   generateOutfitNote,
   generateOutfitTitle,
   getWardrobeSection,
+  wardrobeSections,
 } from "../utils/outfitUtils";
 
 const WEATHER_ICONS = {
@@ -173,41 +174,54 @@ function sortByVisualQuality(items) {
 
 function roleForSection(section) {
   const map = {
-    Upperwear: "upper",
-    Lowerwear: "lower",
+    "Western upperwear": "upper",
+    "Indian upperwear": "upper",
+    "Western lowerwear": "lower",
+    "Indian lowerwear": "lower",
+    "One-piece / Full body": "upper",
+    "Indian full outfit": "upper",
     Footwear: "footwear",
     Outerwear: "outerwear",
+    Drapes: "accessory",
     Accessories: "accessory",
+    "Base layers": "upper",
+    Activewear: "upper",
   };
 
   return map[section] || "accessory";
 }
 
 function groupPiecesBySection(items) {
-  return items.reduce(
-    (groups, item) => {
-      const section = getWardrobeSection(item.category);
-      groups[section].push(item);
-      return groups;
-    },
-    {
-      Upperwear: [],
-      Lowerwear: [],
-      Footwear: [],
-      Outerwear: [],
-      Accessories: [],
-      Other: [],
-    },
-  );
+  return items.reduce((groups, item) => {
+    const section = getWardrobeSection(item.category);
+    if (!groups[section]) {
+      groups[section] = [];
+    }
+    groups[section].push(item);
+    return groups;
+  }, Object.fromEntries(wardrobeSections.map((section) => [section, []])));
 }
 
 function buildStarterLooks(clothingItems, preferredSeason) {
   const grouped = groupPiecesBySection(clothingItems);
-  const uppers = sortByVisualQuality(grouped.Upperwear);
-  const lowers = sortByVisualQuality(grouped.Lowerwear);
+  const uppers = sortByVisualQuality([
+    ...grouped["Western upperwear"],
+    ...grouped["Indian upperwear"],
+    ...grouped["One-piece / Full body"],
+    ...grouped["Indian full outfit"],
+    ...grouped["Base layers"],
+    ...grouped.Activewear,
+  ]);
+  const lowers = sortByVisualQuality([
+    ...grouped["Western lowerwear"],
+    ...grouped["Indian lowerwear"],
+  ]);
   const footwear = sortByVisualQuality(grouped.Footwear);
   const outerwear = sortByVisualQuality(grouped.Outerwear);
-  const accessories = sortByVisualQuality(grouped.Accessories);
+  const accessories = sortByVisualQuality([
+    ...grouped.Accessories,
+    ...grouped.Drapes,
+  ]);
 
   const candidateCount = Math.min(
     3,

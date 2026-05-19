@@ -160,11 +160,10 @@ export default function Vault() {
   const sectionLinks = [
     { id: "favorite-fits", label: "Favorite Fits" },
     { id: "outfit-memories", label: "Outfit Memories" },
-    { id: "upperwear", label: "Upperwear" },
-    { id: "lowerwear", label: "Lowerwear" },
-    { id: "footwear", label: "Footwear" },
-    { id: "outerwear", label: "Outerwear" },
-    { id: "accessories", label: "Accessories" },
+    ...wardrobeSections.map((section) => ({
+      id: section.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+      label: section,
+    })),
   ];
 
   const isLoading = outfitsLoading || clothingLoading;
@@ -286,7 +285,7 @@ export default function Vault() {
         {wardrobeSections.map((section) => (
           <RailSection
             key={section}
-            id={section.toLowerCase()}
+            id={section.toLowerCase().replace(/[^a-z0-9]+/g, "-")}
             title={section}
             description="Supporting pieces grouped calmly by section, so the closet stays easy to scan on mobile."
             items={groupedItems[section]}

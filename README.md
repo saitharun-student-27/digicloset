@@ -20,6 +20,8 @@ DigiCloset currently includes:
   - logout
 - dedicated outfit detail pages
 - piece detail pages
+- searchable category entry for clothing and outfit-piece flows
+- shared wardrobe taxonomy for Indian, western, and Indo-western categories
 - shared client-side wardrobe data layer for outfits and clothing
 - outfit lifecycle actions:
   - favorite / unfavorite
@@ -120,11 +122,18 @@ Wardrobe behaves like a digital closet:
 
 - Favorite Fits
 - All Outfit Memories
-- Upperwear
-- Lowerwear
+- Western upperwear
+- Western lowerwear
+- One-piece / Full body
 - Footwear
 - Outerwear
+- Indian upperwear
+- Indian lowerwear
+- Indian full outfit
+- Drapes
 - Accessories
+- Base layers
+- Activewear
 - Other
 
 Favorites are featured, not moved. A favorited outfit still remains in the full outfit memory rail.
@@ -161,7 +170,7 @@ These sections are deterministic and based on real data only.
 Each clothing piece has a dedicated detail page:
 
 - image or placeholder
-- category and section
+- normalized category and section
 - color
 - season
 - occasion
@@ -199,6 +208,7 @@ Legacy redirects:
 - route-level lazy loading
 - `AuthContext` for user + session state
 - shared `WardrobeDataProvider` for outfit and clothing state
+- shared wardrobe taxonomy helpers for category normalization, grouping, and labels
 - browser verification script for critical shared-state flows
 
 ### Backend
@@ -231,10 +241,15 @@ Recent auth and ownership phases:
 - `3E.3` frontend auth context, login/signup, protected routes, and bearer-token wiring
 - `3E.3B` auth reference-matched visual redesign
 - `3E.3C` auth screen correction into separate mobile-style welcome/login/signup screens
+- `3E.4` user-scoped uploads polish and full auth/app QA
 
-Next planned auth-adjacent phase:
+Recent wardrobe-information phase:
 
-- `3E.5` PostgreSQL migration planning and hosted deployment readiness
+- `3F.1` searchable category picker + Indian/western wardrobe taxonomy
+
+Next planned wardrobe-information phase:
+
+- `3F.2` wardrobe search/filtering built on top of normalized taxonomy
 
 ## Repository Structure
 
@@ -443,10 +458,12 @@ Oversize message:
 - separate mobile-style auth entry screens that match the calmer DigiCloset editorial mood more closely
 - verified user-scoped upload isolation across authenticated users
 - verified logout/login switching without stale wardrobe leakage
+- stronger mixed-wardrobe category support with readable labels and safer grouping
+- better support for Indian traditional, western, and Indo-western clothing types
 
 ## Honest Current Gaps
 
-The biggest remaining product-quality gap is hosted-readiness planning and secondary derived freshness:
+The biggest remaining product-quality gap is now hosted-readiness planning plus richer discovery on top of the new taxonomy:
 
 - core outfit and piece mutations now use shared client state
 - but weather/suggestion-derived content is still fetched separately from the shared wardrobe layer
@@ -454,10 +471,11 @@ The biggest remaining product-quality gap is hosted-readiness planning and secon
 - old orphaned upload files from earlier bugs can now be detected, but are not auto-deleted by default
 - local dev access to the backfilled dev user now has a dedicated reset utility for safe frontend-auth testing
 - signup is now visually present and reachable, but the auth entry flow could still use one more tiny spacing pass if we later want even tighter parity with the reference image
+- taxonomy is now much stronger, but we still do not have full wardrobe search/filter tools built on top of it
 
 The highest-impact next refinement would be:
 
-- Phase `3E.5`: PostgreSQL migration planning and hosted deployment readiness
+- Phase `3F.2`: wardrobe search/filtering built on the normalized taxonomy without turning DigiCloset into an inventory dashboard
 
 ## Documentation Maintenance
 

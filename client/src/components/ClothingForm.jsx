@@ -1,23 +1,12 @@
 import { ImagePlus, Plus, Shirt, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
+import CategoryPicker from "./CategoryPicker.jsx";
 import {
   ACCEPTED_IMAGE_INPUT,
   validateImageFile,
 } from "../utils/uploadValidation";
-
-const categories = [
-  "shirt",
-  "t_shirt",
-  "pant",
-  "jeans",
-  "shorts",
-  "jacket",
-  "hoodie",
-  "shoes",
-  "accessory",
-  "dress",
-];
+import { normalizeCategory } from "../utils/wardrobeTaxonomy";
 
 const seasons = ["summer", "winter", "rainy", "all"];
 
@@ -110,7 +99,7 @@ export default function ClothingForm({ onSubmit, isSubmitting }) {
 
     const payload = new FormData();
     payload.append("name", formData.name);
-    payload.append("category", formData.category);
+    payload.append("category", normalizeCategory(formData.category));
     payload.append("color", formData.color);
     payload.append("season", formData.season);
     payload.append("occasion", formData.occasion);
@@ -195,12 +184,14 @@ export default function ClothingForm({ onSubmit, isSubmitting }) {
 
         <div>
           <FieldLabel htmlFor="category">Category</FieldLabel>
-          <SelectInput
+          <CategoryPicker
             id="category"
             name="category"
             value={formData.category}
-            onChange={handleChange}
-            options={categories}
+            onChange={(category) =>
+              setFormData((current) => ({ ...current, category }))
+            }
+            placeholder="Search category"
           />
         </div>
 

@@ -7,6 +7,7 @@ Current backend scope includes:
 - outfit and clothing APIs
 - deterministic suggestions
 - safe local upload handling
+- category validation that supports expanded normalized wardrobe categories
 - backend auth foundation:
   - `POST /api/auth/signup`
   - `POST /api/auth/login`
@@ -114,6 +115,12 @@ Current frontend/backend auth state:
 - local dev testing can use:
   - email: `dev@digicloset.local`
   - password: `devpassword123`
+
+Current category-taxonomy boundary:
+
+- frontend now normalizes category input for Indian, western, and Indo-western wardrobes
+- backend clothing schemas accept expanded canonical category strings and safe custom category values
+- old category records are not auto-rewritten by the backend
 
 Next backend-adjacent phase:
 

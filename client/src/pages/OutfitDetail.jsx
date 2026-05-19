@@ -18,6 +18,7 @@ import OutfitEditModal from "../components/OutfitEditModal";
 import { useWardrobeData } from "../context/WardrobeDataProvider.jsx";
 import { getImageUrl } from "../services/clothingService";
 import { formatValue } from "../utils/outfitUtils";
+import { formatCategoryLabel } from "../utils/wardrobeTaxonomy";
 
 const pieceSectionMap = {
   upper: "Upperwear",
@@ -522,7 +523,7 @@ export default function OutfitDetail() {
                             {piece?.name}
                           </p>
                           <p className="mt-1 text-xs capitalize leading-5 text-stone">
-                            {[piece?.color, formatValue(piece?.category)]
+                            {[piece?.color, formatCategoryLabel(piece?.category)]
                               .filter(Boolean)
                               .join(" · ")}
                           </p>

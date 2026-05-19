@@ -7,15 +7,19 @@ import ErrorState from "../components/ErrorState";
 import LoadingState from "../components/LoadingState";
 import OutfitEditModal from "../components/OutfitEditModal";
 import OutfitShowcaseCard from "../components/OutfitShowcaseCard";
+import CategoryPicker from "../components/CategoryPicker.jsx";
 import { useWardrobeData } from "../context/WardrobeDataProvider.jsx";
 import { getImageUrl } from "../services/clothingService";
 import {
-  categories,
   formatValue,
   getWardrobeSection,
   occasions,
   seasons,
 } from "../utils/outfitUtils";
+import {
+  formatCategoryLabel,
+  normalizeCategory,
+} from "../utils/wardrobeTaxonomy";
 
 const inputClass =
   "h-11 min-h-[var(--touch-target-min)] w-full rounded-xl border border-black/10 bg-white px-3 text-sm text-charcoal outline-none transition focus:border-sage focus:ring-4 focus:ring-sage/10";
@@ -110,22 +114,17 @@ function PieceEditModal({ item, isOpen, isSaving, onClose, onSubmit }) {
               <label className="mb-2 block text-sm font-medium text-charcoal">
                 Category
               </label>
-              <select
-                className={inputClass}
+              <CategoryPicker
+                className="bg-white"
                 value={formData.category}
-                onChange={(event) =>
+                onChange={(category) =>
                   setFormData((current) => ({
                     ...current,
-                    category: event.target.value,
+                    category,
                   }))
                 }
-              >
-                {categories.map((category) => (
-                  <option key={category} value={category}>
-                    {formatValue(category)}
-                  </option>
-                ))}
-              </select>
+                placeholder="Search category"
+              />
             </div>
             <div>
               <label className="mb-2 block text-sm font-medium text-charcoal">
@@ -288,7 +287,10 @@ export default function PieceDetail() {
     setIsSavingPiece(true);
     try {
       setActionError("");
-      await updatePiece(item.id, payload);
+      await updatePiece(item.id, {
+        ...payload,
+        category: normalizeCategory(payload.category),
+      });
       setIsEditingPiece(false);
     } catch (saveError) {
       setActionError(
@@ -434,7 +436,7 @@ export default function PieceDetail() {
 
           <div className="mt-6 grid gap-3 sm:grid-cols-2">
             {[
-              ["Category", formatValue(item.category)],
+              ["Category", formatCategoryLabel(item.category)],
               ["Season", formatValue(item.season || "all")],
               ["Occasion", formatValue(item.occasion || "casual")],
               ["Style", item.style || "Not set"],

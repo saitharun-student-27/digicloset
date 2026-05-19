@@ -1,41 +1,10 @@
 from datetime import datetime
-from typing import Literal
+from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
 
-ClothingCategory = Literal[
-    "shirt",
-    "t_shirt",
-    "top",
-    "kurta",
-    "blouse",
-    "pant",
-    "pants",
-    "jeans",
-    "shorts",
-    "skirt",
-    "trousers",
-    "jacket",
-    "hoodie",
-    "blazer",
-    "coat",
-    "sweater",
-    "shoes",
-    "sneakers",
-    "sandals",
-    "boots",
-    "loafers",
-    "accessory",
-    "watch",
-    "belt",
-    "bag",
-    "cap",
-    "hat",
-    "scarf",
-    "dress",
-    "unknown",
-]
+ClothingCategory = Annotated[str, Field(min_length=1, max_length=50)]
 ClothingSeason = Literal["summer", "winter", "rainy", "all"]
 ClothingOccasion = Literal[
     "casual",

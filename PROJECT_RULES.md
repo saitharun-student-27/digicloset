@@ -212,10 +212,19 @@ Do not:
 The wardrobe page should feel like opening a real digital closet.
 
 ### 7.1 Wardrobe page may show
-- upperwear
-- lowerwear
+- western upperwear
+- western lowerwear
+- one-piece / full body
+- outerwear
+- Indian upperwear
+- Indian lowerwear
+- Indian full outfit
+- drapes
 - footwear
 - accessories
+- base layers
+- activewear
+- other
 - saved outfits as contextual anchors
 - outfit-linked wardrobe organization
 - lightweight filters by season, occasion, color, or category
@@ -234,6 +243,26 @@ Within wardrobe:
 
 ### 7.4 Wardrobe page CTA rule
 Primary call to action on wardrobe should push users toward **Outfit Memory**, not toward item-by-item inventory entry.
+
+### 7.5 Category taxonomy rule
+Wardrobe categorization must support mixed closets realistically, including:
+- western clothing
+- Indian traditional clothing
+- Indo-western clothing
+- one-piece clothing
+- footwear
+- accessories
+
+Do:
+- normalize messy input through a shared taxonomy layer before display or grouping
+- use readable display labels instead of raw storage-like category strings
+- keep unknown categories safe and visible under `Other`
+- improve grouping first before considering broad database rewrites
+
+Do not:
+- assume western-only wardrobe language
+- auto-mutate old stored categories without an explicit migration plan
+- turn category management into a large taxonomy-admin system
 
 ---
 

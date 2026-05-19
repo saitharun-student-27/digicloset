@@ -1,3 +1,11 @@
+import {
+  formatCategoryLabel,
+  getCategoryOptions,
+  getCategorySection,
+  normalizeCategory,
+  wardrobeSections,
+} from "./wardrobeTaxonomy";
+
 export const seasons = ["summer", "winter", "rainy", "all"];
 
 export const occasions = [
@@ -10,38 +18,7 @@ export const occasions = [
   "traditional",
 ];
 
-export const categories = [
-  "shirt",
-  "t_shirt",
-  "top",
-  "kurta",
-  "blouse",
-  "pant",
-  "pants",
-  "jeans",
-  "shorts",
-  "skirt",
-  "trousers",
-  "jacket",
-  "hoodie",
-  "blazer",
-  "coat",
-  "sweater",
-  "shoes",
-  "sneakers",
-  "sandals",
-  "boots",
-  "loafers",
-  "accessory",
-  "watch",
-  "belt",
-  "bag",
-  "cap",
-  "hat",
-  "scarf",
-  "dress",
-  "unknown",
-];
+export const categories = getCategoryOptions();
 
 export const roles = ["upper", "lower", "footwear", "outerwear", "accessory"];
 
@@ -87,7 +64,7 @@ const pieceMatchers = [
     category: "dress",
     slot: "upper",
     name: "Dress",
-    aliases: ["dress", "gown"],
+    aliases: ["dress", "gown", "frock", "one piece", "one-piece"],
   },
   {
     category: "top",
@@ -99,7 +76,13 @@ const pieceMatchers = [
     category: "kurta",
     slot: "upper",
     name: "Kurta",
-    aliases: ["kurta"],
+    aliases: ["kurta", "kurta set", "kurta pajama", "kurta pyjama"],
+  },
+  {
+    category: "kurti",
+    slot: "upper",
+    name: "Kurti",
+    aliases: ["kurti", "kurthi"],
   },
   {
     category: "blouse",
@@ -117,19 +100,13 @@ const pieceMatchers = [
     category: "t_shirt",
     slot: "upper",
     name: "T-Shirt",
-    aliases: ["t shirt", "tee", "t-shirt"],
-  },
-  {
-    category: "pant",
-    slot: "lower",
-    name: "Pants",
-    aliases: ["pant", "slacks"],
+    aliases: ["t shirt", "tee", "t-shirt", "tshirt", "tee shirt"],
   },
   {
     category: "pants",
     slot: "lower",
     name: "Pants",
-    aliases: ["pants"],
+    aliases: ["pant", "pants", "slacks", "bottoms", "lower"],
   },
   {
     category: "jeans",
@@ -148,6 +125,18 @@ const pieceMatchers = [
     slot: "lower",
     name: "Skirt",
     aliases: ["skirt"],
+  },
+  {
+    category: "lehenga",
+    slot: "lower",
+    name: "Lehenga",
+    aliases: ["lehenga", "lehenga choli", "lengha", "ghagra choli"],
+  },
+  {
+    category: "dupatta",
+    slot: "accessory",
+    name: "Dupatta",
+    aliases: ["dupatta", "dupata", "chunni"],
   },
   {
     category: "trousers",
@@ -189,7 +178,7 @@ const pieceMatchers = [
     category: "shoes",
     slot: "footwear",
     name: "Shoes",
-    aliases: ["shoes", "heels"],
+    aliases: ["shoes", "shoe", "heels", "formal shoe"],
   },
   {
     category: "sneakers",
@@ -202,6 +191,12 @@ const pieceMatchers = [
     slot: "footwear",
     name: "Sandals",
     aliases: ["sandals", "sandal"],
+  },
+  {
+    category: "juttis",
+    slot: "footwear",
+    name: "Juttis",
+    aliases: ["juttis", "jutti", "juti"],
   },
   {
     category: "boots",
@@ -259,48 +254,8 @@ const pieceMatchers = [
   },
 ];
 
-export const wardrobeSections = [
-  "Upperwear",
-  "Lowerwear",
-  "Footwear",
-  "Outerwear",
-  "Accessories",
-  "Other",
-];
-
-const categorySectionMap = {
-  shirt: "Upperwear",
-  t_shirt: "Upperwear",
-  top: "Upperwear",
-  kurta: "Upperwear",
-  blouse: "Upperwear",
-  pant: "Lowerwear",
-  pants: "Lowerwear",
-  jeans: "Lowerwear",
-  shorts: "Lowerwear",
-  skirt: "Lowerwear",
-  trousers: "Lowerwear",
-  shoes: "Footwear",
-  sneakers: "Footwear",
-  sandals: "Footwear",
-  boots: "Footwear",
-  loafers: "Footwear",
-  jacket: "Outerwear",
-  hoodie: "Outerwear",
-  blazer: "Outerwear",
-  coat: "Outerwear",
-  sweater: "Outerwear",
-  accessory: "Accessories",
-  watch: "Accessories",
-  belt: "Accessories",
-  bag: "Accessories",
-  cap: "Accessories",
-  hat: "Accessories",
-  scarf: "Accessories",
-};
-
 export function getWardrobeSection(category) {
-  return categorySectionMap[category] || "Other";
+  return getCategorySection(category);
 }
 
 export const emptyPiece = {
@@ -535,10 +490,12 @@ export function parseOutfitDescription(text) {
 
       return {
         name: displayName,
-        category: matcher.category,
+        category: normalizeCategory(matcher.category),
         color,
         role: matcher.slot,
       };
     })
     .filter(Boolean);
 }
+
+export { formatCategoryLabel, normalizeCategory, wardrobeSections };

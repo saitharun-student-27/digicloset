@@ -12,8 +12,8 @@ import {
 } from "lucide-react";
 import { useMemo, useRef, useState } from "react";
 
+import CategoryPicker from "./CategoryPicker.jsx";
 import {
-  categories,
   emptyPiece,
   formatValue,
   generateOutfitNote,
@@ -24,6 +24,7 @@ import {
   seasons,
   titleCase,
 } from "../utils/outfitUtils";
+import { normalizeCategory } from "../utils/wardrobeTaxonomy";
 import {
   ACCEPTED_IMAGE_INPUT,
   validateImageFile,
@@ -292,13 +293,10 @@ function PiecesEditor({ pieces, updatePiece, removePiece, addPiece }) {
                 placeholder="maroon"
                 required
               />
-              <SelectInput
-                name="category"
+              <CategoryPicker
                 value={piece.category}
-                onChange={(event) =>
-                  updatePiece(index, "category", event.target.value)
-                }
-                options={categories}
+                onChange={(category) => updatePiece(index, "category", category)}
+                placeholder="Search category"
               />
               <SelectInput
                 name="role"
@@ -340,7 +338,7 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
       pieces
         .map((piece) => ({
           name: piece.name.trim(),
-          category: piece.category,
+          category: normalizeCategory(piece.category),
           color: piece.color.trim(),
           role: piece.role,
         }))

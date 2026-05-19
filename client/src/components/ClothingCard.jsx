@@ -2,7 +2,8 @@ import { Pencil, Shirt, Trash2 } from "lucide-react";
 import { Link } from "react-router-dom";
 
 import { getImageUrl } from "../services/clothingService";
-import { formatValue, getWardrobeSection } from "../utils/outfitUtils";
+import { getWardrobeSection } from "../utils/outfitUtils";
+import { formatCategoryLabel } from "../utils/wardrobeTaxonomy";
 
 export default function ClothingCard({
   item,
@@ -48,7 +49,7 @@ export default function ClothingCard({
                 {item.name}
               </h3>
               <p className="mt-1 text-xs font-medium uppercase tracking-[0.14em] text-stone">
-                {formatValue(item.category)}
+                {formatCategoryLabel(item.category)}
               </p>
             </div>
 

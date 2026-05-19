@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
+import CategoryPicker from "../components/CategoryPicker.jsx";
 import EmptyState from "../components/EmptyState";
 import ErrorState from "../components/ErrorState";
 import LoadingState from "../components/LoadingState";
@@ -17,7 +18,10 @@ import OutfitMemoryForm from "../components/OutfitMemoryForm";
 import OutfitShowcaseCard from "../components/OutfitShowcaseCard";
 import { useWardrobeData } from "../context/WardrobeDataProvider.jsx";
 import { api } from "../lib/api";
-import { categories, formatValue } from "../utils/outfitUtils";
+import {
+  formatCategoryLabel,
+  normalizeCategory,
+} from "../utils/wardrobeTaxonomy";
 import {
   ACCEPTED_IMAGE_INPUT,
   validateImageFile,
@@ -217,7 +221,7 @@ export default function Capture() {
     try {
       const formData = new FormData();
       formData.append("name", singleForm.name);
-      formData.append("category", singleForm.category);
+      formData.append("category", normalizeCategory(singleForm.category));
       formData.append("color", singleForm.color);
       formData.append("season", singleForm.season);
       formData.append("occasion", singleForm.occasion);
@@ -303,7 +307,7 @@ export default function Capture() {
     try {
       const formData = new FormData();
       formData.append("name", scanResult.name);
-      formData.append("category", scanResult.category);
+      formData.append("category", normalizeCategory(scanResult.category));
       formData.append("color", scanResult.color);
       formData.append("season", scanResult.season || "all");
       formData.append("occasion", scanResult.occasion || "casual");
@@ -448,22 +452,17 @@ export default function Capture() {
                   <label className="mb-1 block text-xs font-bold uppercase tracking-widest text-stone">
                     Category
                   </label>
-                  <select
-                    className={selectClass}
+                  <CategoryPicker
+                    className="bg-ivory"
                     value={singleForm.category}
-                    onChange={(event) =>
+                    onChange={(category) =>
                       setSingleForm((current) => ({
                         ...current,
-                        category: event.target.value,
+                        category,
                       }))
                     }
-                  >
-                    {categories.map((option) => (
-                      <option key={option} value={option}>
-                        {formatValue(option)}
-                      </option>
-                    ))}
-                  </select>
+                    placeholder="Search category"
+                  />
                 </div>
                 <div>
                   <label className="mb-1 block text-xs font-bold uppercase tracking-widest text-stone">
@@ -566,8 +565,8 @@ export default function Capture() {
                     </div>
                     <div>
                       <p className="text-xs text-stone">Category</p>
-                      <p className="font-medium capitalize text-charcoal">
-                        {scanResult.category}
+                      <p className="font-medium text-charcoal">
+                        {formatCategoryLabel(scanResult.category)}
                       </p>
                     </div>
                     <div>

@@ -6,7 +6,7 @@ This changelog tracks the product from the original full-stack scaffold to the c
 
 ## 2026-05-19 - Verify user-scoped uploads and full authenticated app isolation
 
-Commit: pending current checkpoint
+Commit: `9021157`
 
 ### Phase 3E.4 scope
 
@@ -62,6 +62,85 @@ Commit: pending current checkpoint
 
 - DigiCloset now has verified user-scoped upload behavior and a clean end-to-end auth/app QA pass
 - historical orphan files remain detectable, but no new orphan files were introduced by the Phase `3E.4` tests
+
+## 2026-05-19 - Add searchable category taxonomy for Indian and western wardrobes
+
+Commit: pending current checkpoint
+
+### Phase 3F.1 scope
+
+- added a shared wardrobe taxonomy that supports:
+  - western clothing
+  - Indian traditional clothing
+  - Indo-western sets
+  - one-piece / full-body clothing
+  - footwear
+  - accessories
+- added a searchable category picker for piece entry and editing flows
+- added alias normalization for messy category input without rewriting old database records
+- improved wardrobe grouping and category display labels across the app
+
+### Taxonomy additions
+
+- introduced canonical grouped categories for:
+  - Western upperwear
+  - Western lowerwear
+  - One-piece / Full body
+  - Outerwear
+  - Indian upperwear
+  - Indian lowerwear
+  - Indian full outfit
+  - Drapes
+  - Footwear
+  - Accessories
+  - Base layers
+  - Activewear
+  - Other
+- added alias normalization such as:
+  - `tee` -> `t_shirt`
+  - `pant` -> `pants`
+  - `frock` -> `dress`
+  - `sari` -> `saree`
+  - `chunni` -> `dupatta`
+  - `lehenga choli` -> `lehenga`
+  - `jutti` -> `juttis`
+
+### Picker and display improvements
+
+- added a lightweight searchable `CategoryPicker`
+- integrated it into:
+  - Quick Add Piece
+  - Clothing form flows
+  - piece editing
+  - outfit-memory piece entry
+- updated category display labels so raw values like:
+  - `t_shirt`
+  - `co_ord_set`
+  - `salwar_suit`
+  - `indo_western_set`
+  become readable UI labels
+
+### Grouping behavior
+
+- wardrobe grouping now uses shared category normalization instead of narrow hardcoded buckets
+- old records remain safe:
+  - no automatic database rewrite was performed
+  - unknown/custom categories still display safely and group under `Other`
+
+### Backend compatibility
+
+- widened backend clothing-category validation so expanded canonical and custom normalized category strings can persist safely
+- did not change:
+  - auth
+  - user ownership
+  - uploads
+  - broader product behavior
+
+### Result
+
+- DigiCloset now handles mixed Indian and western wardrobes more realistically
+- category entry is faster and more forgiving
+- wardrobe sections and outfit breakdowns are more reliable and readable
 
 ## 2026-03-15 - Initial commit - DigiCloset full-stack app
 
