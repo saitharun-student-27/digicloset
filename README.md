@@ -28,6 +28,7 @@ DigiCloset currently includes:
   - occasion
   - style
   - formality
+- existing-piece search inside the outfit builder so saved wardrobe pieces can be reused before new duplicates are created
 - shared client-side wardrobe data layer for outfits and clothing
 - outfit lifecycle actions:
   - favorite / unfavorite
@@ -116,6 +117,12 @@ Users can save a complete look through:
 - outfit photo upload
 - text-guided outfit capture
 - image with title only
+
+Inside the text-guided builder, DigiCloset now also supports:
+
+- searching existing wardrobe pieces
+- selecting reusable existing pieces into the pending outfit
+- mixing reused existing pieces with newly created manual pieces
 
 Secondary tools exist, but remain clearly secondary:
 
@@ -270,10 +277,11 @@ Recent wardrobe-information phase:
 - `3F.1` searchable category picker + Indian/western wardrobe taxonomy
 - `3F.2` wardrobe search + lightweight filtering
 - `3F.3` field autosuggest + chip inputs for wardrobe metadata cleanup
+- `3F.4` existing-piece search inside the outfit builder to encourage wardrobe reuse over duplicate clothing records
 
 Next planned wardrobe-information phase:
 
-- `3F.4` lightweight wardrobe filtering/sorting refinement built on top of search and normalized taxonomy
+- `3F.5` lightweight wardrobe filtering/sorting refinement built on top of search and normalized taxonomy
 
 ## Repository Structure
 
@@ -487,6 +495,7 @@ Oversize message:
 - fast frontend Wardrobe search without leaving the closet-style layout behind
 - cleaner metadata entry through normalized autosuggest and chip inputs
 - more readable color / season / occasion / style labels across the app
+- easier reuse of existing wardrobe pieces while building a new outfit memory
 
 ## Honest Current Gaps
 
@@ -499,10 +508,11 @@ The biggest remaining product-quality gap is now hosted-readiness planning plus 
 - local dev access to the backfilled dev user now has a dedicated reset utility for safe frontend-auth testing
 - signup is now visually present and reachable, but the auth entry flow could still use one more tiny spacing pass if we later want even tighter parity with the reference image
 - taxonomy, metadata entry, and search are now much stronger, but Wardrobe still does not yet have lightweight filter/sort refinement for denser closets
+- outfit creation now encourages reuse first, but it still does not surface broader duplicate-similarity suggestions beyond the current lightweight search/select flow
 
 The highest-impact next refinement would be:
 
-- Phase `3F.4`: lightweight filter/sort refinement built on the normalized taxonomy and new Wardrobe search, without turning DigiCloset into an inventory dashboard
+- Phase `3F.5`: lightweight filter/sort refinement built on the normalized taxonomy and new Wardrobe search, without turning DigiCloset into an inventory dashboard
 
 ## Documentation Maintenance
 

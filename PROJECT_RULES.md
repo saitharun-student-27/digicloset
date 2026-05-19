@@ -163,6 +163,21 @@ Primary creation flow must not be:
 
 `POST /api/clothing` may remain available, but it is supporting infrastructure, not the flagship workflow.
 
+### 5.6 Reuse-before-duplicate rule
+When a user is building an outfit memory, the product should make reusing existing wardrobe pieces easier than creating duplicate clothing records.
+
+Do:
+- surface existing current-user wardrobe pieces inside outfit building flows when practical
+- allow outfits to mix:
+  - existing linked pieces
+  - newly created manual pieces
+- keep manual creation available as a fallback when the piece truly does not exist yet
+
+Do not:
+- make duplicate manual piece creation the path of least resistance
+- turn outfit building into a heavy inventory-management table
+- block users from creating a new piece when reuse is not the right fit
+
 ---
 
 ## 6. Home Page Rules

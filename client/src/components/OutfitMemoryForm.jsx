@@ -3,6 +3,7 @@ import {
   FileImage,
   FilePenLine,
   ImagePlus,
+  Search,
   Plus,
   Sparkles,
   Trash2,
@@ -15,6 +16,8 @@ import { useMemo, useRef, useState } from "react";
 import AutosuggestField from "./AutosuggestField.jsx";
 import CategoryPicker from "./CategoryPicker.jsx";
 import ChipSelect from "./ChipSelect.jsx";
+import { useWardrobeData } from "../context/WardrobeDataProvider.jsx";
+import { getImageUrl } from "../services/clothingService";
 import {
   emptyPiece,
   formatValue,
@@ -25,8 +28,13 @@ import {
   seasons,
 } from "../utils/outfitUtils";
 import {
+  formatCategoryLabel,
+  formatColorLabel,
   formatOccasionLabel,
   formatSeasonLabel,
+  getCategorySearchTerms,
+  getCategorySection,
+  getFieldSearchTerms,
   normalizeCategory,
   normalizeColor,
   normalizeOccasion,
@@ -37,6 +45,80 @@ import {
   ACCEPTED_IMAGE_INPUT,
   validateImageFile,
 } from "../utils/uploadValidation";
+
+function normalizeSearchText(value) {
+  return String(value || "")
+    .toLowerCase()
+    .trim()
+    .replace(/[_-]+/g, " ")
+    .replace(/[^\w\s]/g, " ")
+    .replace(/\s+/g, " ");
+}
+
+function buildSearchTerms(query) {
+  return normalizeSearchText(query)
+    .split(" ")
+    .filter(Boolean);
+}
+
+function matchesSearch(haystack, query) {
+  const normalizedHaystack = normalizeSearchText(haystack);
+  const terms = buildSearchTerms(query);
+
+  if (terms.length === 0) {
+    return true;
+  }
+
+  return terms.every((term) => normalizedHaystack.includes(term));
+}
+
+function deriveRoleFromCategory(category) {
+  const section = getCategorySection(category);
+
+  if (section.includes("upperwear")) {
+    return "upper";
+  }
+
+  if (section.includes("lowerwear")) {
+    return "lower";
+  }
+
+  if (section === "Footwear") {
+    return "footwear";
+  }
+
+  if (section === "Outerwear") {
+    return "outerwear";
+  }
+
+  if (section === "Accessories" || section === "Drapes") {
+    return "accessory";
+  }
+
+  if (section === "One-piece / Full body" || section === "Indian full outfit") {
+    return "upper";
+  }
+
+  return "upper";
+}
+
+function collectExistingPieceSearchText(item) {
+  return [
+    item.name,
+    ...getCategorySearchTerms(item.category),
+    getCategorySection(item.category),
+    item.color,
+    ...getFieldSearchTerms("color", item.color),
+    item.season,
+    ...getFieldSearchTerms("season", item.season),
+    item.occasion,
+    ...getFieldSearchTerms("occasion", item.occasion),
+    item.style,
+    ...getFieldSearchTerms("style", item.style),
+  ]
+    .filter(Boolean)
+    .join(" ");
+}
 
 
 const captureModes = [
@@ -151,6 +233,87 @@ function PieceSlot({ label, piece }) {
   );
 }
 
+function ExistingPieceCard({ item, onRemove }) {
+  const imageUrl = getImageUrl(item.image_url);
+
+  return (
+    <div className="flex items-center gap-3 rounded-2xl border border-black/5 bg-white p-3">
+      <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-[linear-gradient(135deg,#f4efe6_0%,#fbf8f2_100%)]">
+        {imageUrl ? (
+          <img
+            src={imageUrl}
+            alt={item.name}
+            className="h-full w-full object-cover"
+          />
+        ) : (
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-sage shadow-soft">
+            <Sparkles className="h-4 w-4" />
+          </div>
+        )}
+      </div>
+      <div className="min-w-0 flex-1">
+        <div className="flex flex-wrap items-center gap-2">
+          <p className="truncate text-sm font-medium text-charcoal">
+            {item.name}
+          </p>
+          <span className="rounded-full bg-sage/10 px-2.5 py-1 text-[11px] font-medium text-sage">
+            Existing piece
+          </span>
+        </div>
+        <p className="mt-1 text-xs leading-5 text-stone">
+          {[formatCategoryLabel(item.category), formatColorLabel(item.color)]
+            .filter(Boolean)
+            .join(" - ")}
+        </p>
+      </div>
+      <button
+        type="button"
+        onClick={() => onRemove(item.id)}
+        className="flex h-9 w-9 min-w-[var(--touch-target-min)] items-center justify-center rounded-full bg-ivory text-charcoal transition hover:bg-linen"
+        aria-label={`Remove ${item.name} from selected pieces`}
+      >
+        <X className="h-4 w-4" />
+      </button>
+    </div>
+  );
+}
+
+function SearchResultButton({ item, onSelect }) {
+  const imageUrl = getImageUrl(item.image_url);
+
+  return (
+    <button
+      type="button"
+      onClick={() => onSelect(item.id)}
+      className="flex min-h-[var(--touch-target-min)] w-full items-center gap-3 rounded-2xl px-3 py-3 text-left transition hover:bg-white"
+    >
+      <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-white">
+        {imageUrl ? (
+          <img
+            src={imageUrl}
+            alt={item.name}
+            className="h-full w-full object-cover"
+          />
+        ) : (
+          <Sparkles className="h-4 w-4 text-sage" />
+        )}
+      </div>
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-medium text-charcoal">{item.name}</p>
+        <p className="mt-1 text-xs leading-5 text-stone">
+          {[
+            formatCategoryLabel(item.category),
+            formatColorLabel(item.color),
+            getCategorySection(item.category),
+          ]
+            .filter(Boolean)
+            .join(" - ")}
+        </p>
+      </div>
+    </button>
+  );
+}
+
 function ImagePicker({
   imagePreviewUrl,
   imageName,
@@ -235,91 +398,187 @@ function ImagePicker({
   );
 }
 
-function PiecesEditor({ pieces, updatePiece, removePiece, addPiece }) {
+function PiecesEditor({
+  pieces,
+  updatePiece,
+  removePiece,
+  addPiece,
+  clothingItems,
+  selectedExistingPieces,
+  addExistingPiece,
+  removeExistingPiece,
+}) {
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const matchingExistingPieces = useMemo(() => {
+    const trimmedQuery = searchQuery.trim();
+
+    return clothingItems
+      .filter(
+        (item) =>
+          !selectedExistingPieces.some((selected) => selected.id === item.id),
+      )
+      .filter((item) =>
+        trimmedQuery
+          ? matchesSearch(collectExistingPieceSearchText(item), trimmedQuery)
+          : false,
+      )
+      .slice(0, 8);
+  }, [clothingItems, searchQuery, selectedExistingPieces]);
+
   return (
     <section className="rounded-2xl bg-ivory p-4">
-      <div className="mb-4 flex items-center justify-between gap-3">
+      <div className="space-y-5">
         <div>
           <p className="text-sm font-semibold text-charcoal">
-            Confirm pieces
+            Reuse from your wardrobe
           </p>
           <p className="mt-1 text-sm leading-6 text-stone">
-            Review the suggested pieces or add your own.
+            Search pieces you already own first so reuse feels easier than duplication.
           </p>
-        </div>
-        <button
-          type="button"
-          onClick={addPiece}
-          className="inline-flex h-10 items-center gap-2 rounded-full bg-white px-4 text-sm font-medium text-charcoal transition hover:bg-brass/20"
-        >
-          <Plus className="h-4 w-4" />
-          Add piece
-        </button>
-      </div>
-
-      <div className="space-y-3">
-        {pieces.map((piece, index) => (
-          <div
-            key={index}
-            className="rounded-2xl border border-black/5 bg-white p-4"
-          >
-            <div className="mb-3 flex items-center justify-between gap-3">
-              <div className="flex flex-wrap gap-2">
-                <span className="rounded-full bg-linen px-3 py-1 text-xs font-medium text-charcoal">
-                  Piece {index + 1}
-                </span>
-                <span className="rounded-full bg-sage/10 px-3 py-1 text-xs font-medium capitalize text-sage">
-                  {formatValue(piece.role)}
-                </span>
-              </div>
-              <button
-                type="button"
-                onClick={() => removePiece(index)}
-                className="flex h-8 w-8 items-center justify-center rounded-full text-stone transition hover:bg-ivory hover:text-charcoal"
-                aria-label={`Remove piece ${index + 1}`}
-              >
-                <Trash2 className="h-4 w-4" />
-              </button>
+          <div className="relative mt-3">
+            <div className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-stone/60">
+              <Search className="h-4 w-4" />
             </div>
-
-            <div className="grid gap-3 sm:grid-cols-2">
-              <TextInput
-                name="name"
-                value={piece.name}
-                onChange={(event) =>
-                  updatePiece(index, "name", event.target.value)
-                }
-                placeholder="Maroon Shirt"
-                required
-              />
-              <AutosuggestField
-                field="color"
-                value={piece.color}
-                onChange={(color) => updatePiece(index, "color", color)}
-                placeholder="Search color"
-              />
-              <CategoryPicker
-                value={piece.category}
-                onChange={(category) => updatePiece(index, "category", category)}
-                placeholder="Search category"
-              />
-              <SelectInput
-                name="role"
-                value={piece.role}
-                onChange={(event) =>
-                  updatePiece(index, "role", event.target.value)
-                }
-                options={roles}
-              />
-            </div>
+            <input
+              type="search"
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+              placeholder="Search your wardrobe pieces..."
+              className="h-11 min-h-[var(--touch-target-min)] w-full rounded-xl border border-black/10 bg-white pl-10 pr-3 text-sm text-charcoal outline-none transition placeholder:text-stone/60 focus:border-sage focus:ring-4 focus:ring-sage/10"
+            />
           </div>
-        ))}
+          <div className="mt-3 rounded-2xl border border-black/5 bg-linen/55 p-2">
+            {searchQuery.trim() ? (
+              matchingExistingPieces.length > 0 ? (
+                <div className="space-y-1">
+                  {matchingExistingPieces.map((item) => (
+                    <SearchResultButton
+                      key={item.id}
+                      item={item}
+                      onSelect={addExistingPiece}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="px-3 py-4 text-sm leading-6 text-stone">
+                  No matching pieces yet. Create it as a new piece.
+                </div>
+              )
+            ) : (
+              <div className="px-3 py-4 text-sm leading-6 text-stone">
+                Search by name, category, color, season, occasion, or style.
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div>
+          <p className="text-sm font-semibold text-charcoal">Selected pieces</p>
+          <p className="mt-1 text-sm leading-6 text-stone">
+            Existing wardrobe pieces linked into this outfit will stay reusable.
+          </p>
+          <div className="mt-3 space-y-3">
+            {selectedExistingPieces.length > 0 ? (
+              selectedExistingPieces.map((item) => (
+                <ExistingPieceCard
+                  key={item.id}
+                  item={item}
+                  onRemove={removeExistingPiece}
+                />
+              ))
+            ) : (
+              <div className="rounded-2xl border border-dashed border-black/10 bg-white px-4 py-4 text-sm leading-6 text-stone">
+                No existing pieces selected yet.
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <p className="text-sm font-semibold text-charcoal">
+              Create new piece
+            </p>
+            <p className="mt-1 text-sm leading-6 text-stone">
+              Only add a new piece when you do not already have it in your wardrobe.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={addPiece}
+            className="inline-flex h-10 items-center gap-2 rounded-full bg-white px-4 text-sm font-medium text-charcoal transition hover:bg-brass/20"
+          >
+            <Plus className="h-4 w-4" />
+            Add piece
+          </button>
+        </div>
+
+        <div className="space-y-3">
+          {pieces.map((piece, index) => (
+            <div
+              key={index}
+              className="rounded-2xl border border-black/5 bg-white p-4"
+            >
+              <div className="mb-3 flex items-center justify-between gap-3">
+                <div className="flex flex-wrap gap-2">
+                  <span className="rounded-full bg-linen px-3 py-1 text-xs font-medium text-charcoal">
+                    Piece {index + 1}
+                  </span>
+                  <span className="rounded-full bg-sage/10 px-3 py-1 text-xs font-medium capitalize text-sage">
+                    {formatValue(piece.role)}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => removePiece(index)}
+                  className="flex h-8 w-8 items-center justify-center rounded-full text-stone transition hover:bg-ivory hover:text-charcoal"
+                  aria-label={`Remove piece ${index + 1}`}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </button>
+              </div>
+
+              <div className="grid gap-3 sm:grid-cols-2">
+                <TextInput
+                  name="name"
+                  value={piece.name}
+                  onChange={(event) =>
+                    updatePiece(index, "name", event.target.value)
+                  }
+                  placeholder="Maroon Shirt"
+                  required
+                />
+                <AutosuggestField
+                  field="color"
+                  value={piece.color}
+                  onChange={(color) => updatePiece(index, "color", color)}
+                  placeholder="Search color"
+                />
+                <CategoryPicker
+                  value={piece.category}
+                  onChange={(category) => updatePiece(index, "category", category)}
+                  placeholder="Search category"
+                />
+                <SelectInput
+                  name="role"
+                  value={piece.role}
+                  onChange={(event) =>
+                    updatePiece(index, "role", event.target.value)
+                  }
+                  options={roles}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );
 }
 
 export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
+  const { clothingItems } = useWardrobeData();
   const [captureMode, setCaptureMode] = useState("photo_note");
   const [formData, setFormData] = useState({
     title: "",
@@ -330,6 +589,7 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
     photoNote: "",
   });
   const [pieces, setPieces] = useState([{ ...emptyPiece }]);
+  const [selectedExistingPieceIds, setSelectedExistingPieceIds] = useState([]);
   const [imageFile, setImageFile] = useState(null);
   const [imagePreviewUrl, setImagePreviewUrl] = useState("");
   const [imageName, setImageName] = useState("");
@@ -338,7 +598,17 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
 
   const fileInputRef = useRef(null);
 
-  const validPieces = useMemo(
+  const selectedExistingPieces = useMemo(
+    () =>
+      selectedExistingPieceIds
+        .map((pieceId) =>
+          clothingItems.find((item) => item.id === pieceId) || null,
+        )
+        .filter(Boolean),
+    [clothingItems, selectedExistingPieceIds],
+  );
+
+  const validNewPieces = useMemo(
     () =>
       pieces
         .map((piece) => ({
@@ -349,6 +619,23 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
         }))
         .filter((piece) => piece.name && piece.color),
     [pieces],
+  );
+
+  const selectedExistingPieceSummaries = useMemo(
+    () =>
+      selectedExistingPieces.map((piece) => ({
+        id: piece.id,
+        name: piece.name,
+        category: normalizeCategory(piece.category),
+        color: normalizeColor(piece.color),
+        role: deriveRoleFromCategory(piece.category),
+      })),
+    [selectedExistingPieces],
+  );
+
+  const validPieces = useMemo(
+    () => [...validNewPieces, ...selectedExistingPieceSummaries],
+    [selectedExistingPieceSummaries, validNewPieces],
   );
 
   const generatedTitle = useMemo(
@@ -422,6 +709,18 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
 
   const addPiece = () => {
     setPieces((current) => [...current, { ...emptyPiece }]);
+  };
+
+  const addExistingPiece = (pieceId) => {
+    setSelectedExistingPieceIds((current) =>
+      current.includes(pieceId) ? current : [...current, pieceId],
+    );
+  };
+
+  const removeExistingPiece = (pieceId) => {
+    setSelectedExistingPieceIds((current) =>
+      current.filter((currentId) => currentId !== pieceId),
+    );
   };
 
   const removePiece = (index) => {
@@ -504,6 +803,7 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
       photoNote: "",
     });
     setPieces([{ ...emptyPiece }]);
+    setSelectedExistingPieceIds([]);
     setImageFile(null);
     setImagePreviewUrl("");
     setImageName("");
@@ -540,7 +840,9 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
       imagePreviewUrl,
       imageFile,
       imageName,
-      pieces: captureMode === "text_input" ? validPieces : [],
+      pieces: captureMode === "text_input" ? validNewPieces : [],
+      clothing_item_ids:
+        captureMode === "text_input" ? selectedExistingPieceIds : [],
       description:
         captureMode === "photo_note"
           ? formData.photoNote.trim()
@@ -705,6 +1007,10 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
               updatePiece={updatePiece}
               removePiece={removePiece}
               addPiece={addPiece}
+              clothingItems={clothingItems}
+              selectedExistingPieces={selectedExistingPieces}
+              addExistingPiece={addExistingPiece}
+              removeExistingPiece={removeExistingPiece}
             />
 
             <section className="rounded-2xl bg-ivory p-4">

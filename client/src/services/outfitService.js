@@ -30,6 +30,10 @@ export async function createOutfit(outfit) {
   formData.append("occasion", outfit.occasion);
   formData.append("season", outfit.season);
   formData.append("pieces", JSON.stringify(pieces));
+  formData.append(
+    "clothing_item_ids",
+    JSON.stringify(outfit.clothing_item_ids || []),
+  );
 
   if (outfit.source_type) {
     formData.append("source_type", outfit.source_type);

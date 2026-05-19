@@ -287,6 +287,65 @@ Commit: `4ac1cf3`
 - metadata displays more gracefully across the app
 - wardrobe search stays aligned with what users naturally type
 
+## 2026-05-19 - Add existing wardrobe piece search inside the outfit builder
+
+Commit: latest Phase 3F.4 checkpoint on `main`
+
+### Phase 3F.4 scope
+
+- added existing-piece search inside the outfit-memory text builder
+- made it easier to reuse current wardrobe pieces before creating new ones
+- kept manual new-piece entry available as a fallback
+- preserved mixed outfit creation using:
+  - existing linked pieces
+  - new manual pieces
+
+### Current builder findings
+
+- the backend already supported linking existing `clothing_item_id` values into outfits
+- the frontend outfit service was not yet sending `clothing_item_ids`
+- the text-based outfit builder only surfaced manual new-piece creation before this phase
+- current-user clothing data was already available through `WardrobeDataProvider`
+
+### Reuse-first builder behavior
+
+- added a `Reuse from your wardrobe` search block inside `OutfitMemoryForm`
+- search now matches current-user wardrobe pieces by:
+  - name
+  - category
+  - normalized category label
+  - category section
+  - color
+  - season
+  - occasion
+  - style
+- added a `Selected pieces` area that shows:
+  - image when available
+  - piece name
+  - category
+  - color
+  - `Existing piece` marker
+  - remove action
+
+### Mixed outfit support
+
+- outfit creation now sends `clothing_item_ids` alongside new manual pieces
+- verified mixed outfits can save with:
+  - reused existing wardrobe pieces
+  - new supporting pieces created only when needed
+- verified removing a selected existing piece only removes it from the pending outfit, not from the wardrobe
+
+### Ownership and safety
+
+- existing-piece search only uses the authenticated user’s already-loaded wardrobe pieces
+- backend ownership checks continue to block cross-user clothing linking
+- browser and API verification confirmed a second user cannot see or attach the dev user’s searched pieces
+
+### Result
+
+- DigiCloset now makes wardrobe reuse easier than duplication during outfit creation
+- outfit memory stays primary while clothing pieces become cleaner reusable support data
+
 ## 2026-03-15 - Initial commit - DigiCloset full-stack app
 
 Commit: `31fee73`

@@ -132,6 +132,14 @@ Current category-taxonomy boundary:
 - backend season and occasion schemas accept these normalized values safely
 - old category records are not auto-rewritten by the backend
 
+Current outfit-builder contract boundary:
+
+- backend outfit creation already accepts:
+  - new manual pieces through `pieces`
+  - existing wardrobe reuse through `clothing_item_ids`
+- ownership checks still apply when linking existing clothing records into a new outfit
+- cross-user clothing-item linking is rejected safely
+
 Next backend-adjacent phase:
 
 - Phase `3E.5`: PostgreSQL migration planning and hosted deployment readiness
