@@ -4,6 +4,65 @@ All notable changes to DigiCloset are documented here in chronological order.
 
 This changelog tracks the product from the original full-stack scaffold to the current outfit-memory-first, mobile-first wardrobe experience.
 
+## 2026-05-20 - Define DigiCloset visual system and page-by-page refresh roadmap
+
+Commit: latest Phase 3G.0 checkpoint on `main`
+
+### Phase 3G.0 scope
+
+- documented the visual north star for the next DigiCloset refresh cycle
+- interpreted the generated auth and app reference images into product-specific design rules
+- created a dedicated visual system document for later implementation phases
+- updated project rules so the visual refresh must happen page-by-page without breaking product behavior
+
+### Reference interpretation
+
+- mapped the provided app-theme references into guidance for:
+  - Home
+  - Wardrobe
+  - Outfit Memory / Capture
+  - Suggestions
+  - Outfit Detail
+  - Piece Detail
+- treated the references as:
+  - layout direction
+  - spacing rhythm
+  - typography mood
+  - image hierarchy
+- explicitly did not treat them as pixel-perfect implementation contracts
+
+### Visual system rules
+
+- added `docs/VISUAL_SYSTEM.md`
+- documented:
+  - brand statement
+  - color direction
+  - typography direction
+  - surface and card rules
+  - CTA rules
+  - bottom-dock rules
+  - image treatment rules
+  - form and empty-state rules
+  - page-specific visual rules
+  - strict visual "Do Not" guidance
+
+### 3G roadmap
+
+- documented the visual rollout phases:
+  - `3G.1` AppShell + bottom dock
+  - `3G.2` Home
+  - `3G.3` Wardrobe
+  - `3G.4` Outfit Memory / Capture
+  - `3G.5` Suggestions
+  - `3G.6` Outfit Detail + Piece Detail
+  - `3G.7` final mobile visual QA
+- documented target files, expected visual outcomes, and what must not break for each phase
+
+### Important boundary
+
+- this phase changed documentation and rules only
+- no app UI code, backend logic, data flow, or auth behavior was modified
+
 ## 2026-05-19 - Verify user-scoped uploads and full authenticated app isolation
 
 Commit: `9021157`

@@ -502,6 +502,23 @@ Do not:
 - let auth screens read like ecommerce, SaaS dashboard, or shopping flows
 - rely on a large desktop split layout as the primary auth presentation
 
+### 9.6C Full visual refresh rule
+Full visual refresh work must happen page-by-page, not as one giant app-wide redesign pass.
+
+Each visual phase must:
+- preserve functionality
+- preserve auth and user isolation
+- preserve data flows
+- run the relevant build checks
+- run mobile viewport checks
+- compare against reference screenshots when possible
+- avoid feature expansion
+
+Do not:
+- redesign multiple major product pages at once without a clear phase boundary
+- mix visual refresh with unrelated backend or feature work
+- treat reference images as permission to invent unsupported product behavior
+
 ### 9.7 Backend source-of-truth rule
 Persistent delete, edit, and image-removal behavior must be validated against backend state, not only against immediate frontend appearance.
 

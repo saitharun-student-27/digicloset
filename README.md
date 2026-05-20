@@ -294,6 +294,17 @@ Next planned wardrobe-information phase:
 
 - `3F.6` small metadata-filter refinement such as occasion-aware narrowing, only if it keeps Wardrobe calm and mobile-first
 
+Upcoming visual refresh planning phase:
+
+- `3G.0` visual reference interpretation + app theme rules
+- `3G.1` AppShell + bottom dock visual refresh
+- `3G.2` Home visual refresh
+- `3G.3` Wardrobe visual refresh
+- `3G.4` Outfit Memory / Capture visual refresh
+- `3G.5` Suggestions visual refresh
+- `3G.6` Outfit Detail + Piece Detail visual refresh
+- `3G.7` final mobile visual QA
+
 ## Repository Structure
 
 ```text
@@ -563,4 +574,6 @@ Repeat the same pattern for:
 ## Changelog
 
 Release history lives in [CHANGELOG.md](CHANGELOG.md).
+
+Visual refresh planning and reference rules live in [docs/VISUAL_SYSTEM.md](docs/VISUAL_SYSTEM.md).
 
