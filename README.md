@@ -44,6 +44,11 @@ DigiCloset currently includes:
   - more dominant hero image
   - more compact image-led rails
   - less landing-page feel on desktop
+- refreshed Wardrobe toward a calmer closet-browsing layout with:
+  - softer editorial search and filter controls
+  - stronger closet-zone section panels
+  - earlier saved outfit memories
+  - less empty dashboard-like stretch
 - shared client-side wardrobe data layer for outfits and clothing
 - outfit lifecycle actions:
   - favorite / unfavorite
@@ -194,6 +199,14 @@ can still find normalized stored values without needing raw underscore strings.
 
 Favorites are featured, not moved. A favorited outfit still remains in the full outfit memory rail.
 
+The current Wardrobe visual direction also pushes the page toward:
+
+- a calmer centered editorial intro
+- softer integrated search, chip, and sort controls
+- stronger category sections that feel like closet zones instead of admin groupings
+- saved outfit memories staying visible near the top as wardrobe anchors
+- a mobile-app feel on desktop instead of a wide utility page
+
 ### Outfit Detail
 
 Each saved look now has a dedicated detail route:
@@ -333,6 +346,7 @@ Completed visual refresh phases:
 - `3G.1` AppShell + bottom dock visual refresh
 - `3G.2` Home visual refresh
 - `3G.2B` Home correction toward the reference structure
+- `3G.3` Wardrobe visual refresh
 
 ## Repository Structure
 
@@ -550,6 +564,7 @@ Oversize message:
 - lightweight filtering and sorting that narrow the closet without turning it into inventory software
 - a calmer, more outfit-memory-first Home that better matches the editorial visual system
 - a corrected Home layout that now stays closer to the generated mobile reference instead of drifting toward a desktop landing page
+- a calmer Wardrobe layout that now feels more like a private digital closet than a utility-heavy management page
 
 ## Honest Current Gaps
 
@@ -566,7 +581,7 @@ The biggest remaining product-quality gap is now hosted-readiness planning plus 
 
 The highest-impact next refinement would be:
 
-- Phase `3G.3`: Wardrobe visual refresh, now that the Home page and shared shell are aligned more closely with the editorial mobile visual system
+- Phase `3G.4`: Outfit Memory / Capture visual refresh, now that the shell, Home, and Wardrobe are aligned more closely with the editorial mobile visual system
 
 ## Documentation Maintenance
 

@@ -4,6 +4,72 @@ All notable changes to DigiCloset are documented here in chronological order.
 
 This changelog tracks the product from the original full-stack scaffold to the current outfit-memory-first, mobile-first wardrobe experience.
 
+## 2026-05-20 - Refresh Wardrobe toward a calmer mobile editorial closet
+
+Commit: latest Phase 3G.3 checkpoint on `main`
+
+### Phase 3G.3 scope
+
+- refreshed only the Wardrobe page visuals
+- kept search, filters, sorting, grouping, and route behavior intact
+- integrated the existing wardrobe controls into a softer editorial layout
+- made category sections feel more like closet zones than utility rails
+
+### Wardrobe visual refresh
+
+- replaced the utility-first header with a calmer centered Wardrobe intro
+- moved the page toward a stronger mobile-app rhythm on both phone and desktop
+- tightened page width so desktop still reads like a centered app screen
+- kept outfit memories visible near the top instead of burying them below heavy controls
+
+### Search, filter, and sort presentation
+
+- restyled the search field into a softer rounded control surface
+- softened content, section, and season chip rows without removing any options
+- kept the existing sort options and clear-filters behavior while making the control row quieter
+- preserved filtered mode and its result split:
+  - `Matching Outfit Memories`
+  - `Matching Wardrobe Pieces`
+
+### Closet-zone section treatment
+
+- turned wardrobe sections into larger curved zone panels
+- used real section imagery when current user pieces already had images
+- avoided fake counts and fake placeholder photography
+- stopped rendering every empty category as a full-height panel, which removed large dead stretches from the page
+
+### Outfit memory rail polish
+
+- refined the saved outfit rails into softer editorial sections
+- kept Favorite Fits and Saved Outfit Memories visible as real wardrobe anchors
+- preserved all outfit card actions and links
+
+### Verification
+
+- frontend production build passed
+- browser QA passed for:
+  - dev-user login to Wardrobe
+  - search
+  - content filters
+  - section filtering
+  - A-Z sorting
+  - clear filters
+  - piece detail navigation
+  - outfit detail navigation
+  - new-user private empty Wardrobe state
+  - viewport checks at:
+    - `360 x 800`
+    - `390 x 844`
+    - `414 x 896`
+    - desktop
+- reference screenshot comparison was performed against:
+  - `references/app-theme/02-wardrobe-reference.png`
+
+### Important boundary
+
+- no backend, auth, provider, or route logic changed
+- no other page was redesigned in this phase
+
 ## 2026-05-20 - Correct Home toward the mobile editorial reference
 
 Commit: latest Phase 3G.2B checkpoint on `main`
