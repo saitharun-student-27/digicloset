@@ -294,6 +294,20 @@ Do not:
 - let search mode turn Wardrobe into an admin dashboard
 - overload the page with advanced filters before basic search is solid
 
+### 7.6A Wardrobe filter-and-sort rule
+Wardrobe filtering and sorting should stay light, calm, and frontend-first while the already-loaded wardrobe data is still small enough to support it comfortably.
+
+Do:
+- prefer chip-based or compact controls over sidebars and drawers
+- keep filter groups small and meaningful
+- let search and filters work together without changing the closet-like page character
+- keep default Wardrobe behavior intact when search and filters are not active
+
+Do not:
+- add heavy dashboard-style filter panels
+- push Wardrobe toward spreadsheet or inventory-management behavior
+- introduce backend filter endpoints before lightweight frontend narrowing stops being enough
+
 ### 7.7 Metadata normalization rule
 Small wardrobe metadata fields should become cleaner through shared normalization before they become more complex.
 

@@ -346,6 +346,77 @@ Commit: latest Phase 3F.4 checkpoint on `main`
 - DigiCloset now makes wardrobe reuse easier than duplication during outfit creation
 - outfit memory stays primary while clothing pieces become cleaner reusable support data
 
+## 2026-05-20 - Add calm wardrobe filters and sorting
+
+Commit: latest Phase 3F.5 checkpoint on `main`
+
+### Phase 3F.5 scope
+
+- added lightweight frontend-only wardrobe filters
+- added a compact sort control
+- kept Wardrobe mobile-first and closet-like instead of turning it into a dashboard
+- preserved the existing search split between:
+  - Matching Outfit Memories
+  - Matching Wardrobe Pieces
+
+### Filter controls
+
+- added calm chip-based filters for:
+  - content
+  - section
+  - season
+- kept them horizontally scrollable and mobile-friendly
+- avoided:
+  - heavy filter sidebars
+  - drawer-based controls
+  - table-style admin filtering
+
+### Sort behavior
+
+- added a compact `Sort` control with:
+  - `Recently added`
+  - `Recently worn`
+  - `Favorites first`
+  - `A-Z`
+- applied sort to both:
+  - normal wardrobe layout
+  - filtered/search result mode
+
+### Search and filtered-mode interaction
+
+- normal wardrobe layout still appears when:
+  - search is empty
+  - filters are at default
+- filtered mode now appears when:
+  - search is active
+  - or one of the lightweight filters is active
+- content filters can narrow the result mode down to:
+  - outfit memories only
+  - wardrobe pieces only
+
+### Verification
+
+- frontend build passed
+- browser QA passed for:
+  - search still working
+  - content filters
+  - section filters
+  - season filters
+  - alphabetical sort
+  - favorites-first sort
+  - recently-worn sort
+  - clear-filters return to normal wardrobe layout
+  - new-user isolation from dev-user wardrobe data
+  - mobile widths:
+    - `360 x 800`
+    - `390 x 844`
+    - `414 x 896`
+
+### Result
+
+- DigiCloset now lets users narrow and sort a fuller wardrobe more calmly
+- Wardrobe stays closet-like, scannable, and mobile-first while becoming faster to browse
+
 ## 2026-03-15 - Initial commit - DigiCloset full-stack app
 
 Commit: `31fee73`

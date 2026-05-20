@@ -29,6 +29,7 @@ DigiCloset currently includes:
   - style
   - formality
 - existing-piece search inside the outfit builder so saved wardrobe pieces can be reused before new duplicates are created
+- calm wardrobe filters and sorting for faster closet browsing without leaving the outfit-memory-first product shape
 - shared client-side wardrobe data layer for outfits and clothing
 - outfit lifecycle actions:
   - favorite / unfavorite
@@ -134,6 +135,15 @@ Secondary tools exist, but remain clearly secondary:
 Wardrobe behaves like a digital closet:
 
 - calm search across outfits, pieces, colors, categories, and occasions
+- lightweight chip filters for:
+  - content
+  - section
+  - season
+- compact sorting for:
+  - Recently added
+  - Recently worn
+  - Favorites first
+  - A-Z
 - Favorite Fits
 - All Outfit Memories
 - Western upperwear
@@ -278,10 +288,11 @@ Recent wardrobe-information phase:
 - `3F.2` wardrobe search + lightweight filtering
 - `3F.3` field autosuggest + chip inputs for wardrobe metadata cleanup
 - `3F.4` existing-piece search inside the outfit builder to encourage wardrobe reuse over duplicate clothing records
+- `3F.5` calm wardrobe filters + sorting
 
 Next planned wardrobe-information phase:
 
-- `3F.5` lightweight wardrobe filtering/sorting refinement built on top of search and normalized taxonomy
+- `3F.6` small metadata-filter refinement such as occasion-aware narrowing, only if it keeps Wardrobe calm and mobile-first
 
 ## Repository Structure
 
@@ -496,6 +507,7 @@ Oversize message:
 - cleaner metadata entry through normalized autosuggest and chip inputs
 - more readable color / season / occasion / style labels across the app
 - easier reuse of existing wardrobe pieces while building a new outfit memory
+- lightweight filtering and sorting that narrow the closet without turning it into inventory software
 
 ## Honest Current Gaps
 
@@ -507,12 +519,12 @@ The biggest remaining product-quality gap is now hosted-readiness planning plus 
 - old orphaned upload files from earlier bugs can now be detected, but are not auto-deleted by default
 - local dev access to the backfilled dev user now has a dedicated reset utility for safe frontend-auth testing
 - signup is now visually present and reachable, but the auth entry flow could still use one more tiny spacing pass if we later want even tighter parity with the reference image
-- taxonomy, metadata entry, and search are now much stronger, but Wardrobe still does not yet have lightweight filter/sort refinement for denser closets
+- taxonomy, metadata entry, search, and basic filtering are now much stronger, but Wardrobe still does not yet have deeper metadata-aware narrowing like occasion refinement
 - outfit creation now encourages reuse first, but it still does not surface broader duplicate-similarity suggestions beyond the current lightweight search/select flow
 
 The highest-impact next refinement would be:
 
-- Phase `3F.5`: lightweight filter/sort refinement built on the normalized taxonomy and new Wardrobe search, without turning DigiCloset into an inventory dashboard
+- Phase `3F.6`: small metadata-aware filter refinement, such as occasion narrowing, only if it keeps Wardrobe feeling like a closet instead of an admin tool
 
 ## Documentation Maintenance
 

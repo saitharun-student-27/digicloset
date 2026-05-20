@@ -1,4 +1,4 @@
-import { Plus, Search, Sparkles, X } from "lucide-react";
+import { ArrowUpDown, Plus, Search, Sparkles, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -12,6 +12,8 @@ import {
   getCategorySearchTerms,
   getCategorySection,
   getFieldSearchTerms,
+  normalizeSeason,
+  wardrobeSections as taxonomyWardrobeSections,
 } from "../utils/wardrobeTaxonomy";
 
 function RailSection({
@@ -53,6 +55,44 @@ function RailSection({
         </div>
       )}
     </section>
+  );
+}
+
+function FilterChip({ label, active, onClick }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`inline-flex min-h-[var(--touch-target-min)] items-center justify-center rounded-full px-4 py-2 text-sm font-medium whitespace-nowrap transition ${
+        active
+          ? "bg-charcoal text-ivory shadow-soft"
+          : "bg-white text-charcoal shadow-soft hover:bg-linen"
+      }`}
+    >
+      {label}
+    </button>
+  );
+}
+
+function FilterRow({ label, options, value, onChange, formatLabel = (item) => item.label }) {
+  return (
+    <div>
+      <p className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-stone">
+        {label}
+      </p>
+      <div className="-mx-1 overflow-x-auto px-1 pb-1">
+        <div className="flex min-w-max gap-2">
+          {options.map((option) => (
+            <FilterChip
+              key={option.value}
+              label={formatLabel(option)}
+              active={value === option.value}
+              onClick={() => onChange(option.value)}
+            />
+          ))}
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -138,6 +178,111 @@ function sectionIdForLabel(label) {
   return label.toLowerCase().replace(/[^a-z0-9]+/g, "-");
 }
 
+function getSortableDateValue(value) {
+  const parsed = Date.parse(value || "");
+  return Number.isNaN(parsed) ? null : parsed;
+}
+
+function sortOutfits(outfits, sortBy) {
+  const withIndex = outfits.map((outfit, index) => ({ outfit, index }));
+
+  withIndex.sort((left, right) => {
+    if (sortBy === "favorites") {
+      if (Boolean(left.outfit.is_favorite) !== Boolean(right.outfit.is_favorite)) {
+        return left.outfit.is_favorite ? -1 : 1;
+      }
+    }
+
+    if (sortBy === "recently_worn") {
+      const leftWorn = getSortableDateValue(left.outfit.last_worn_date);
+      const rightWorn = getSortableDateValue(right.outfit.last_worn_date);
+
+      if (leftWorn !== rightWorn) {
+        if (leftWorn === null) return 1;
+        if (rightWorn === null) return -1;
+        return rightWorn - leftWorn;
+      }
+    }
+
+    if (sortBy === "alphabetical") {
+      return (left.outfit.title || "").localeCompare(right.outfit.title || "");
+    }
+
+    const leftCreated = getSortableDateValue(left.outfit.created_at);
+    const rightCreated = getSortableDateValue(right.outfit.created_at);
+
+    if (leftCreated !== rightCreated) {
+      if (leftCreated === null) return 1;
+      if (rightCreated === null) return -1;
+      return rightCreated - leftCreated;
+    }
+
+    return left.index - right.index;
+  });
+
+  return withIndex.map((entry) => entry.outfit);
+}
+
+function sortPieces(items, sortBy) {
+  const withIndex = items.map((item, index) => ({ item, index }));
+
+  withIndex.sort((left, right) => {
+    if (sortBy === "alphabetical") {
+      return (left.item.name || "").localeCompare(right.item.name || "");
+    }
+
+    if (sortBy === "recently_worn") {
+      const leftWorn = getSortableDateValue(left.item.last_worn_date);
+      const rightWorn = getSortableDateValue(right.item.last_worn_date);
+
+      if (leftWorn !== rightWorn) {
+        if (leftWorn === null) return 1;
+        if (rightWorn === null) return -1;
+        return rightWorn - leftWorn;
+      }
+    }
+
+    const leftCreated = getSortableDateValue(left.item.created_at);
+    const rightCreated = getSortableDateValue(right.item.created_at);
+
+    if (leftCreated !== rightCreated) {
+      if (leftCreated === null) return 1;
+      if (rightCreated === null) return -1;
+      return rightCreated - leftCreated;
+    }
+
+    return left.index - right.index;
+  });
+
+  return withIndex.map((entry) => entry.item);
+}
+
+function outfitMatchesSection(outfit, section) {
+  if (section === "all_sections") {
+    return true;
+  }
+
+  return (outfit.outfit_items || []).some(
+    (item) => getCategorySection(item?.clothing_item?.category) === section,
+  );
+}
+
+function pieceMatchesSection(item, section) {
+  if (section === "all_sections") {
+    return true;
+  }
+
+  return getCategorySection(item.category) === section;
+}
+
+function matchesSeasonFilter(value, seasonFilter) {
+  if (seasonFilter === "all_seasons") {
+    return true;
+  }
+
+  return normalizeSeason(value) === seasonFilter;
+}
+
 export default function Vault() {
   const navigate = useNavigate();
   const {
@@ -160,6 +305,10 @@ export default function Vault() {
   const [isSavingEdit, setIsSavingEdit] = useState(false);
   const [pageError, setPageError] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [contentFilter, setContentFilter] = useState("all");
+  const [sectionFilter, setSectionFilter] = useState("all_sections");
+  const [seasonFilter, setSeasonFilter] = useState("all_seasons");
+  const [sortBy, setSortBy] = useState("recent");
 
   async function handleDeleteClothing(item) {
     if (!window.confirm(`Delete "${item.name}"?`)) {
@@ -231,38 +380,106 @@ export default function Vault() {
     }
   }
 
+  const sortedOutfits = useMemo(() => sortOutfits(outfits, sortBy), [outfits, sortBy]);
+  const sortedClothingItems = useMemo(
+    () => sortPieces(clothingItems, sortBy),
+    [clothingItems, sortBy],
+  );
+
   const groupedItems = useMemo(() => {
     const base = Object.fromEntries(
       wardrobeSections.map((section) => [section, []]),
     );
 
-    clothingItems.forEach((item) => {
+    sortedClothingItems.forEach((item) => {
       base[getWardrobeSection(item.category)].push(item);
     });
 
     return base;
-  }, [clothingItems]);
+  }, [sortedClothingItems]);
 
-  const favoriteOutfits = outfits.filter((outfit) => outfit.is_favorite);
-  const allOutfitMemories = outfits;
+  const favoriteOutfits = useMemo(
+    () => sortedOutfits.filter((outfit) => outfit.is_favorite),
+    [sortedOutfits],
+  );
+  const allOutfitMemories = sortedOutfits;
   const trimmedSearch = searchQuery.trim();
   const isSearchActive = trimmedSearch.length > 0;
+  const hasActiveFilters =
+    contentFilter !== "all" ||
+    sectionFilter !== "all_sections" ||
+    seasonFilter !== "all_seasons";
+  const hasNonDefaultControls = hasActiveFilters || sortBy !== "recent";
+  const isFilteredMode = isSearchActive || hasActiveFilters;
+  const contentOptions = [
+    { value: "all", label: "All" },
+    { value: "outfits", label: "Outfit memories" },
+    { value: "pieces", label: "Wardrobe pieces" },
+  ];
+  const sectionOptions = [
+    { value: "all_sections", label: "All sections" },
+    ...taxonomyWardrobeSections
+      .filter((section) => section !== "Base layers")
+      .map((section) => ({ value: section, label: section })),
+  ];
+  const seasonOptions = [
+    { value: "all_seasons", label: "All seasons" },
+    { value: "summer", label: "Summer" },
+    { value: "winter", label: "Winter" },
+    { value: "rainy", label: "Rainy" },
+    { value: "spring", label: "Spring" },
+    { value: "autumn", label: "Autumn" },
+  ];
+  const sortOptions = [
+    { value: "recent", label: "Recently added" },
+    { value: "recently_worn", label: "Recently worn" },
+    { value: "favorites", label: "Favorites first" },
+    { value: "alphabetical", label: "A-Z" },
+  ];
+
   const matchingOutfits = useMemo(
     () =>
-      outfits.filter((outfit) =>
-        matchesSearch(collectOutfitSearchText(outfit), trimmedSearch),
-      ),
-    [outfits, trimmedSearch],
+      sortedOutfits.filter((outfit) => {
+        if (isSearchActive && !matchesSearch(collectOutfitSearchText(outfit), trimmedSearch)) {
+          return false;
+        }
+
+        if (!outfitMatchesSection(outfit, sectionFilter)) {
+          return false;
+        }
+
+        if (!matchesSeasonFilter(outfit.season, seasonFilter)) {
+          return false;
+        }
+
+        return true;
+      }),
+    [sortedOutfits, isSearchActive, trimmedSearch, sectionFilter, seasonFilter],
   );
   const matchingPieces = useMemo(
     () =>
-      clothingItems.filter((item) =>
-        matchesSearch(collectPieceSearchText(item), trimmedSearch),
-      ),
-    [clothingItems, trimmedSearch],
+      sortedClothingItems.filter((item) => {
+        if (isSearchActive && !matchesSearch(collectPieceSearchText(item), trimmedSearch)) {
+          return false;
+        }
+
+        if (!pieceMatchesSection(item, sectionFilter)) {
+          return false;
+        }
+
+        if (!matchesSeasonFilter(item.season, seasonFilter)) {
+          return false;
+        }
+
+        return true;
+      }),
+    [sortedClothingItems, isSearchActive, trimmedSearch, sectionFilter, seasonFilter],
   );
-  const hasSearchMatches =
-    matchingOutfits.length > 0 || matchingPieces.length > 0;
+  const showOutfitResults = contentFilter !== "pieces";
+  const showPieceResults = contentFilter !== "outfits";
+  const visibleOutfitCount = showOutfitResults ? matchingOutfits.length : 0;
+  const visiblePieceCount = showPieceResults ? matchingPieces.length : 0;
+  const hasVisibleMatches = visibleOutfitCount > 0 || visiblePieceCount > 0;
   const sectionLinks = [
     { id: "favorite-fits", label: "Favorite Fits" },
     { id: "outfit-memories", label: "Outfit Memories" },
@@ -354,7 +571,67 @@ export default function Vault() {
         </p>
       </section>
 
-      {!isSearchActive ? (
+      <section className="section-surface mb-5 p-4 sm:p-5">
+        <div className="flex flex-col gap-4">
+          <FilterRow
+            label="Content"
+            options={contentOptions}
+            value={contentFilter}
+            onChange={setContentFilter}
+          />
+          <FilterRow
+            label="Section"
+            options={sectionOptions}
+            value={sectionFilter}
+            onChange={setSectionFilter}
+          />
+          <FilterRow
+            label="Season"
+            options={seasonOptions}
+            value={seasonFilter}
+            onChange={setSeasonFilter}
+          />
+
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-2 text-sm text-stone">
+              <ArrowUpDown className="h-4 w-4 text-brass" />
+              <span className="font-medium text-charcoal">Sort</span>
+            </div>
+
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+              <select
+                value={sortBy}
+                onChange={(event) => setSortBy(event.target.value)}
+                className="h-11 min-h-[var(--touch-target-min)] rounded-full border border-black/10 bg-white px-4 text-sm text-charcoal shadow-soft outline-none transition focus:border-sage/40 focus:ring-4 focus:ring-sage/10"
+                aria-label="Sort wardrobe content"
+              >
+                {sortOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+
+              {hasNonDefaultControls ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setContentFilter("all");
+                    setSectionFilter("all_sections");
+                    setSeasonFilter("all_seasons");
+                    setSortBy("recent");
+                  }}
+                  className="inline-flex h-11 min-h-[var(--touch-target-min)] items-center justify-center rounded-full bg-ivory px-4 text-sm font-medium text-charcoal transition hover:bg-linen"
+                >
+                  Clear filters
+                </button>
+              ) : null}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {!isFilteredMode ? (
         <div className="sticky top-3 z-20 mb-5 -mx-4 bg-ivory/95 px-4 py-2 backdrop-blur sm:-mx-5 sm:px-5 lg:static lg:mx-0 lg:bg-transparent lg:px-0 lg:py-0 lg:backdrop-blur-0">
           <div className="memory-rail pb-1 lg:pb-3">
             {sectionLinks.map((section) => (
@@ -376,62 +653,78 @@ export default function Vault() {
         </div>
       ) : (
         <div className="mb-5 rounded-[1.5rem] bg-linen px-4 py-3 text-sm text-stone">
-          {matchingOutfits.length} outfit
-          {matchingOutfits.length === 1 ? "" : "s"} and {matchingPieces.length} piece
-          {matchingPieces.length === 1 ? "" : "s"} match "
-          <span className="font-medium text-charcoal">{trimmedSearch}</span>".
+          {visibleOutfitCount} outfit
+          {visibleOutfitCount === 1 ? "" : "s"} and {visiblePieceCount} piece
+          {visiblePieceCount === 1 ? "" : "s"}
+          {isSearchActive ? (
+            <>
+              {" "}match "
+              <span className="font-medium text-charcoal">{trimmedSearch}</span>
+              ".
+            </>
+          ) : (
+            <> fit your current filters.</>
+          )}
         </div>
       )}
 
-      {isSearchActive ? (
-        hasSearchMatches ? (
+      {isFilteredMode ? (
+        hasVisibleMatches ? (
           <div className="space-y-5 sm:space-y-6">
-            <RailSection
-              id="matching-outfits"
-              title="Matching Outfit Memories"
-              description="Saved looks that match your search through titles, notes, occasions, seasons, styles, or the pieces inside them."
-              items={matchingOutfits}
-              emptyMessage="No matching outfit memories."
-              cardClassName="memory-rail-card"
-              renderItem={(outfit) => (
-                <OutfitShowcaseCard
-                  outfit={outfit}
-                  onFavorite={handleFavorite}
-                  onMarkWorn={handleMarkWorn}
-                  onEdit={setEditingOutfit}
-                  onDelete={handleDeleteOutfit}
-                  isBusy={isOutfitPending(outfit.id)}
-                  showMeta={false}
-                />
-              )}
-            />
+            {showOutfitResults ? (
+              <RailSection
+                id="matching-outfits"
+                title="Matching Outfit Memories"
+                description="Saved looks that match your current search, filters, and sort without losing the calm closet rhythm."
+                items={matchingOutfits}
+                emptyMessage="No matching outfit memories."
+                cardClassName="memory-rail-card"
+                renderItem={(outfit) => (
+                  <OutfitShowcaseCard
+                    outfit={outfit}
+                    onFavorite={handleFavorite}
+                    onMarkWorn={handleMarkWorn}
+                    onEdit={setEditingOutfit}
+                    onDelete={handleDeleteOutfit}
+                    isBusy={isOutfitPending(outfit.id)}
+                    showMeta={false}
+                  />
+                )}
+              />
+            ) : null}
 
-            <RailSection
-              id="matching-pieces"
-              title="Matching Wardrobe Pieces"
-              description="Pieces that match by name, color, category, section, season, occasion, style, or formality."
-              items={matchingPieces}
-              emptyMessage="No matching wardrobe pieces."
-              cardClassName="piece-rail-card"
-              renderItem={(item) => (
-                <ClothingCard
-                  item={item}
-                  onEdit={() => navigate(`/pieces/${item.id}`)}
-                  onDelete={handleDeleteClothing}
-                  isBusy={isPiecePending(item.id)}
-                  showActions={false}
-                />
-              )}
-            />
+            {showPieceResults ? (
+              <RailSection
+                id="matching-pieces"
+                title="Matching Wardrobe Pieces"
+                description="Pieces that match by name, color, category, section, season, occasion, style, or formality."
+                items={matchingPieces}
+                emptyMessage="No matching wardrobe pieces."
+                cardClassName="piece-rail-card"
+                renderItem={(item) => (
+                  <ClothingCard
+                    item={item}
+                    onEdit={() => navigate(`/pieces/${item.id}`)}
+                    onDelete={handleDeleteClothing}
+                    isBusy={isPiecePending(item.id)}
+                    showActions={false}
+                  />
+                )}
+              />
+            ) : null}
           </div>
         ) : (
           <section className="section-surface p-5 sm:p-6">
             <div className="rounded-[1.5rem] border border-dashed border-black/10 bg-white px-5 py-8 text-center">
               <h2 className="font-serif text-2xl text-charcoal">
-                No matching wardrobe memories.
+                {contentFilter === "outfits"
+                  ? "No matching outfit memories."
+                  : contentFilter === "pieces"
+                    ? "No matching wardrobe pieces."
+                    : "No matching wardrobe memories."}
               </h2>
               <p className="mt-3 text-sm leading-6 text-stone">
-                Try a color, category, outfit title, or occasion.
+                Try clearing a filter or searching by color, category, outfit title, or occasion.
               </p>
             </div>
           </section>
