@@ -34,6 +34,11 @@ DigiCloset currently includes:
   - warmer editorial app canvas
   - quieter identity/profile header
   - sculpted bottom dock
+- refreshed Home into:
+  - a warmer editorial welcome
+  - a stronger outfit-led hero
+  - calmer weather support
+  - softer memory rails
 - shared client-side wardrobe data layer for outfits and clothing
 - outfit lifecycle actions:
   - favorite / unfavorite
@@ -95,7 +100,7 @@ Home is now adaptive instead of fixed.
 
 Depending on how much wardrobe data exists, it can show:
 
-- a daily wardrobe brief
+- an editorial wardrobe return moment
 - Today's Fit only when an outfit was actually saved that day
 - deterministic starting looks from real closet pieces
 - Good Starting Points
@@ -106,6 +111,13 @@ Depending on how much wardrobe data exists, it can show:
 Home is designed to answer:
 
 > What can I wear today?
+
+The current visual direction also pushes Home toward:
+
+- one stronger outfit-led hero moment
+- compact weather support instead of a dashboard-style module
+- calmer image-led rails for memory and favorites
+- warmer editorial spacing instead of stacked utility boxes
 
 Important Home rule:
 
@@ -313,6 +325,7 @@ Completed visual refresh phases:
 
 - `3G.0` visual reference system + app theme rules
 - `3G.1` AppShell + bottom dock visual refresh
+- `3G.2` Home visual refresh
 
 ## Repository Structure
 
@@ -528,6 +541,7 @@ Oversize message:
 - more readable color / season / occasion / style labels across the app
 - easier reuse of existing wardrobe pieces while building a new outfit memory
 - lightweight filtering and sorting that narrow the closet without turning it into inventory software
+- a calmer, more outfit-memory-first Home that better matches the editorial visual system
 
 ## Honest Current Gaps
 
@@ -544,7 +558,7 @@ The biggest remaining product-quality gap is now hosted-readiness planning plus 
 
 The highest-impact next refinement would be:
 
-- Phase `3G.2`: Home visual refresh, now that the shared shell and dock are aligned with the editorial mobile visual system
+- Phase `3G.3`: Wardrobe visual refresh, now that the Home page and shared shell are aligned more closely with the editorial mobile visual system
 
 ## Documentation Maintenance
 

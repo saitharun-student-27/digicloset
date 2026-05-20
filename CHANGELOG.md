@@ -4,6 +4,78 @@ All notable changes to DigiCloset are documented here in chronological order.
 
 This changelog tracks the product from the original full-stack scaffold to the current outfit-memory-first, mobile-first wardrobe experience.
 
+## 2026-05-20 - Refresh Home into a calmer editorial outfit-memory experience
+
+Commit: latest Phase 3G.2 checkpoint on `main`
+
+### Phase 3G.2 scope
+
+- refreshed only the Home page visuals
+- strengthened the outfit-led hero treatment
+- softened the weather support block
+- refined section rhythm for recent and favorite rails
+- preserved all Home actions, route behavior, and data logic
+
+### Home visual refresh
+
+- replaced the old utility-heavy top section with a warmer editorial greeting
+- kept Home focused on returning to saved looks instead of operational summaries
+- reduced the feeling of stacked equal-weight modules
+- moved the page toward the visual system documented in `docs/VISUAL_SYSTEM.md`
+
+### Hero outfit treatment
+
+- gave the main Home outfit a larger image-led surface
+- simplified hero metadata into calmer supporting pills
+- kept outfit actions available but quieter:
+  - favorite
+  - mark worn
+  - edit
+  - delete
+- preserved the direct path into outfit detail
+- added a more premium empty-state hero when no saved outfit memory exists yet
+
+### Weather and rail polish
+
+- compressed weather support into a quieter wear-support strip
+- kept the weather block helpful without making it feel like analytics
+- refined the recent, favorites, and seasonal rails into calmer editorial surfaces
+- preserved the adaptive Home logic for:
+  - Good Starting Points
+  - Recent Outfit Memories
+  - Favorite Fits
+  - Seasonal Staples
+  - Quiet Rediscovery
+
+### Verification
+
+- frontend production build passed
+- browser verification passed for:
+  - unauthenticated entry staying on `/welcome`
+  - dev-user login
+  - Home loading correctly
+  - favorite action from Home
+  - mark-worn action from Home
+  - opening outfit detail from Home
+  - logout back to `/welcome`
+  - new-user private empty Home state
+  - navigating away from and back to Home
+  - viewport checks at:
+    - `360 x 800`
+    - `390 x 844`
+    - `414 x 896`
+    - desktop
+
+### Important boundary
+
+- this phase did not redesign:
+  - Wardrobe
+  - Outfit Memory / Capture
+  - Suggestions
+  - Outfit Detail
+  - Piece Detail
+- backend, auth, and provider logic were intentionally left unchanged
+
 ## 2026-05-20 - Refresh AppShell and bottom dock toward the DigiCloset editorial system
 
 Commit: latest Phase 3G.1 checkpoint on `main`
