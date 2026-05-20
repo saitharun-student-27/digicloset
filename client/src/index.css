@@ -11,7 +11,7 @@
   --page-padding-tablet: 20px;
   --section-gap-mobile: 20px;
   --section-gap-tablet: 24px;
-  --bottom-dock-clearance: calc(88px + env(safe-area-inset-bottom));
+  --bottom-dock-clearance: calc(104px + env(safe-area-inset-bottom));
   --touch-target-min: 44px;
   --outfit-rail-card-width: clamp(280px, 82vw, 336px);
   --piece-rail-card-width: clamp(154px, 45vw, 214px);
@@ -29,7 +29,9 @@ body {
   min-width: 320px;
   min-height: 100vh;
   min-height: 100dvh;
-  background: #f8f5ee;
+  background:
+    radial-gradient(circle at top, rgba(255, 255, 255, 0.66), transparent 28rem),
+    linear-gradient(180deg, #f6f1e8 0%, #f8f5ee 18%, #f5efe6 100%);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
@@ -47,6 +49,68 @@ button {
 }
 
 @layer components {
+  .app-canvas {
+    background:
+      radial-gradient(circle at top, rgba(255, 255, 255, 0.76), transparent 26rem),
+      linear-gradient(180deg, #f6f1e8 0%, #f8f5ee 18%, #f5efe6 100%);
+  }
+
+  .shell-curve {
+    border-bottom-left-radius: 999px;
+    border-bottom-right-radius: 999px;
+    border: 1px solid rgba(182, 144, 91, 0.26);
+    border-top: 0;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.88) 0%, rgba(248, 245, 238, 0.52) 100%);
+    box-shadow: 0 26px 65px rgba(29, 29, 27, 0.04);
+    opacity: 0.88;
+  }
+
+  .shell-header {
+    @apply grid items-center gap-3 rounded-[1.65rem] border px-3 py-3 shadow-soft backdrop-blur-xl;
+    grid-template-columns: minmax(0, 1fr) auto;
+    border-color: rgba(255, 255, 255, 0.55);
+    background: rgba(255, 255, 255, 0.72);
+  }
+
+  .shell-brand {
+    @apply flex min-w-0 items-center gap-3;
+  }
+
+  .shell-brand-mark {
+    @apply flex h-11 w-11 shrink-0 items-center justify-center rounded-full border text-charcoal shadow-sm;
+    border-color: rgba(29, 29, 27, 0.05);
+    background: rgba(255, 255, 255, 0.72);
+  }
+
+  .shell-profile-pill {
+    @apply flex items-center gap-2 rounded-full border px-2 py-2;
+    border-color: rgba(29, 29, 27, 0.05);
+    background: rgba(248, 245, 238, 0.88);
+  }
+
+  .shell-dock {
+    @apply flex w-full max-w-[28rem] items-center justify-between gap-1 rounded-[2rem] border p-2 shadow-soft backdrop-blur-xl;
+    border-color: rgba(255, 255, 255, 0.6);
+    background: rgba(255, 255, 255, 0.76);
+    box-shadow:
+      0 20px 45px rgba(29, 29, 27, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.55);
+  }
+
+  .shell-dock-link {
+    @apply relative flex min-h-[var(--touch-target-min)] min-w-0 flex-1 flex-col items-center justify-center gap-1 rounded-[1.45rem] px-2 py-2 text-center transition-all duration-200;
+  }
+
+  .shell-dock-link-active {
+    @apply bg-charcoal text-ivory;
+    box-shadow: 0 12px 30px rgba(29, 29, 27, 0.16);
+  }
+
+  .shell-dock-label {
+    @apply block text-[10px] font-medium leading-none sm:text-[10.5px];
+  }
+
   .page-shell {
     @apply mx-auto w-full max-w-6xl;
     padding-inline: var(--page-padding-mobile);
@@ -96,6 +160,7 @@ button {
 @media (min-width: 640px) {
   :root {
     --page-padding-mobile: 16px;
+    --bottom-dock-clearance: calc(110px + env(safe-area-inset-bottom));
     --outfit-rail-card-width: clamp(292px, 44vw, 344px);
     --piece-rail-card-width: clamp(176px, 28vw, 220px);
   }
@@ -105,6 +170,7 @@ button {
   :root {
     --page-padding-mobile: var(--page-padding-tablet);
     --section-gap-mobile: var(--section-gap-tablet);
+    --bottom-dock-clearance: calc(116px + env(safe-area-inset-bottom));
     --outfit-rail-card-width: clamp(304px, 34vw, 360px);
     --piece-rail-card-width: clamp(190px, 22vw, 236px);
   }

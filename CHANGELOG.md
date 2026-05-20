@@ -4,6 +4,69 @@ All notable changes to DigiCloset are documented here in chronological order.
 
 This changelog tracks the product from the original full-stack scaffold to the current outfit-memory-first, mobile-first wardrobe experience.
 
+## 2026-05-20 - Refresh AppShell and bottom dock toward the DigiCloset editorial system
+
+Commit: latest Phase 3G.1 checkpoint on `main`
+
+### Phase 3G.1 scope
+
+- refreshed only the shared protected-app shell
+- refreshed the floating bottom dock
+- warmed the global app canvas and safe-area spacing
+- preserved all auth, route, and data behavior
+
+### AppShell refresh
+
+- added a calmer DigiCloset identity lockup to the protected shell
+- refined the top profile/logout treatment into a quieter editorial header
+- kept logout behavior and redirect behavior unchanged
+- preserved the protected-route wrapper and dock-free auth screens
+
+### Bottom dock refresh
+
+- restyled the dock into a more sculpted mobile-app pill
+- added small always-visible labels under dock icons
+- kept the same navigation items:
+  - Home
+  - Wardrobe
+  - Outfit Memory
+  - Suggestions
+- preserved route behavior while making the dock feel less like a generic web navbar
+
+### Canvas and spacing polish
+
+- warmed the protected app background further
+- added a subtle curved shell backdrop behind the app header
+- increased bottom dock clearance so page content is less likely to be obscured near the viewport edge
+- preserved page content and route composition without redesigning any page body
+
+### Verification
+
+- frontend production build passed
+- backend health remained unchanged
+- Playwright browser verification passed for:
+  - unauthenticated redirect to `/welcome`
+  - no dock on auth screens
+  - dev login
+  - dock navigation across:
+    - Home
+    - Outfit Memory
+    - Wardrobe
+    - Suggestions
+  - outfit detail route
+  - piece detail route
+  - logout back to `/welcome`
+  - mobile and desktop shell checks at:
+    - `360 x 800`
+    - `390 x 844`
+    - `414 x 896`
+    - desktop
+
+### Important boundary
+
+- no page-level redesign was done in this phase
+- Home, Wardrobe, Capture, Suggestions, Outfit Detail, and Piece Detail logic and layout structure were intentionally left alone
+
 ## 2026-05-20 - Define DigiCloset visual system and page-by-page refresh roadmap
 
 Commit: latest Phase 3G.0 checkpoint on `main`

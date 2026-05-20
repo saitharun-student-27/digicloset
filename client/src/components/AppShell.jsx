@@ -1,4 +1,10 @@
-import { Box, Home as HomeIcon, LogOut, Plus, Sparkles } from "lucide-react";
+import {
+  Box,
+  Home as HomeIcon,
+  LogOut,
+  Plus,
+  Sparkles,
+} from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 
 import { useAuth } from "../context/AuthContext.jsx";
@@ -41,48 +47,70 @@ export default function AppShell({ children }) {
   const profileLabel = user?.display_name || user?.email || "Signed in";
 
   return (
-    <div className="relative min-h-[100vh] min-h-[100dvh] bg-ivory pb-[var(--bottom-dock-clearance)] text-charcoal">
-      <div className="sticky top-0 z-40 px-3 pt-[max(0.75rem,env(safe-area-inset-top))] sm:px-4">
-        <div className="mx-auto flex max-w-7xl justify-end">
-          <div className="flex items-center gap-2 rounded-full border border-white/40 bg-white/80 px-2 py-2 shadow-soft backdrop-blur-xl">
-            <span className="max-w-[10rem] truncate px-2 text-xs font-medium text-stone sm:max-w-none">
-              {profileLabel}
-            </span>
-            <button
-              type="button"
-              onClick={handleLogout}
-              className="inline-flex h-10 min-h-[var(--touch-target-min)] min-w-[var(--touch-target-min)] items-center justify-center rounded-full bg-ivory px-3 text-sm font-medium text-charcoal transition hover:bg-linen"
-              aria-label="Log out"
-            >
-              <LogOut className="h-4 w-4 sm:mr-2" />
-              <span className="hidden sm:inline">Log out</span>
-            </button>
-          </div>
-        </div>
+    <div className="app-canvas relative min-h-[100vh] min-h-[100dvh] overflow-x-hidden pb-[var(--bottom-dock-clearance)] text-charcoal">
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-0 flex justify-center">
+        <div className="shell-curve h-[15.5rem] w-[min(100%,72rem)]" />
       </div>
 
-      {children}
+      <div className="relative z-10">
+        <div className="sticky top-0 z-40 px-3 pt-[max(0.75rem,env(safe-area-inset-top))] sm:px-4">
+          <div className="mx-auto max-w-6xl">
+            <div className="shell-header">
+              <div className="shell-brand">
+                <div className="shell-brand-mark" aria-hidden="true">
+                  <span className="font-serif text-[1.05rem] leading-none">
+                    DC
+                  </span>
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.22em] text-stone/80">
+                    Private wardrobe memory
+                  </p>
+                  <p className="font-serif text-[1.05rem] leading-none text-charcoal sm:text-[1.15rem]">
+                    DigiCloset
+                  </p>
+                </div>
+              </div>
 
-      {/* Floating Bottom Dock Navigation */}
+              <div className="shell-profile-pill">
+                <span className="max-w-[8.75rem] truncate text-[11px] font-medium text-stone sm:max-w-[12rem]">
+                  {profileLabel}
+                </span>
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="inline-flex h-10 min-h-[var(--touch-target-min)] min-w-[var(--touch-target-min)] items-center justify-center rounded-full bg-ivory px-3 text-sm font-medium text-charcoal transition hover:bg-linen"
+                  aria-label="Log out"
+                >
+                  <LogOut className="h-4 w-4 sm:mr-2" />
+                  <span className="hidden sm:inline">Log out</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {children}
+      </div>
+
       <div className="pointer-events-none fixed bottom-[max(0.75rem,env(safe-area-inset-bottom))] left-0 right-0 z-50 flex justify-center px-3 sm:px-4">
-        <nav className="pointer-events-auto flex items-center gap-1.5 rounded-[2rem] border border-white/20 bg-white/78 p-2 shadow-soft backdrop-blur-xl">
+        <nav className="shell-dock pointer-events-auto" aria-label="Primary">
           {navigationItems.map(({ to, label, icon: Icon }) => (
             <NavLink
               key={to}
               to={to}
               className={({ isActive }) =>
-                `group relative flex h-12 min-h-[var(--touch-target-min)] w-12 min-w-[var(--touch-target-min)] items-center justify-center rounded-full transition-all duration-300 sm:h-14 sm:w-14 ${
+                `shell-dock-link group ${
                   isActive
-                    ? "bg-charcoal text-ivory shadow-lg scale-105"
-                    : "text-stone hover:bg-white hover:text-charcoal hover:shadow-md"
+                    ? "shell-dock-link-active"
+                    : "text-stone hover:bg-white/70 hover:text-charcoal"
                 }`
               }
               aria-label={label}
             >
-              <Icon className="h-6 w-6" strokeWidth={2} />
-              
-              {/* Tooltip on hover for larger screens */}
-              <span className="absolute -top-10 scale-0 rounded-lg bg-charcoal px-3 py-1.5 text-xs font-medium text-ivory opacity-0 transition-all group-hover:scale-100 group-hover:opacity-100 hidden sm:block">
+              <Icon className="h-[1.15rem] w-[1.15rem] sm:h-[1.2rem] sm:w-[1.2rem]" strokeWidth={2} />
+              <span className="shell-dock-label">{label}</span>
+              <span className="absolute -top-9 hidden scale-95 rounded-lg bg-charcoal px-3 py-1 text-xs font-medium text-ivory opacity-0 transition-all group-hover:scale-100 group-hover:opacity-100 sm:block">
                 {label}
               </span>
             </NavLink>

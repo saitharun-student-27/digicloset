@@ -30,6 +30,10 @@ DigiCloset currently includes:
   - formality
 - existing-piece search inside the outfit builder so saved wardrobe pieces can be reused before new duplicates are created
 - calm wardrobe filters and sorting for faster closet browsing without leaving the outfit-memory-first product shape
+- refreshed protected-app shell with:
+  - warmer editorial app canvas
+  - quieter identity/profile header
+  - sculpted bottom dock
 - shared client-side wardrobe data layer for outfits and clothing
 - outfit lifecycle actions:
   - favorite / unfavorite
@@ -294,7 +298,7 @@ Next planned wardrobe-information phase:
 
 - `3F.6` small metadata-filter refinement such as occasion-aware narrowing, only if it keeps Wardrobe calm and mobile-first
 
-Upcoming visual refresh planning phase:
+Current visual refresh roadmap:
 
 - `3G.0` visual reference interpretation + app theme rules
 - `3G.1` AppShell + bottom dock visual refresh
@@ -304,6 +308,11 @@ Upcoming visual refresh planning phase:
 - `3G.5` Suggestions visual refresh
 - `3G.6` Outfit Detail + Piece Detail visual refresh
 - `3G.7` final mobile visual QA
+
+Completed visual refresh phases:
+
+- `3G.0` visual reference system + app theme rules
+- `3G.1` AppShell + bottom dock visual refresh
 
 ## Repository Structure
 
@@ -535,7 +544,7 @@ The biggest remaining product-quality gap is now hosted-readiness planning plus 
 
 The highest-impact next refinement would be:
 
-- Phase `3F.6`: small metadata-aware filter refinement, such as occasion narrowing, only if it keeps Wardrobe feeling like a closet instead of an admin tool
+- Phase `3G.2`: Home visual refresh, now that the shared shell and dock are aligned with the editorial mobile visual system
 
 ## Documentation Maintenance
 
