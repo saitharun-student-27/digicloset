@@ -4,6 +4,59 @@ All notable changes to DigiCloset are documented here in chronological order.
 
 This changelog tracks the product from the original full-stack scaffold to the current outfit-memory-first, mobile-first wardrobe experience.
 
+## 2026-05-20 - Move Wardrobe filters behind a compact Filter button
+
+Commit: latest Phase 3G.3C checkpoint on `main`
+
+### Phase 3G.3C scope
+
+- kept Wardrobe search visible at the top
+- moved filter options behind a compact Filter button
+- kept sorting compact beside it
+- preserved all Wardrobe search, filter, sort, and routing behavior
+
+### Control-layout correction
+
+- replaced the always-expanded filter rows with a small control row:
+  - `Filter`
+  - `Sort`
+  - `Clear filters` only when needed
+- stopped pushing category content downward with always-open section and season chips
+- kept the top of Wardrobe much closer to the mobile editorial reference rhythm
+
+### Filter button behavior
+
+- added a compact filter panel behind the Filter button
+- the panel now contains:
+  - content filters
+  - section filters
+  - season filters
+  - local clear action
+  - done action
+- filters still apply immediately when selected
+- the panel can be closed cleanly after selection
+
+### Active state and QA
+
+- the Filter button now shows an active count when one or more filters are set
+- search is not counted as a filter
+- browser QA confirmed:
+  - panel opens
+  - filter count updates
+  - search, filters, and sort still work
+  - no clipping or overlap at:
+    - `360 x 800`
+    - `390 x 844`
+    - `414 x 896`
+    - desktop
+- reference comparison was performed against:
+  - `references/app-theme/02-wardrobe-reference.png`
+
+### Important boundary
+
+- no backend, auth, provider, or route logic changed
+- no other page was redesigned in this correction phase
+
 ## 2026-05-20 - Correct Wardrobe toward the reference with compressed filters
 
 Commit: latest Phase 3G.3B checkpoint on `main`

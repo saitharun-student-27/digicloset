@@ -1,5 +1,5 @@
-import { ArrowUpDown, ChevronDown, Plus, Search, Sparkles, X } from "lucide-react";
-import { useMemo, useState } from "react";
+import { ArrowUpDown, ChevronDown, Plus, Search, SlidersHorizontal, Sparkles, X } from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import ClothingCard from "../components/ClothingCard";
@@ -425,7 +425,36 @@ export default function Vault() {
   const [sectionFilter, setSectionFilter] = useState("all_sections");
   const [seasonFilter, setSeasonFilter] = useState("all_seasons");
   const [sortBy, setSortBy] = useState("recent");
-  const [showSeasonFilters, setShowSeasonFilters] = useState(false);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const filterPanelRef = useRef(null);
+
+  useEffect(() => {
+    function handlePointerDown(event) {
+      if (!isFilterOpen) {
+        return;
+      }
+
+      if (filterPanelRef.current?.contains(event.target)) {
+        return;
+      }
+
+      setIsFilterOpen(false);
+    }
+
+    function handleEscape(event) {
+      if (event.key === "Escape") {
+        setIsFilterOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("keydown", handleEscape);
+
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, [isFilterOpen]);
 
   async function handleDeleteClothing(item) {
     if (!window.confirm(`Delete "${item.name}"?`)) {
@@ -530,7 +559,10 @@ export default function Vault() {
     contentFilter !== "all" ||
     sectionFilter !== "all_sections" ||
     seasonFilter !== "all_seasons";
-  const hasNonDefaultControls = hasActiveFilters || sortBy !== "recent";
+  const activeFilterCount = Number(contentFilter !== "all") +
+    Number(sectionFilter !== "all_sections") +
+    Number(seasonFilter !== "all_seasons");
+  const hasNonDefaultControls = hasActiveFilters || sortBy !== "recent" || isSearchActive;
   const isFilteredMode = isSearchActive || hasActiveFilters;
   const contentOptions = [
     { value: "all", label: "All" },
@@ -691,45 +723,31 @@ export default function Vault() {
               </p>
             </div>
 
-            <div className="grid gap-3 border-t border-[#eadfce] pt-4">
-              <FilterRow
-                label="Content"
-                options={contentOptions}
-                value={contentFilter}
-                onChange={setContentFilter}
-              />
-              <FilterRow
-                label="Section"
-                options={sectionOptions}
-                value={sectionFilter}
-                onChange={setSectionFilter}
-              />
-
-              <div className="flex flex-wrap items-center gap-2 border-t border-[#eadfce] pt-3">
+            <div className="relative border-t border-[#eadfce] pt-4" ref={filterPanelRef}>
+              <div className="flex flex-wrap items-center gap-2">
                 <button
                   type="button"
-                  onClick={() => setShowSeasonFilters((value) => !value)}
+                  onClick={() => setIsFilterOpen((value) => !value)}
                   className={`inline-flex h-10 min-h-[var(--touch-target-min)] items-center gap-2 rounded-full border px-3.5 text-sm font-medium transition ${
-                    showSeasonFilters || seasonFilter !== "all_seasons"
+                    isFilterOpen || activeFilterCount > 0
                       ? "border-charcoal bg-charcoal text-ivory shadow-soft"
                       : "border-[#e0d4c0] bg-white text-charcoal hover:bg-linen"
                   }`}
+                  aria-expanded={isFilterOpen}
+                  aria-controls="wardrobe-filter-panel"
                 >
-                  Season
+                  <SlidersHorizontal className="h-4 w-4" />
+                  {activeFilterCount > 0 ? `Filter · ${activeFilterCount}` : "Filter"}
                   <ChevronDown
-                    className={`h-4 w-4 transition ${showSeasonFilters ? "rotate-180" : ""}`}
+                    className={`h-4 w-4 transition ${isFilterOpen ? "rotate-180" : ""}`}
                   />
                 </button>
 
-                <div className="flex min-w-0 flex-1 items-center gap-2 sm:flex-none">
-                  <div className="flex items-center gap-2 pl-1 text-sm text-stone">
-                    <ArrowUpDown className="h-4 w-4 text-brass" />
-                    <span className="font-medium text-charcoal">Sort</span>
-                  </div>
+                <div className="flex min-w-0 flex-1 items-center gap-2">
                   <select
                     value={sortBy}
                     onChange={(event) => setSortBy(event.target.value)}
-                    className="h-10 min-h-[var(--touch-target-min)] min-w-0 flex-1 rounded-full border border-[#e0d4c0] bg-white px-4 text-sm text-charcoal shadow-soft outline-none transition focus:border-sage/40 focus:ring-4 focus:ring-sage/10 sm:w-[12.5rem] sm:flex-none"
+                    className="h-10 min-h-[var(--touch-target-min)] min-w-0 flex-1 rounded-full border border-[#e0d4c0] bg-white px-4 text-sm text-charcoal shadow-soft outline-none transition focus:border-sage/40 focus:ring-4 focus:ring-sage/10 sm:max-w-[14rem]"
                     aria-label="Sort wardrobe content"
                   >
                     {sortOptions.map((option) => (
@@ -744,11 +762,12 @@ export default function Vault() {
                   <button
                     type="button"
                     onClick={() => {
+                      setSearchQuery("");
                       setContentFilter("all");
                       setSectionFilter("all_sections");
                       setSeasonFilter("all_seasons");
                       setSortBy("recent");
-                      setShowSeasonFilters(false);
+                      setIsFilterOpen(false);
                     }}
                     className="inline-flex h-10 min-h-[var(--touch-target-min)] items-center justify-center rounded-full bg-ivory px-3.5 text-sm font-medium text-charcoal transition hover:bg-linen"
                   >
@@ -757,13 +776,53 @@ export default function Vault() {
                 ) : null}
               </div>
 
-              {(showSeasonFilters || seasonFilter !== "all_seasons") ? (
-                <FilterRow
-                  label="Season"
-                  options={seasonOptions}
-                  value={seasonFilter}
-                  onChange={setSeasonFilter}
-                />
+              {isFilterOpen ? (
+                <div
+                  id="wardrobe-filter-panel"
+                  className="mt-3 rounded-[1.55rem] border border-[#e7dccb] bg-white/95 p-4 shadow-soft backdrop-blur sm:absolute sm:left-0 sm:right-auto sm:z-20 sm:mt-2 sm:w-[min(32rem,calc(100vw-3rem))]"
+                >
+                  <div className="space-y-4">
+                    <FilterRow
+                      label="Content"
+                      options={contentOptions}
+                      value={contentFilter}
+                      onChange={setContentFilter}
+                    />
+                    <FilterRow
+                      label="Section"
+                      options={sectionOptions}
+                      value={sectionFilter}
+                      onChange={setSectionFilter}
+                    />
+                    <FilterRow
+                      label="Season"
+                      options={seasonOptions}
+                      value={seasonFilter}
+                      onChange={setSeasonFilter}
+                    />
+
+                    <div className="flex items-center justify-between border-t border-[#eadfce] pt-3">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setContentFilter("all");
+                          setSectionFilter("all_sections");
+                          setSeasonFilter("all_seasons");
+                        }}
+                        className="text-sm font-medium text-stone transition hover:text-charcoal"
+                      >
+                        Clear filters
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setIsFilterOpen(false)}
+                        className="inline-flex h-10 min-h-[var(--touch-target-min)] items-center justify-center rounded-full bg-charcoal px-4 text-sm font-medium text-ivory transition hover:bg-softblack"
+                      >
+                        Done
+                      </button>
+                    </div>
+                  </div>
+                </div>
               ) : null}
             </div>
           </div>
