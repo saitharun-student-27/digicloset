@@ -59,6 +59,12 @@ DigiCloset currently includes:
   - compact `Filter` button with active count
   - compact sort control
   - no always-expanded filter wall
+- refreshed Outfit Memory / Capture into a calmer editorial creation surface with:
+  - centered DigiCloset / Outfit Memory header
+  - compact `Image only`, `Text only`, and `Manual only` mode cards
+  - stronger reuse-from-wardrobe treatment
+  - softer selected-piece and create-new-piece sections
+  - anchored black pill save CTA
 - shared client-side wardrobe data layer for outfits and clothing
 - outfit lifecycle actions:
   - favorite / unfavorite
@@ -152,11 +158,11 @@ This is the primary creation flow.
 
 Users can save a complete look through:
 
-- outfit photo upload
+- image-first outfit memory
 - text-guided outfit capture
-- image with title only
+- manual piece-by-piece building
 
-Inside the text-guided builder, DigiCloset now also supports:
+Inside the builder flows, DigiCloset now also supports:
 
 - searching existing wardrobe pieces
 - selecting reusable existing pieces into the pending outfit
@@ -361,6 +367,7 @@ Completed visual refresh phases:
 - `3G.3` Wardrobe visual refresh
 - `3G.3B` Wardrobe correction toward the reference structure
 - `3G.3C` Wardrobe filter button + compact filter sheet correction
+- `3G.4` Outfit Memory / Capture visual refresh
 
 ## Repository Structure
 
@@ -581,6 +588,7 @@ Oversize message:
 - a calmer Wardrobe layout that now feels more like a private digital closet than a utility-heavy management page
 - a corrected Wardrobe control area that now stays compact and avoids chip overlap or duplicate filter clutter
 - a compact Wardrobe filter-button flow that lets content appear much sooner without losing filtering power
+- a calmer Capture page that now feels more like saving an outfit memory than filling out a utility form
 
 ## Honest Current Gaps
 
@@ -597,7 +605,7 @@ The biggest remaining product-quality gap is now hosted-readiness planning plus 
 
 The highest-impact next refinement would be:
 
-- Phase `3G.4`: Outfit Memory / Capture visual refresh, now that the shell, Home, and Wardrobe are aligned more closely with the editorial mobile visual system
+- Phase `3G.5`: Suggestions visual refresh, now that the shell, Home, Wardrobe, and Capture are aligned more closely with the editorial mobile visual system
 
 ## Documentation Maintenance
 

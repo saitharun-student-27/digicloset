@@ -427,6 +427,7 @@ export default function Vault() {
   const [sortBy, setSortBy] = useState("recent");
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const filterPanelRef = useRef(null);
+  const filterButtonRef = useRef(null);
 
   useEffect(() => {
     function handlePointerDown(event) {
@@ -435,6 +436,10 @@ export default function Vault() {
       }
 
       if (filterPanelRef.current?.contains(event.target)) {
+        return;
+      }
+
+      if (filterButtonRef.current?.contains(event.target)) {
         return;
       }
 
@@ -447,11 +452,11 @@ export default function Vault() {
       }
     }
 
-    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("pointerdown", handlePointerDown);
     document.addEventListener("keydown", handleEscape);
 
     return () => {
-      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("pointerdown", handlePointerDown);
       document.removeEventListener("keydown", handleEscape);
     };
   }, [isFilterOpen]);
@@ -692,7 +697,7 @@ export default function Vault() {
         </div>
       </section>
 
-      <section className="section-surface mt-4 overflow-hidden p-3 sm:p-4">
+      <section className="section-surface mt-4 overflow-visible p-3 sm:p-4">
         <div className="rounded-[1.85rem] border border-[#e7dccb] bg-[linear-gradient(180deg,rgba(255,255,255,0.96)_0%,rgba(248,245,238,0.98)_100%)] p-4 sm:p-5">
           <div className="space-y-4">
             <div>
@@ -726,6 +731,7 @@ export default function Vault() {
             <div className="relative border-t border-[#eadfce] pt-4" ref={filterPanelRef}>
               <div className="flex flex-wrap items-center gap-2">
                 <button
+                  ref={filterButtonRef}
                   type="button"
                   onClick={() => setIsFilterOpen((value) => !value)}
                   className={`inline-flex h-10 min-h-[var(--touch-target-min)] items-center gap-2 rounded-full border px-3.5 text-sm font-medium transition ${
@@ -776,11 +782,11 @@ export default function Vault() {
                 ) : null}
               </div>
 
-              {isFilterOpen ? (
-                <div
-                  id="wardrobe-filter-panel"
-                  className="mt-3 rounded-[1.55rem] border border-[#e7dccb] bg-white/95 p-4 shadow-soft backdrop-blur sm:absolute sm:left-0 sm:right-auto sm:z-20 sm:mt-2 sm:w-[min(32rem,calc(100vw-3rem))]"
-                >
+                {isFilterOpen ? (
+                  <div
+                    id="wardrobe-filter-panel"
+                    className="z-30 mt-3 rounded-[1.55rem] border border-[#e7dccb] bg-white/95 p-4 shadow-soft backdrop-blur sm:absolute sm:left-0 sm:right-auto sm:mt-2 sm:w-[min(32rem,calc(100vw-3rem))]"
+                  >
                   <div className="space-y-4">
                     <FilterRow
                       label="Content"

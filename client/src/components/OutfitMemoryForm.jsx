@@ -3,8 +3,8 @@ import {
   FileImage,
   FilePenLine,
   ImagePlus,
-  Search,
   Plus,
+  Search,
   Sparkles,
   Trash2,
   Type,
@@ -35,8 +35,6 @@ import {
   getCategorySearchTerms,
   getCategorySection,
   getFieldSearchTerms,
-  normalizeCategory,
-  normalizeColor,
   normalizeOccasion,
   normalizeSeason,
   normalizeStyle,
@@ -120,27 +118,46 @@ function collectExistingPieceSearchText(item) {
     .join(" ");
 }
 
-
 const captureModes = [
   {
-    id: "photo_note",
-    title: "Upload outfit photo",
-    description: "Save a look from an outfit image with a short note.",
+    id: "image_only",
+    title: "Image only",
+    description: "Upload a photo",
     icon: FileImage,
   },
   {
-    id: "text_input",
-    title: "Type the outfit",
-    description: "Write the look in text and confirm the suggested pieces.",
+    id: "text_only",
+    title: "Text only",
+    description: "Describe the look",
     icon: Type,
   },
   {
-    id: "image_title",
-    title: "Image with title only",
-    description: "Save just the outfit image and title without extra breakdown.",
-    icon: ImagePlus,
+    id: "manual_only",
+    title: "Manual only",
+    description: "Build it piece by piece",
+    icon: Plus,
   },
 ];
+
+function SectionCard({ title, description, children, className = "" }) {
+  return (
+    <section
+      className={`rounded-[1.7rem] border border-[#e8ddcd] bg-[linear-gradient(180deg,rgba(251,248,242,0.98)_0%,rgba(247,242,234,0.94)_100%)] p-4 sm:p-5 ${className}`}
+    >
+      {title ? (
+        <div className="mb-4">
+          <p className="font-serif text-[1.45rem] leading-tight text-charcoal">
+            {title}
+          </p>
+          {description ? (
+            <p className="mt-1 text-sm leading-6 text-stone">{description}</p>
+          ) : null}
+        </div>
+      ) : null}
+      {children}
+    </section>
+  );
+}
 
 function TextInput({ value, name, onChange, placeholder, required = false }) {
   return (
@@ -150,7 +167,7 @@ function TextInput({ value, name, onChange, placeholder, required = false }) {
       onChange={onChange}
       placeholder={placeholder}
       required={required}
-      className="h-11 w-full rounded-xl border border-black/10 bg-white px-3 text-sm text-charcoal outline-none transition placeholder:text-stone/60 focus:border-sage focus:bg-white focus:ring-4 focus:ring-sage/10"
+      className="h-11 w-full rounded-[1.15rem] border border-[#e1d5c3] bg-white px-3.5 text-sm text-charcoal outline-none transition placeholder:text-stone/60 focus:border-sage focus:bg-white focus:ring-4 focus:ring-sage/10"
     />
   );
 }
@@ -161,7 +178,7 @@ function SelectInput({ value, name, onChange, options }) {
       name={name}
       value={value}
       onChange={onChange}
-      className="h-11 w-full rounded-xl border border-black/10 bg-white px-3 text-sm capitalize text-charcoal outline-none transition focus:border-sage focus:bg-white focus:ring-4 focus:ring-sage/10"
+      className="h-11 w-full rounded-[1.15rem] border border-[#e1d5c3] bg-white px-3.5 text-sm capitalize text-charcoal outline-none transition focus:border-sage focus:bg-white focus:ring-4 focus:ring-sage/10"
     >
       {options.map((option) => (
         <option key={option} value={option}>
@@ -180,28 +197,33 @@ function TextArea({ value, name, onChange, placeholder, rows = 4 }) {
       onChange={onChange}
       rows={rows}
       placeholder={placeholder}
-      className="w-full rounded-xl border border-black/10 bg-white px-3 py-3 text-sm text-charcoal outline-none transition placeholder:text-stone/60 focus:border-sage focus:ring-4 focus:ring-sage/10"
+      className="w-full rounded-[1.15rem] border border-[#e1d5c3] bg-white px-3.5 py-3 text-sm text-charcoal outline-none transition placeholder:text-stone/60 focus:border-sage focus:ring-4 focus:ring-sage/10"
     />
   );
 }
 
 function ModeCard({ mode, activeMode, onClick }) {
   const Icon = mode.icon;
+  const isActive = activeMode === mode.id;
 
   return (
     <button
       type="button"
       onClick={() => onClick(mode.id)}
-      className={`rounded-[1.5rem] border p-4 text-left transition ${
-        activeMode === mode.id
-          ? "border-sage bg-white shadow-soft"
-          : "border-black/5 bg-ivory hover:border-black/10 hover:bg-white"
+      className={`min-h-[7.75rem] rounded-[1.45rem] border px-4 py-4 text-left transition ${
+        isActive
+          ? "border-charcoal bg-white shadow-soft"
+          : "border-[#e4d8c7] bg-white/88 hover:border-[#d8c8b0] hover:bg-white"
       }`}
     >
-      <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-linen text-brass">
+      <div
+        className={`flex h-10 w-10 items-center justify-center rounded-2xl ${
+          isActive ? "bg-charcoal text-ivory" : "bg-linen text-brass"
+        }`}
+      >
         <Icon className="h-5 w-5" />
       </div>
-      <p className="mt-4 text-sm font-semibold text-charcoal">{mode.title}</p>
+      <p className="mt-3.5 text-[15px] font-semibold text-charcoal">{mode.title}</p>
       <p className="mt-1 text-sm leading-6 text-stone">{mode.description}</p>
     </button>
   );
@@ -209,7 +231,7 @@ function ModeCard({ mode, activeMode, onClick }) {
 
 function PreviewBadge({ label, value }) {
   return (
-    <div className="rounded-2xl bg-white p-3 shadow-soft">
+    <div className="rounded-[1.35rem] border border-[#e8ddcd] bg-white px-3.5 py-3 shadow-soft">
       <p className="text-xs font-semibold uppercase tracking-[0.14em] text-stone">
         {label}
       </p>
@@ -222,7 +244,7 @@ function PreviewBadge({ label, value }) {
 
 function PieceSlot({ label, piece }) {
   return (
-    <div className="rounded-2xl border border-black/5 bg-white p-3">
+    <div className="rounded-[1.35rem] border border-[#e8ddcd] bg-white px-3.5 py-3">
       <p className="text-xs font-semibold uppercase tracking-[0.14em] text-stone">
         {label}
       </p>
@@ -237,8 +259,8 @@ function ExistingPieceCard({ item, onRemove }) {
   const imageUrl = getImageUrl(item.image_url);
 
   return (
-    <div className="flex items-center gap-3 rounded-2xl border border-black/5 bg-white p-3">
-      <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-[linear-gradient(135deg,#f4efe6_0%,#fbf8f2_100%)]">
+    <div className="flex items-center gap-3 rounded-[1.35rem] border border-[#e7dccb] bg-white px-3.5 py-3 shadow-soft">
+      <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-[1rem] bg-[linear-gradient(135deg,#f4efe6_0%,#fbf8f2_100%)]">
         {imageUrl ? (
           <img
             src={imageUrl}
@@ -253,17 +275,15 @@ function ExistingPieceCard({ item, onRemove }) {
       </div>
       <div className="min-w-0 flex-1">
         <div className="flex flex-wrap items-center gap-2">
-          <p className="truncate text-sm font-medium text-charcoal">
-            {item.name}
-          </p>
-          <span className="rounded-full bg-sage/10 px-2.5 py-1 text-[11px] font-medium text-sage">
+          <p className="truncate text-sm font-medium text-charcoal">{item.name}</p>
+          <span className="rounded-full bg-ivory px-2.5 py-1 text-[11px] font-medium text-stone">
             Existing piece
           </span>
         </div>
         <p className="mt-1 text-xs leading-5 text-stone">
           {[formatCategoryLabel(item.category), formatColorLabel(item.color)]
             .filter(Boolean)
-            .join(" - ")}
+            .join(" · ")}
         </p>
       </div>
       <button
@@ -285,9 +305,9 @@ function SearchResultButton({ item, onSelect }) {
     <button
       type="button"
       onClick={() => onSelect(item.id)}
-      className="flex min-h-[var(--touch-target-min)] w-full items-center gap-3 rounded-2xl px-3 py-3 text-left transition hover:bg-white"
+      className="flex min-h-[var(--touch-target-min)] w-full items-center gap-3 rounded-[1.25rem] px-3 py-3 text-left transition hover:bg-white"
     >
-      <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-white">
+      <div className="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-[1rem] border border-[#ece2d3] bg-white">
         {imageUrl ? (
           <img
             src={imageUrl}
@@ -307,7 +327,7 @@ function SearchResultButton({ item, onSelect }) {
             getCategorySection(item.category),
           ]
             .filter(Boolean)
-            .join(" - ")}
+            .join(" · ")}
         </p>
       </div>
     </button>
@@ -323,16 +343,11 @@ function ImagePicker({
   helperText,
 }) {
   return (
-    <section className="rounded-2xl bg-ivory p-4">
-      <div className="mb-4">
-        <p className="text-sm font-semibold text-charcoal">Outfit image</p>
-        <p className="mt-1 text-sm leading-6 text-stone">{helperText}</p>
-      </div>
-
-      <div className="rounded-[1.5rem] border border-dashed border-black/15 bg-white p-4">
+    <SectionCard title="Outfit image" description={helperText}>
+      <div className="rounded-[1.55rem] border border-dashed border-[#d7c8b2] bg-white/94 p-4">
         {imagePreviewUrl ? (
           <div className="space-y-4">
-            <div className="flex h-56 items-center justify-center rounded-[1.25rem] bg-[linear-gradient(135deg,#f4efe6_0%,#fbf8f2_100%)] p-3 sm:h-72 sm:p-4">
+            <div className="flex h-56 items-center justify-center rounded-[1.35rem] bg-[linear-gradient(135deg,#f4efe6_0%,#fbf8f2_100%)] p-3 sm:h-72 sm:p-4">
               <img
                 src={imagePreviewUrl}
                 alt="Outfit preview"
@@ -348,11 +363,11 @@ function ImagePicker({
                   We&apos;ll use this as your outfit memory.
                 </p>
               </div>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="inline-flex h-10 items-center gap-2 rounded-full bg-linen px-4 text-sm font-medium text-charcoal transition hover:bg-brass/20"
+                  className="inline-flex h-10 items-center gap-2 rounded-full bg-linen px-4 text-sm font-medium text-charcoal transition hover:bg-brass/15"
                 >
                   <ImagePlus className="h-4 w-4" />
                   Change image
@@ -372,7 +387,7 @@ function ImagePicker({
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="flex w-full cursor-pointer flex-col items-center justify-center rounded-[1.25rem] bg-[linear-gradient(135deg,#f4efe6_0%,#fbf8f2_100%)] px-4 py-8 text-center transition hover:bg-white sm:py-10"
+            className="flex w-full cursor-pointer flex-col items-center justify-center rounded-[1.35rem] bg-[linear-gradient(135deg,#f4efe6_0%,#fbf8f2_100%)] px-4 py-8 text-center transition hover:bg-white sm:py-10"
           >
             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-sage shadow-soft">
               <ImagePlus className="h-5 w-5" />
@@ -394,7 +409,7 @@ function ImagePicker({
           className="sr-only"
         />
       </div>
-    </section>
+    </SectionCard>
   );
 }
 
@@ -427,16 +442,13 @@ function PiecesEditor({
   }, [clothingItems, searchQuery, selectedExistingPieces]);
 
   return (
-    <section className="rounded-2xl bg-ivory p-4">
-      <div className="space-y-5">
+    <SectionCard
+      title="Reuse from your wardrobe"
+      description="Search pieces you already own first so reuse feels easier than duplication."
+    >
+      <div className="space-y-6">
         <div>
-          <p className="text-sm font-semibold text-charcoal">
-            Reuse from your wardrobe
-          </p>
-          <p className="mt-1 text-sm leading-6 text-stone">
-            Search pieces you already own first so reuse feels easier than duplication.
-          </p>
-          <div className="relative mt-3">
+          <div className="relative">
             <div className="pointer-events-none absolute inset-y-0 left-3 flex items-center text-stone/60">
               <Search className="h-4 w-4" />
             </div>
@@ -444,11 +456,11 @@ function PiecesEditor({
               type="search"
               value={searchQuery}
               onChange={(event) => setSearchQuery(event.target.value)}
-              placeholder="Search your wardrobe pieces..."
-              className="h-11 min-h-[var(--touch-target-min)] w-full rounded-xl border border-black/10 bg-white pl-10 pr-3 text-sm text-charcoal outline-none transition placeholder:text-stone/60 focus:border-sage focus:ring-4 focus:ring-sage/10"
+              placeholder="Search your wardrobe"
+              className="h-11 min-h-[var(--touch-target-min)] w-full rounded-[1.15rem] border border-[#e1d5c3] bg-white pl-10 pr-3 text-sm text-charcoal outline-none transition placeholder:text-stone/60 focus:border-sage focus:ring-4 focus:ring-sage/10"
             />
           </div>
-          <div className="mt-3 rounded-2xl border border-black/5 bg-linen/55 p-2">
+          <div className="mt-3 rounded-[1.45rem] border border-[#e7dccb] bg-white/76 p-2 shadow-soft">
             {searchQuery.trim() ? (
               matchingExistingPieces.length > 0 ? (
                 <div className="space-y-1">
@@ -474,10 +486,14 @@ function PiecesEditor({
         </div>
 
         <div>
-          <p className="text-sm font-semibold text-charcoal">Selected pieces</p>
-          <p className="mt-1 text-sm leading-6 text-stone">
-            Existing wardrobe pieces linked into this outfit will stay reusable.
-          </p>
+          <div className="flex items-center justify-between gap-3">
+            <p className="font-serif text-[1.35rem] leading-tight text-charcoal">
+              Selected pieces
+            </p>
+            <span className="rounded-full bg-white px-3 py-1 text-xs font-medium text-stone shadow-soft">
+              {selectedExistingPieces.length}
+            </span>
+          </div>
           <div className="mt-3 space-y-3">
             {selectedExistingPieces.length > 0 ? (
               selectedExistingPieces.map((item) => (
@@ -488,44 +504,56 @@ function PiecesEditor({
                 />
               ))
             ) : (
-              <div className="rounded-2xl border border-dashed border-black/10 bg-white px-4 py-4 text-sm leading-6 text-stone">
-                No existing pieces selected yet.
+              <div className="rounded-[1.55rem] border border-dashed border-[#d5c7b2] bg-white px-4 py-5 text-sm leading-6 text-stone">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[#d8cbb7] bg-[linear-gradient(180deg,#fdfaf5_0%,#f5ede2_100%)] text-charcoal">
+                    <Plus className="h-5 w-5" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-charcoal">
+                      Add pieces to build your outfit
+                    </p>
+                    <p className="mt-1 text-sm text-stone">
+                      Search or create new pieces to get started.
+                    </p>
+                  </div>
+                </div>
               </div>
             )}
           </div>
         </div>
 
-        <div className="flex items-center justify-between gap-3">
-          <div>
-            <p className="text-sm font-semibold text-charcoal">
-              Create new piece
-            </p>
-            <p className="mt-1 text-sm leading-6 text-stone">
-              Only add a new piece when you do not already have it in your wardrobe.
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={addPiece}
-            className="inline-flex h-10 items-center gap-2 rounded-full bg-white px-4 text-sm font-medium text-charcoal transition hover:bg-brass/20"
-          >
-            <Plus className="h-4 w-4" />
-            Add piece
-          </button>
-        </div>
-
         <div className="space-y-3">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <p className="font-serif text-[1.35rem] leading-tight text-charcoal">
+                Create new piece
+              </p>
+              <p className="mt-1 text-sm leading-6 text-stone">
+                Only add a new piece if it is not already in your wardrobe.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={addPiece}
+              className="inline-flex h-10 items-center gap-2 rounded-full bg-white px-4 text-sm font-medium text-charcoal shadow-soft transition hover:bg-brass/15"
+            >
+              <Plus className="h-4 w-4" />
+              Add piece
+            </button>
+          </div>
+
           {pieces.map((piece, index) => (
             <div
               key={index}
-              className="rounded-2xl border border-black/5 bg-white p-4"
+              className="rounded-[1.45rem] border border-[#e7dccb] bg-white p-4 shadow-soft"
             >
               <div className="mb-3 flex items-center justify-between gap-3">
                 <div className="flex flex-wrap gap-2">
                   <span className="rounded-full bg-linen px-3 py-1 text-xs font-medium text-charcoal">
                     Piece {index + 1}
                   </span>
-                  <span className="rounded-full bg-sage/10 px-3 py-1 text-xs font-medium capitalize text-sage">
+                  <span className="rounded-full bg-ivory px-3 py-1 text-xs font-medium capitalize text-stone">
                     {formatValue(piece.role)}
                   </span>
                 </div>
@@ -546,7 +574,7 @@ function PiecesEditor({
                   onChange={(event) =>
                     updatePiece(index, "name", event.target.value)
                   }
-                  placeholder="Maroon Shirt"
+                  placeholder="Maroon shirt"
                   required
                 />
                 <AutosuggestField
@@ -573,13 +601,13 @@ function PiecesEditor({
           ))}
         </div>
       </div>
-    </section>
+    </SectionCard>
   );
 }
 
 export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
   const { clothingItems } = useWardrobeData();
-  const [captureMode, setCaptureMode] = useState("photo_note");
+  const [captureMode, setCaptureMode] = useState("manual_only");
   const [formData, setFormData] = useState({
     title: "",
     occasion: "casual",
@@ -600,11 +628,7 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
 
   const selectedExistingPieces = useMemo(
     () =>
-      selectedExistingPieceIds
-        .map((pieceId) =>
-          clothingItems.find((item) => item.id === pieceId) || null,
-        )
-        .filter(Boolean),
+      clothingItems.filter((item) => selectedExistingPieceIds.includes(item.id)),
     [clothingItems, selectedExistingPieceIds],
   );
 
@@ -612,12 +636,15 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
     () =>
       pieces
         .map((piece) => ({
+          ...piece,
           name: piece.name.trim(),
-          category: normalizeCategory(piece.category),
-          color: normalizeColor(piece.color),
-          role: piece.role,
+          color: piece.color.trim(),
         }))
-        .filter((piece) => piece.name && piece.color),
+        .filter((piece) => piece.name && piece.color)
+        .map((piece) => ({
+          ...piece,
+          source_type: "manual_piece",
+        })),
     [pieces],
   );
 
@@ -626,8 +653,8 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
       selectedExistingPieces.map((piece) => ({
         id: piece.id,
         name: piece.name,
-        category: normalizeCategory(piece.category),
-        color: normalizeColor(piece.color),
+        category: piece.category,
+        color: piece.color,
         role: deriveRoleFromCategory(piece.category),
       })),
     [selectedExistingPieces],
@@ -650,14 +677,8 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
   );
 
   const generatedNote = useMemo(() => {
-    if (captureMode === "photo_note" && formData.photoNote.trim()) {
+    if (captureMode === "image_only" && formData.photoNote.trim()) {
       return formData.photoNote.trim();
-    }
-
-    if (captureMode === "image_title" && validPieces.length === 0) {
-      return `Saved as a ${formatValue(formData.occasion)} ${formatValue(
-        formData.season,
-      )} outfit memory.`;
     }
 
     return generateOutfitNote({
@@ -761,7 +782,9 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
     reader.onload = () => {
       setImagePreviewUrl(String(reader.result || ""));
       setImageName(file.name);
-      setParseMessage("Photo ready. You can keep this simple and move straight into the memory.");
+      setParseMessage(
+        "Photo ready. You can keep this simple and move straight into the memory.",
+      );
     };
     reader.readAsDataURL(file);
   };
@@ -793,7 +816,7 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
   };
 
   const resetForm = () => {
-    setCaptureMode("photo_note");
+    setCaptureMode("manual_only");
     setFormData({
       title: "",
       occasion: "casual",
@@ -814,16 +837,12 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
   };
 
   const canSubmit = useMemo(() => {
-    if (captureMode === "photo_note") {
-      return Boolean(imageFile && formData.photoNote.trim());
+    if (captureMode === "image_only") {
+      return Boolean(imageFile && formData.title.trim());
     }
 
-    if (captureMode === "text_input") {
-      return validPieces.length > 0;
-    }
-
-    return Boolean(imageFile && formData.title.trim());
-  }, [captureMode, formData.photoNote, formData.title, imageFile, validPieces]);
+    return validPieces.length > 0;
+  }, [captureMode, formData.title, imageFile, validPieces]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -840,19 +859,24 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
       imagePreviewUrl,
       imageFile,
       imageName,
-      pieces: captureMode === "text_input" ? validNewPieces : [],
+      pieces:
+        captureMode === "text_only" || captureMode === "manual_only"
+          ? validNewPieces
+          : [],
       clothing_item_ids:
-        captureMode === "text_input" ? selectedExistingPieceIds : [],
+        captureMode === "text_only" || captureMode === "manual_only"
+          ? selectedExistingPieceIds
+          : [],
       description:
-        captureMode === "photo_note"
-          ? formData.photoNote.trim()
+        captureMode === "image_only"
+          ? formData.photoNote.trim() || generatedNote
           : generatedNote,
       source_type:
-        captureMode === "text_input"
+        captureMode === "text_only"
           ? "text_input"
-          : imageFile
-            ? "image_upload"
-            : "manual_build",
+          : captureMode === "manual_only"
+            ? "manual_build"
+            : "image_upload",
     };
 
     const savedOutfit = await onSubmit(payload);
@@ -866,24 +890,16 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="rounded-2xl border border-black/5 bg-white p-4 shadow-soft sm:p-5"
+      className="rounded-[2rem] border border-[#e7dccb] bg-[linear-gradient(180deg,rgba(255,255,255,0.96)_0%,rgba(248,245,238,0.98)_100%)] p-4 shadow-soft sm:p-5"
     >
-      <div className="mb-6 flex items-start gap-3">
-        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-linen text-brass">
-          <Sparkles className="h-5 w-5" />
-        </div>
-        <div>
-          <h2 className="text-lg font-semibold text-charcoal">
-            Create Outfit Memory
-          </h2>
-          <p className="mt-1 text-sm text-stone">
-            Pick one way to save the look. Keep the flow light, then let the memory carry the context.
-          </p>
-        </div>
+      <div className="mb-6 rounded-[1.7rem] border border-[#eadfce] bg-white/78 px-4 py-4 text-center sm:px-5">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-stone">
+          How would you like to capture this outfit?
+        </p>
       </div>
 
       {saveFeedback ? (
-        <div className="mb-5 flex items-start gap-3 rounded-2xl border border-sage/15 bg-sage/10 px-4 py-4 text-sm text-charcoal">
+        <div className="mb-5 flex items-start gap-3 rounded-[1.55rem] border border-sage/15 bg-sage/10 px-4 py-4 text-sm text-charcoal">
           <div className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white text-sage shadow-soft">
             <Check className="h-4 w-4" />
           </div>
@@ -894,10 +910,7 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
         </div>
       ) : null}
 
-      <section className="mb-5">
-        <p className="mb-3 text-sm font-semibold text-charcoal">
-          Choose how you want to save this look
-        </p>
+      <section className="mb-6">
         <div className="grid gap-3 sm:grid-cols-3">
           {captureModes.map((mode) => (
             <ModeCard
@@ -911,7 +924,7 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
       </section>
 
       <div className="space-y-5">
-        {captureMode === "photo_note" ? (
+        {captureMode === "image_only" ? (
           <>
             <ImagePicker
               imagePreviewUrl={imagePreviewUrl}
@@ -919,19 +932,13 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
               fileInputRef={fileInputRef}
               onChange={handleImageChange}
               onRemove={clearImage}
-              helperText="Upload the full look, then add a short note about it. No forced piece-by-piece form."
+              helperText="Upload the full look first, then add only the details that help you remember it."
             />
 
-            <section className="rounded-2xl bg-ivory p-4">
-              <div className="mb-4">
-                <p className="text-sm font-semibold text-charcoal">
-                  Short look note
-                </p>
-                <p className="mt-1 text-sm leading-6 text-stone">
-                  A simple line is enough. Think memory first, not description first.
-                </p>
-              </div>
-
+            <SectionCard
+              title="Add the memory"
+              description="Keep it light. A title is enough, and notes can stay optional."
+            >
               <div className="grid gap-4">
                 <div>
                   <label className="mb-2 block text-sm font-medium text-charcoal">
@@ -941,12 +948,13 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
                     name="title"
                     value={formData.title}
                     onChange={handleChange}
-                    placeholder={generatedTitle}
+                    placeholder={generatedTitle || "Soft coffee run look"}
+                    required
                   />
                 </div>
                 <div>
                   <label className="mb-2 block text-sm font-medium text-charcoal">
-                    Small description
+                    Add notes (optional)
                   </label>
                   <TextArea
                     name="photoNote"
@@ -957,23 +965,16 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
                   />
                 </div>
               </div>
-            </section>
+            </SectionCard>
           </>
         ) : null}
 
-        {captureMode === "text_input" ? (
+        {captureMode === "text_only" ? (
           <>
-            <section className="rounded-2xl bg-ivory p-4">
-              <div className="mb-4">
-                <p className="text-sm font-semibold text-charcoal">
-                  Type the outfit
-                </p>
-                <p className="mt-1 text-sm leading-6 text-stone">
-                  Describe the look in plain language and we&apos;ll suggest a
-                  breakdown for you to confirm.
-                </p>
-              </div>
-
+            <SectionCard
+              title="Describe the look"
+              description="Write the outfit in plain language, then confirm the pieces that feel right."
+            >
               <TextArea
                 name="descriptionText"
                 value={formData.descriptionText}
@@ -985,7 +986,7 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
                 <button
                   type="button"
                   onClick={handleParseDescription}
-                  className="inline-flex h-11 items-center gap-2 rounded-full bg-charcoal px-4 text-sm font-medium text-ivory shadow-soft transition hover:-translate-y-0.5 hover:bg-softblack"
+                  className="inline-flex h-11 items-center gap-2 rounded-full bg-charcoal px-4 text-sm font-medium text-ivory shadow-soft transition hover:bg-softblack"
                 >
                   <WandSparkles className="h-4 w-4" />
                   Suggest pieces
@@ -996,11 +997,11 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
               </div>
 
               {parseMessage ? (
-                <div className="mt-4 rounded-2xl border border-black/5 bg-white p-4 text-sm leading-6 text-stone">
+                <div className="mt-4 rounded-[1.35rem] border border-[#e7dccb] bg-white p-4 text-sm leading-6 text-stone">
                   {parseMessage}
                 </div>
               ) : null}
-            </section>
+            </SectionCard>
 
             <PiecesEditor
               pieces={pieces}
@@ -1013,7 +1014,7 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
               removeExistingPiece={removeExistingPiece}
             />
 
-            <section className="rounded-2xl bg-ivory p-4">
+            <SectionCard title="Finish the title">
               <label className="mb-2 block text-sm font-medium text-charcoal">
                 Outfit title
               </label>
@@ -1021,24 +1022,26 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
                 name="title"
                 value={formData.title}
                 onChange={handleChange}
-                placeholder={generatedTitle}
+                placeholder={generatedTitle || "Weekend ivory layers"}
               />
-            </section>
+            </SectionCard>
           </>
         ) : null}
 
-        {captureMode === "image_title" ? (
+        {captureMode === "manual_only" ? (
           <>
-            <ImagePicker
-              imagePreviewUrl={imagePreviewUrl}
-              imageName={imageName}
-              fileInputRef={fileInputRef}
-              onChange={handleImageChange}
-              onRemove={clearImage}
-              helperText="Upload the outfit and give it a title. This is the lightest save path."
+            <PiecesEditor
+              pieces={pieces}
+              updatePiece={updatePiece}
+              removePiece={removePiece}
+              addPiece={addPiece}
+              clothingItems={clothingItems}
+              selectedExistingPieces={selectedExistingPieces}
+              addExistingPiece={addExistingPiece}
+              removeExistingPiece={removeExistingPiece}
             />
 
-            <section className="rounded-2xl bg-ivory p-4">
+            <SectionCard title="Name the look">
               <label className="mb-2 block text-sm font-medium text-charcoal">
                 Outfit title
               </label>
@@ -1046,21 +1049,16 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
                 name="title"
                 value={formData.title}
                 onChange={handleChange}
-                placeholder="Rainy campus fit"
-                required
+                placeholder={generatedTitle || "Library day layers"}
               />
-            </section>
+            </SectionCard>
           </>
         ) : null}
 
-        <section className="rounded-2xl bg-ivory p-4">
-          <div className="mb-4">
-            <p className="text-sm font-semibold text-charcoal">Style context</p>
-            <p className="mt-1 text-sm leading-6 text-stone">
-              Light context helps the memory feel remembered without turning this into a big form.
-            </p>
-          </div>
-
+        <SectionCard
+          title="Style context"
+          description="Light context helps the memory feel remembered without turning this into a big form."
+        >
           <div className="grid gap-4">
             <div>
               <label className="mb-2 block text-sm font-medium text-charcoal">
@@ -1090,7 +1088,7 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
               />
             </div>
 
-            <div className="md:col-span-2">
+            <div>
               <label className="mb-2 block text-sm font-medium text-charcoal">
                 Style or aesthetic
               </label>
@@ -1104,16 +1102,16 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
               />
             </div>
           </div>
-        </section>
+        </SectionCard>
 
-        <section className="rounded-2xl border border-black/5 bg-linen p-4 shadow-soft">
+        <section className="rounded-[1.75rem] border border-[#e7dccb] bg-white/92 p-4 shadow-soft sm:p-5">
           <div className="mb-4 flex items-start gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white text-sage shadow-soft">
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-ivory text-brass shadow-soft">
               <FilePenLine className="h-4 w-4" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-charcoal">
-                Preview before saving
+              <p className="font-serif text-[1.35rem] leading-tight text-charcoal">
+                Outfit preview
               </p>
               <p className="mt-1 text-sm leading-6 text-stone">
                 See how the memory will read before you save it.
@@ -1122,7 +1120,7 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
           </div>
 
           {imagePreviewUrl ? (
-            <div className="rounded-[1.5rem] border border-black/5 bg-white p-4">
+            <div className="rounded-[1.5rem] border border-[#eadfce] bg-white p-4">
               <div className="flex h-56 items-center justify-center rounded-[1.25rem] bg-[linear-gradient(135deg,#f4efe6_0%,#fbf8f2_100%)] p-3 sm:h-72 sm:p-4">
                 <img
                   src={imagePreviewUrl}
@@ -1132,7 +1130,7 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
               </div>
             </div>
           ) : (
-            <div className="rounded-[1.5rem] border border-black/5 bg-white p-4">
+            <div className="rounded-[1.5rem] border border-[#eadfce] bg-white p-4">
               <div className="flex min-h-[14rem] flex-col justify-between rounded-[1.25rem] bg-[linear-gradient(135deg,#f4efe6_0%,#fbf8f2_100%)] p-4 sm:min-h-72">
                 <div className="mx-auto flex h-36 w-24 items-end justify-center rounded-[999px] border border-dashed border-charcoal/10 bg-white/70">
                   <div className="flex h-24 w-14 items-center justify-center rounded-t-[999px] bg-charcoal/6" />
@@ -1148,10 +1146,10 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
             </div>
           )}
 
-          <div className="mt-4 grid gap-3 sm:grid-cols-3 lg:grid-cols-1">
+          <div className="mt-4 grid gap-3 sm:grid-cols-3">
             <PreviewBadge
               label="Title"
-              value={formData.title.trim() || generatedTitle}
+              value={formData.title.trim() || generatedTitle || "Outfit memory"}
             />
             <PreviewBadge
               label="Occasion"
@@ -1163,7 +1161,7 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
             />
           </div>
 
-          <div className="mt-4 rounded-2xl bg-white p-4 shadow-soft">
+          <div className="mt-4 rounded-[1.35rem] bg-white p-4 shadow-soft">
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-stone">
               Outfit note
             </p>
@@ -1172,8 +1170,8 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
             </p>
           </div>
 
-          {captureMode === "text_input" ? (
-            <div className="mt-4 rounded-2xl bg-white p-4 shadow-soft">
+          {(captureMode === "text_only" || captureMode === "manual_only") ? (
+            <div className="mt-4 rounded-[1.35rem] bg-white p-4 shadow-soft">
               <p className="text-xs font-semibold uppercase tracking-[0.14em] text-stone">
                 Pieces summary
               </p>
@@ -1184,12 +1182,12 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
                       key={`${piece.name}-${index}`}
                       className="rounded-full bg-linen px-3 py-2 text-xs font-medium capitalize text-charcoal"
                     >
-                      {piece.name} - {formatValue(piece.role)}
+                      {piece.name} · {formatValue(piece.role)}
                     </span>
                   ))
                 ) : (
                   <span className="text-sm text-stone">
-                    Suggest or add pieces to build the outfit summary.
+                    Add or reuse pieces to build the outfit summary.
                   </span>
                 )}
               </div>
@@ -1201,10 +1199,10 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
       <button
         type="submit"
         disabled={isSubmitting || !canSubmit}
-        className="mt-6 inline-flex h-12 min-h-[var(--touch-target-min)] w-full items-center justify-center gap-2 rounded-full bg-charcoal px-5 text-sm font-medium text-ivory shadow-soft transition hover:-translate-y-0.5 hover:bg-softblack disabled:cursor-not-allowed disabled:bg-stone sm:w-auto"
+        className="mt-6 inline-flex h-12 min-h-[var(--touch-target-min)] w-full items-center justify-center gap-2 rounded-full bg-charcoal px-5 text-sm font-medium text-ivory shadow-soft transition hover:bg-softblack disabled:cursor-not-allowed disabled:bg-stone"
       >
         <Sparkles className="h-4 w-4" />
-        {isSubmitting ? "Saving outfit memory..." : "Save Outfit Memory"}
+        {isSubmitting ? "Saving outfit memory..." : "Save Outfit to My Closet"}
       </button>
     </form>
   );

@@ -57,6 +57,76 @@ Commit: latest Phase 3G.3C checkpoint on `main`
 - no backend, auth, provider, or route logic changed
 - no other page was redesigned in this correction phase
 
+## 2026-05-20 - Refresh Capture into a calmer editorial outfit-memory flow
+
+Commit: latest Phase 3G.4 checkpoint on `main`
+
+### Phase 3G.4 scope
+
+- refreshed only the Outfit Memory / Capture page visuals
+- kept all creation behavior intact:
+  - image flow
+  - text-guided flow
+  - manual piece-building flow
+  - existing-piece reuse
+  - Quick Add Piece
+  - AI Scan Piece
+- moved the page toward the generated mobile editorial reference
+
+### What was corrected
+
+- replaced the wide tool-column layout with a centered app-screen rhythm
+- added a calmer curved editorial header for DigiCloset and Outfit Memory
+- rebuilt the main form so it no longer reads like a giant utility form wall
+- made the manual outfit-building surface the default first screen so reuse, selected pieces, and create-new fallback are visible immediately
+
+### Capture structure refresh
+
+- added a stronger mode-choice row for:
+  - `Image only`
+  - `Text only`
+  - `Manual only`
+- refined the existing-piece search section so it feels more like wardrobe reuse and less like inventory search
+- refined Selected pieces with:
+  - count
+  - softer empty state
+  - clearer remove actions
+- refined Create new piece into a secondary but still accessible section
+- anchored the save action as:
+  - `Save Outfit to My Closet`
+
+### Secondary tool polish
+
+- kept Quick Add Piece and AI Scan Piece visually quieter than the main Outfit Memory flow
+- kept recent saved looks visible below as supporting memory context
+- preserved all auth, ownership, upload, and outfit/piece save behavior
+
+### Verification
+
+- frontend production build passed
+- browser verification passed for:
+  - dev-user login
+  - Capture page load
+  - capture-mode switching
+  - image upload flow
+  - text-guided outfit creation
+  - manual mixed outfit creation with:
+    - one existing piece
+    - one new piece
+  - existing-piece select / remove
+  - Quick Add Piece verification
+  - new-user private empty reuse search
+  - screenshot comparison at:
+    - `390 x 844`
+    - desktop
+- reference screenshot comparison was performed against:
+  - `references/app-theme/03-capture-reference.png`
+
+### Important boundary
+
+- no backend, auth, provider, or route logic changed
+- no other page was redesigned in this phase
+
 ## 2026-05-20 - Correct Wardrobe toward the reference with compressed filters
 
 Commit: latest Phase 3G.3B checkpoint on `main`

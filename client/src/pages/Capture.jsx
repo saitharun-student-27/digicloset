@@ -47,7 +47,7 @@ function ToolPanel({
   children,
 }) {
   return (
-    <section className="rounded-[1.75rem] border border-black/5 bg-white p-5 shadow-soft">
+    <section className="rounded-[1.8rem] border border-[#e7dccb] bg-[linear-gradient(180deg,rgba(255,255,255,0.94)_0%,rgba(248,245,238,0.98)_100%)] p-5 shadow-soft">
       <button
         type="button"
         onClick={onToggle}
@@ -57,7 +57,9 @@ function ToolPanel({
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone">
             {eyebrow}
           </p>
-          <h2 className="mt-2 text-xl font-semibold text-charcoal">{title}</h2>
+          <h2 className="mt-2 font-serif text-[1.55rem] leading-tight text-charcoal">
+            {title}
+          </h2>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-stone">
             {description}
           </p>
@@ -338,25 +340,27 @@ export default function Capture() {
   }
 
   const inputClass =
-    "w-full rounded-xl border border-black/10 bg-white px-3 py-2.5 text-sm text-charcoal outline-none transition focus:border-charcoal/30";
+    "w-full rounded-[1.15rem] border border-[#e1d5c3] bg-white px-3.5 py-2.5 text-sm text-charcoal outline-none transition focus:border-charcoal/30 focus:ring-4 focus:ring-sage/10";
 
   return (
-    <main className="mx-auto w-full max-w-6xl px-4 py-5 sm:px-5 sm:py-6 lg:px-6 lg:py-8">
-      <section className="rounded-[1.9rem] bg-charcoal px-5 py-5 text-ivory shadow-soft sm:px-6 sm:py-6">
-        <div className="max-w-3xl">
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full bg-white/10 px-3 py-2 text-sm font-medium text-ivory/80">
-            <Sparkles className="h-4 w-4 text-brass" />
-            Outfit memory first
+    <main className="mx-auto w-full max-w-[56rem] px-4 py-5 sm:px-5 sm:py-6">
+      <section className="section-surface overflow-hidden px-4 py-5 sm:px-5 sm:py-6">
+        <div className="relative rounded-[2.2rem] border border-[#e7dccb] bg-[linear-gradient(180deg,rgba(251,248,242,0.98)_0%,rgba(247,242,234,0.95)_100%)] px-5 pb-8 pt-7 text-center shadow-soft sm:px-7">
+          <div className="absolute left-1/2 top-0 h-[13rem] w-[140%] -translate-x-1/2 -translate-y-[46%] rounded-[50%] border border-[#d6c5ab] bg-[linear-gradient(180deg,rgba(255,255,255,0.9)_0%,rgba(246,239,230,0.32)_100%)]" />
+          <div className="relative">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full border border-[#d8c8b2] bg-white/88 text-brass shadow-soft">
+              <Sparkles className="h-5 w-5" />
+            </div>
+            <p className="mt-4 font-serif text-[2.15rem] leading-none text-charcoal">
+              DigiCloset
+            </p>
+            <p className="mt-5 text-[11px] font-semibold uppercase tracking-[0.18em] text-stone">
+              Outfit Memory
+            </p>
+            <p className="mx-auto mt-3 max-w-[26rem] text-base leading-7 text-charcoal/82">
+              Capture an outfit so you can remember it, rewear it, and rediscover it.
+            </p>
           </div>
-          <h1 className="text-[1.75rem] font-semibold tracking-normal sm:text-[2.1rem]">
-            Capture complete looks first. Add single pieces only when you need
-            to support the closet.
-          </h1>
-          <p className="mt-3 text-sm leading-6 text-ivory/70">
-            This is the main memory flow for DigiCloset. Quick Add Piece and AI
-            Scan are still available, but they stay secondary to saving full
-            outfit memories that feel personal enough to revisit later.
-          </p>
         </div>
       </section>
 
@@ -373,17 +377,17 @@ export default function Capture() {
         </div>
       ) : null}
 
-      <div className="mt-6 grid gap-5 lg:mt-8 lg:grid-cols-[minmax(0,560px)_minmax(0,1fr)] lg:gap-6">
-        <div className="space-y-5 sm:space-y-6">
-          <OutfitMemoryForm
-            onSubmit={handleCreateOutfit}
-            isSubmitting={isSubmittingOutfit}
-          />
+      <div className="mt-6 space-y-5 sm:space-y-6">
+        <OutfitMemoryForm
+          onSubmit={handleCreateOutfit}
+          isSubmitting={isSubmittingOutfit}
+        />
 
+        <div className="space-y-4">
           <ToolPanel
             eyebrow="Secondary tool"
             title="Quick Add Piece"
-            description="Use this only when you need to add a standalone wardrobe piece that is not part of a saved outfit memory yet."
+            description="Only add a standalone wardrobe piece when it is not part of a saved outfit memory yet."
             isOpen={showQuickAdd}
             onToggle={() => setShowQuickAdd((current) => !current)}
           >
@@ -418,7 +422,7 @@ export default function Capture() {
                 )}
               </div>
               {singleError ? (
-                <div className="rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-600">
+                <div className="rounded-[1.15rem] border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-600">
                   {singleError}
                 </div>
               ) : null}
@@ -536,7 +540,7 @@ export default function Capture() {
               </button>
 
               {pieceSavedMessage ? (
-                <div className="flex items-center gap-2 rounded-xl bg-sage/10 px-4 py-3 text-sm font-medium text-sage">
+                <div className="flex items-center gap-2 rounded-[1.15rem] bg-sage/10 px-4 py-3 text-sm font-medium text-sage">
                   <Check className="h-4 w-4" />
                   {pieceSavedMessage}
                 </div>
@@ -547,7 +551,7 @@ export default function Capture() {
           <ToolPanel
             eyebrow="Assistive tool"
             title="AI Scan Piece"
-            description="Keep this as a helper for single wardrobe pieces only. It is not the main DigiCloset capture path."
+            description="Keep this as a helper for single wardrobe pieces only. It stays secondary to saving full outfit memories."
             isOpen={showAiScan}
             onToggle={() => setShowAiScan((current) => !current)}
           >
@@ -584,13 +588,13 @@ export default function Capture() {
               </div>
 
               {scanMessage ? (
-                <div className="rounded-2xl border border-black/5 bg-ivory p-4 text-sm leading-6 text-stone">
+                <div className="rounded-[1.35rem] border border-[#e7dccb] bg-ivory p-4 text-sm leading-6 text-stone">
                   {scanMessage}
                 </div>
               ) : null}
 
               {scanResult ? (
-                <div className="rounded-2xl border border-black/5 bg-ivory p-5">
+                <div className="rounded-[1.35rem] border border-[#e7dccb] bg-ivory p-5">
                   <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone">
                     Scan result
                   </p>
@@ -651,16 +655,15 @@ export default function Capture() {
         </div>
 
         <section className="space-y-4 sm:space-y-5">
-          <div className="rounded-[1.75rem] border border-black/5 bg-white p-5 shadow-soft">
+          <div className="rounded-[1.85rem] border border-[#e7dccb] bg-[linear-gradient(180deg,rgba(255,255,255,0.94)_0%,rgba(248,245,238,0.98)_100%)] p-5 shadow-soft">
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone">
               Saved outfit memories
             </p>
-            <h2 className="mt-2 text-2xl font-semibold text-charcoal">
+            <h2 className="mt-2 font-serif text-[1.7rem] leading-tight text-charcoal">
               Recent looks
             </h2>
             <p className="mt-2 text-sm leading-6 text-stone">
-              Outfit memory is the center of gravity here. Single pieces should
-              support what you save as a full look, not compete with it.
+              A few recent looks stay nearby so this page still feels like outfit memory, not just input.
             </p>
           </div>
 
@@ -674,18 +677,19 @@ export default function Capture() {
           ) : null}
 
           {!outfitsLoading && outfits.length > 0 ? (
-            <div className="grid gap-4">
+            <div className="memory-rail pb-1">
               {outfits.slice(0, 4).map((outfit) => (
-                <OutfitShowcaseCard
-                  key={outfit.id}
-                  outfit={outfit}
-                  onFavorite={handleFavorite}
-                  onMarkWorn={handleMarkWorn}
-                  onEdit={setEditingOutfit}
-                  onDelete={handleDelete}
-                  isBusy={isOutfitPending(outfit.id)}
-                  showMeta={false}
-                />
+                <div key={outfit.id} className="memory-rail-card">
+                  <OutfitShowcaseCard
+                    outfit={outfit}
+                    onFavorite={handleFavorite}
+                    onMarkWorn={handleMarkWorn}
+                    onEdit={setEditingOutfit}
+                    onDelete={handleDelete}
+                    isBusy={isOutfitPending(outfit.id)}
+                    showMeta={false}
+                  />
+                </div>
               ))}
             </div>
           ) : null}
