@@ -39,6 +39,11 @@ DigiCloset currently includes:
   - a stronger outfit-led hero
   - calmer weather support
   - softer memory rails
+- corrected Home again so it stays closer to the mobile editorial reference:
+  - smaller top rhythm
+  - more dominant hero image
+  - more compact image-led rails
+  - less landing-page feel on desktop
 - shared client-side wardrobe data layer for outfits and clothing
 - outfit lifecycle actions:
   - favorite / unfavorite
@@ -118,6 +123,7 @@ The current visual direction also pushes Home toward:
 - compact weather support instead of a dashboard-style module
 - calmer image-led rails for memory and favorites
 - warmer editorial spacing instead of stacked utility boxes
+- a centered app-screen feeling on desktop instead of a wide web landing layout
 
 Important Home rule:
 
@@ -326,6 +332,7 @@ Completed visual refresh phases:
 - `3G.0` visual reference system + app theme rules
 - `3G.1` AppShell + bottom dock visual refresh
 - `3G.2` Home visual refresh
+- `3G.2B` Home correction toward the reference structure
 
 ## Repository Structure
 
@@ -542,6 +549,7 @@ Oversize message:
 - easier reuse of existing wardrobe pieces while building a new outfit memory
 - lightweight filtering and sorting that narrow the closet without turning it into inventory software
 - a calmer, more outfit-memory-first Home that better matches the editorial visual system
+- a corrected Home layout that now stays closer to the generated mobile reference instead of drifting toward a desktop landing page
 
 ## Honest Current Gaps
 

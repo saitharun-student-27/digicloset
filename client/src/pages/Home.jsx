@@ -1,11 +1,15 @@
 import {
   ArrowRight,
+  Check,
   CloudRain,
   CloudSun,
-  Layers3,
+  Heart,
+  MoreHorizontal,
+  Pencil,
   Snowflake,
   Sparkles,
   Sun,
+  Trash2,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
@@ -14,7 +18,6 @@ import EmptyState from "../components/EmptyState";
 import ErrorState from "../components/ErrorState";
 import LoadingState from "../components/LoadingState";
 import OutfitEditModal from "../components/OutfitEditModal";
-import OutfitShowcaseCard from "../components/OutfitShowcaseCard";
 import { useWardrobeData } from "../context/WardrobeDataProvider.jsx";
 import { api } from "../lib/api";
 import { getImageUrl } from "../services/clothingService";
@@ -87,6 +90,18 @@ function isRecentCreation(outfit) {
   }
 
   return Date.now() - created.getTime() < 1000 * 60 * 60 * 24 * 10;
+}
+
+function formatMemoryDate(value) {
+  const date = parseDate(value);
+  if (!date) {
+    return "";
+  }
+
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+  });
 }
 
 function getPreferredSeason(weather) {
@@ -251,6 +266,7 @@ function buildStarterLooks(clothingItems, preferredSeason) {
       source_type: "closet_start",
       synthetic: true,
       outfit_items: pieces,
+      created_at: new Date().toISOString(),
     });
   }
 
@@ -295,45 +311,36 @@ function buildQuietRediscoveryNote(outfit) {
   return `Quietly out of rotation for ${days} days.`;
 }
 
-function HomeEditorialHeader({ heroLabel, heroCopy }) {
-  return (
-    <section className="section-surface overflow-hidden p-5 sm:p-6">
-      <div className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr] lg:items-end">
-        <div className="max-w-3xl">
-          <div className="inline-flex items-center gap-2 rounded-full bg-linen/80 px-3 py-2 text-sm font-medium text-charcoal">
-            <Sparkles className="h-4 w-4 text-brass" />
-            Home
-          </div>
-          <h1 className="mt-4 font-serif text-[2.45rem] leading-[0.95] text-charcoal sm:text-[3.5rem]">
-            {heroLabel}
-          </h1>
-          <p className="mt-4 max-w-2xl text-sm leading-7 text-stone sm:text-[15px]">
-            {heroCopy}
-          </p>
-          <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-            <Link
-              to="/outfit-memory"
-              className="inline-flex h-11 min-h-[var(--touch-target-min)] items-center justify-center rounded-full bg-charcoal px-5 text-sm font-medium text-ivory transition hover:bg-softblack"
-            >
-              Save Outfit Memory
-            </Link>
-            <Link
-              to="/wardrobe"
-              className="inline-flex h-11 min-h-[var(--touch-target-min)] items-center justify-center rounded-full bg-ivory px-5 text-sm font-medium text-charcoal transition hover:bg-linen"
-            >
-              Open Wardrobe
-            </Link>
-          </div>
-        </div>
+function getOutfitPreviewImages(outfit) {
+  const fromPieces = (outfit?.outfit_items || [])
+    .map((item) => item?.clothing_item?.image_url)
+    .filter(Boolean)
+    .map((url) => getImageUrl(url));
 
-        <div className="rounded-[1.85rem] border border-black/5 bg-[linear-gradient(135deg,rgba(238,230,217,0.72)_0%,rgba(255,255,255,0.88)_100%)] p-5 sm:p-6">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone">
-            A private place to keep complete looks close
-          </p>
-          <p className="mt-3 font-serif text-[1.7rem] leading-tight text-charcoal sm:text-[2rem]">
-            Return to what worked, and let your wardrobe stay calm.
-          </p>
+  if (outfit?.image_url) {
+    return [getImageUrl(outfit.image_url), ...fromPieces];
+  }
+
+  return fromPieces;
+}
+
+function HomeEditorialHeader() {
+  return (
+    <section className="px-2 pt-1 text-center sm:px-3">
+      <div className="mx-auto max-w-[30rem]">
+        <div className="inline-flex items-center gap-2 rounded-full bg-white/72 px-3 py-2 text-xs font-medium text-charcoal shadow-sm backdrop-blur">
+          <Sparkles className="h-3.5 w-3.5 text-brass" />
+          Home
         </div>
+        <p className="mt-4 font-serif text-[1.15rem] leading-none text-charcoal">
+          DigiCloset
+        </p>
+        <h1 className="mt-2 font-serif text-[1.8rem] leading-[1.02] text-charcoal sm:text-[1.95rem]">
+          Looks worth returning to
+        </h1>
+        <p className="mt-2.5 text-sm leading-6 text-stone">
+          Saved outfits, weather support, and quiet reminders from your closet.
+        </p>
       </div>
     </section>
   );
@@ -349,35 +356,37 @@ function HeroOutfitCard({
   onDelete,
   isBusy = false,
 }) {
-  const imageUrl = getImageUrl(outfit?.image_url);
+  const previewImages = getOutfitPreviewImages(outfit);
+  const primaryImageUrl = previewImages[0] || "";
   const detailLink = !isStarterLook && outfit?.id ? `/outfits/${outfit.id}` : null;
+  const hasActions = !isStarterLook;
 
   if (!outfit) {
     return (
-      <section className="section-surface overflow-hidden p-5 sm:p-6">
-        <div className="rounded-[1.85rem] bg-[linear-gradient(180deg,rgba(255,255,255,0.78)_0%,rgba(248,245,238,0.96)_100%)] p-5 sm:p-6">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-stone">
-            Your wardrobe memory
+      <section className="section-surface overflow-hidden p-2.5">
+        <div className="rounded-[2rem] border border-[#e2d6c4] bg-[linear-gradient(180deg,rgba(255,255,255,0.88)_0%,rgba(248,245,238,0.98)_100%)] p-5 sm:p-6">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-stone">
+            {"Today's wardrobe memory"}
           </p>
-          <h2 className="mt-3 font-serif text-[2rem] leading-tight text-charcoal sm:text-[2.3rem]">
+          <h2 className="mt-3 font-serif text-[1.9rem] leading-tight text-charcoal sm:text-[2.15rem]">
             Your wardrobe memory starts with one saved look.
           </h2>
-          <p className="mt-4 max-w-2xl text-sm leading-6 text-stone">
+          <p className="mt-3 max-w-xl text-sm leading-6 text-stone">
             Save an outfit you wore recently and DigiCloset will help you
             return to it. If you add a few pieces first, it can still begin
             with calm starting combinations from your closet.
           </p>
 
-          <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+          <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
             <Link
               to="/outfit-memory"
-              className="inline-flex h-11 min-h-[var(--touch-target-min)] items-center justify-center rounded-full bg-charcoal px-5 text-sm font-medium text-ivory transition hover:bg-softblack"
+              className="inline-flex h-12 min-h-[var(--touch-target-min)] items-center justify-center rounded-full bg-charcoal px-5 text-sm font-medium text-ivory transition hover:bg-softblack"
             >
               Save Outfit Memory
             </Link>
             <Link
               to="/wardrobe"
-              className="inline-flex h-11 min-h-[var(--touch-target-min)] items-center justify-center rounded-full bg-ivory px-5 text-sm font-medium text-charcoal transition hover:bg-linen"
+              className="inline-flex h-12 min-h-[var(--touch-target-min)] items-center justify-center rounded-full bg-ivory px-5 text-sm font-medium text-charcoal transition hover:bg-linen"
             >
               Open Wardrobe
             </Link>
@@ -387,188 +396,158 @@ function HeroOutfitCard({
     );
   }
 
-  const hasActions = !isStarterLook;
-
   return (
-    <section className="section-surface overflow-hidden p-3 sm:p-4">
-      <div className="grid gap-0 rounded-[1.95rem] bg-[linear-gradient(180deg,rgba(255,255,255,0.72)_0%,rgba(248,245,238,0.98)_100%)] lg:grid-cols-[1.04fr_0.96fr]">
-        <div className="min-h-[320px] bg-[linear-gradient(135deg,#e8dfcf_0%,#f8f5ee_100%)] p-3 sm:min-h-[380px] sm:p-4">
-          {detailLink ? (
-            <Link
-              to={detailLink}
-              className="block h-full overflow-hidden rounded-[1.75rem] focus:outline-none focus-visible:ring-4 focus-visible:ring-sage/20"
-            >
-              {outfit.image_url ? (
+    <section className="section-surface overflow-hidden p-2.5">
+      <div className="rounded-[2rem] border border-[#dccfb9] bg-[linear-gradient(180deg,rgba(255,255,255,0.95)_0%,rgba(248,245,238,0.98)_100%)] p-4 sm:p-5">
+        <div className="grid gap-4 rounded-[1.8rem] border border-[#e6dac8] bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.96),rgba(246,241,232,0.98))] p-4 sm:p-5 md:grid-cols-[0.88fr_1.12fr] md:items-center">
+          <div className="order-1">
+            <div className="relative flex min-h-[18.75rem] items-end justify-center overflow-hidden rounded-[1.75rem] bg-[linear-gradient(180deg,rgba(255,255,255,0.88)_0%,rgba(232,223,207,0.92)_100%)] px-3 pt-5 sm:min-h-[23rem] sm:px-4">
+              {primaryImageUrl ? (
                 <img
-                  src={imageUrl}
+                  src={primaryImageUrl}
                   alt={outfit.title}
-                  className="h-full min-h-[320px] w-full object-cover sm:min-h-[380px]"
+                  className="max-h-[18rem] w-auto max-w-full object-contain drop-shadow-[0_18px_35px_rgba(79,60,34,0.14)] sm:max-h-[22rem]"
                 />
               ) : (
-                <div className="flex h-full min-h-[320px] items-center justify-center rounded-[1.75rem] bg-white/55 text-stone sm:min-h-[380px]">
-                  <div className="relative m-4 flex h-[220px] w-full max-w-[20rem] items-center justify-center rounded-[1.4rem] border border-white/60 bg-white/55 shadow-inner backdrop-blur-md">
-                    {(outfit.outfit_items || []).slice(0, 4).map((item, index) => (
-                      <div
-                        key={item.id}
-                        className="absolute inset-4 flex items-center justify-center opacity-75"
-                        style={{
-                          transform: `rotate(${index * 4 - 4}deg) translateY(${index * 7}px)`,
-                        }}
-                      >
-                        {item.clothing_item?.image_url ? (
-                          <img
-                            src={getImageUrl(item.clothing_item.image_url)}
-                            alt={item.clothing_item.name}
-                            className="h-24 w-24 object-contain mix-blend-multiply"
-                          />
-                        ) : null}
-                      </div>
-                    ))}
-                  </div>
+                <div className="relative flex h-full w-full items-center justify-center">
+                  {previewImages.slice(0, 3).map((url, index) => (
+                    <img
+                      key={`${url}-${index}`}
+                      src={url}
+                      alt={outfit.title}
+                      className="absolute h-32 w-32 object-contain mix-blend-multiply drop-shadow-[0_14px_24px_rgba(79,60,34,0.12)] sm:h-40 sm:w-40"
+                      style={{
+                        transform: `translate(${index * 18 - 18}px, ${index * 18}px) rotate(${index * 6 - 6}deg)`,
+                      }}
+                    />
+                  ))}
+                  {previewImages.length === 0 ? (
+                    <div className="rounded-[1.4rem] border border-white/65 bg-white/60 px-6 py-8 text-center text-sm text-stone shadow-inner">
+                      Saved pieces will gather here once you keep a look.
+                    </div>
+                  ) : null}
                 </div>
               )}
-            </Link>
-          ) : (
-            <div className="h-full overflow-hidden rounded-[1.75rem]">
-              {outfit.image_url ? (
-                <img
-                  src={imageUrl}
-                  alt={outfit.title}
-                  className="h-full min-h-[320px] w-full object-cover sm:min-h-[380px]"
-                />
-              ) : (
-                <div className="flex h-full min-h-[320px] items-center justify-center rounded-[1.75rem] bg-white/55 text-stone sm:min-h-[380px]">
-                  <div className="relative m-4 flex h-[220px] w-full max-w-[20rem] items-center justify-center rounded-[1.4rem] border border-white/60 bg-white/55 shadow-inner backdrop-blur-md">
-                    {(outfit.outfit_items || []).slice(0, 4).map((item, index) => (
-                      <div
-                        key={item.id}
-                        className="absolute inset-4 flex items-center justify-center opacity-75"
-                        style={{
-                          transform: `rotate(${index * 4 - 4}deg) translateY(${index * 7}px)`,
-                        }}
-                      >
-                        {item.clothing_item?.image_url ? (
-                          <img
-                            src={getImageUrl(item.clothing_item.image_url)}
-                            alt={item.clothing_item.name}
-                            className="h-24 w-24 object-contain mix-blend-multiply"
-                          />
-                        ) : null}
-                      </div>
-                    ))}
-                  </div>
+
+              {previewImages.length > 1 ? (
+                <div className="absolute right-3 top-3 hidden flex-col gap-2 sm:flex">
+                  {previewImages.slice(0, 4).map((url, index) => (
+                    <div
+                      key={`${url}-${index}`}
+                      className="flex h-11 w-11 items-center justify-center rounded-full border border-[#e2d4c0] bg-white/82 shadow-sm backdrop-blur"
+                    >
+                      <img
+                        src={url}
+                        alt=""
+                        className="h-7 w-7 object-contain mix-blend-multiply"
+                      />
+                    </div>
+                  ))}
                 </div>
-              )}
-            </div>
-          )}
-        </div>
-
-        <div className="flex flex-col justify-between p-5 sm:p-6 lg:p-7">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-stone">
-              {isStarterLook ? "Starting from your closet" : "Today's best fit"}
-            </p>
-
-            {detailLink ? (
-              <Link
-                to={detailLink}
-                className="mt-3 block rounded-xl focus:outline-none focus-visible:ring-4 focus-visible:ring-sage/20"
-              >
-                <h2 className="font-serif text-[2.2rem] leading-[0.96] text-charcoal sm:text-[2.8rem]">
-                  {outfit.title}
-                </h2>
-                <p className="mt-4 max-w-lg text-sm leading-7 text-stone">
-                  {outfit.description ||
-                    `A strong starting point for ${weatherLabel.toLowerCase()}.`}
-                </p>
-              </Link>
-            ) : (
-              <>
-                <h2 className="mt-3 font-serif text-[2.2rem] leading-[0.96] text-charcoal sm:text-[2.8rem]">
-                  {outfit.title}
-                </h2>
-                <p className="mt-4 max-w-lg text-sm leading-7 text-stone">
-                  {outfit.description ||
-                    `A strong starting point for ${weatherLabel.toLowerCase()}.`}
-                </p>
-              </>
-            )}
-
-            <div className="mt-5 flex flex-wrap gap-2.5">
-              <span className="rounded-full bg-white px-3 py-1.5 text-[11px] font-medium text-stone shadow-sm">
-                {formatOccasionLabel(outfit.occasion || "casual")}
-              </span>
-              <span className="rounded-full bg-white px-3 py-1.5 text-[11px] font-medium text-stone shadow-sm">
-                {formatSeasonLabel(outfit.season || "all")}
-              </span>
-              <span className="rounded-full bg-white px-3 py-1.5 text-[11px] font-medium text-stone shadow-sm">
-                {isStarterLook ? "From your closet" : "Saved memory"}
-              </span>
+              ) : null}
             </div>
           </div>
 
-          <div className="mt-6 flex flex-col gap-3">
-            {detailLink ? (
-              <Link
-                to={detailLink}
-                className="inline-flex h-11 min-h-[var(--touch-target-min)] items-center justify-center gap-2 rounded-full bg-charcoal px-5 text-sm font-medium text-ivory transition hover:bg-softblack sm:w-fit"
-              >
-                View outfit
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            ) : null}
+          <div className="order-2 flex flex-col justify-between md:min-h-[23rem]">
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-stone">
+                {isStarterLook ? "From your closet" : "Today's best fit"}
+              </p>
+              <h2 className="mt-3 font-serif text-[2rem] leading-[0.95] text-charcoal sm:text-[2.45rem]">
+                {outfit.title}
+              </h2>
+              <p className="mt-4 max-w-[18rem] text-sm leading-7 text-stone sm:max-w-[20rem]">
+                {outfit.description ||
+                  `A strong starting point for ${weatherLabel.toLowerCase()}.`}
+              </p>
+            </div>
 
-            {hasActions ? (
-              <div className="flex flex-wrap gap-2.5">
-                <button
-                  type="button"
-                  onClick={() => onFavorite?.(outfit)}
-                  disabled={isBusy}
-                  className="inline-flex h-11 min-h-[var(--touch-target-min)] items-center justify-center rounded-full bg-ivory px-4 text-sm font-medium text-charcoal transition hover:bg-linen"
-                >
-                  {outfit.is_favorite ? "Unfavorite" : "Favorite"}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => onMarkWorn?.(outfit)}
-                  disabled={isBusy}
-                  className="inline-flex h-11 min-h-[var(--touch-target-min)] items-center justify-center rounded-full bg-ivory px-4 text-sm font-medium text-charcoal transition hover:bg-linen"
-                >
-                  Mark worn
-                </button>
-                <button
-                  type="button"
-                  onClick={() => onEdit?.(outfit)}
-                  disabled={isBusy}
-                  className="inline-flex h-11 min-h-[var(--touch-target-min)] items-center justify-center rounded-full bg-ivory px-4 text-sm font-medium text-charcoal transition hover:bg-linen"
-                >
-                  Edit
-                </button>
-                <button
-                  type="button"
-                  onClick={() => onDelete?.(outfit)}
-                  disabled={isBusy}
-                  className="inline-flex h-11 min-h-[var(--touch-target-min)] items-center justify-center rounded-full bg-white px-4 text-sm font-medium text-red-600 transition hover:bg-red-50"
-                >
-                  Delete
-                </button>
+            <div className="mt-5">
+              <div className="flex flex-wrap gap-2">
+                <span className="rounded-full bg-white px-3 py-1.5 text-[11px] font-medium text-stone shadow-sm">
+                  {formatOccasionLabel(outfit.occasion || "casual")}
+                </span>
+                <span className="rounded-full bg-white px-3 py-1.5 text-[11px] font-medium text-stone shadow-sm">
+                  {formatSeasonLabel(outfit.season || "all")}
+                </span>
+                <span className="rounded-full bg-white px-3 py-1.5 text-[11px] font-medium text-stone shadow-sm">
+                  {isStarterLook ? "Starting look" : "Saved memory"}
+                </span>
               </div>
-            ) : (
-              <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-                <Link
-                  to="/wardrobe"
-                  className="inline-flex h-11 min-h-[var(--touch-target-min)] items-center justify-center rounded-full bg-charcoal px-4 text-sm font-medium text-ivory transition hover:bg-softblack"
-                >
-                  Open Wardrobe
-                </Link>
-                <Link
-                  to="/outfit-memory"
-                  className="inline-flex h-11 min-h-[var(--touch-target-min)] items-center justify-center rounded-full bg-ivory px-4 text-sm font-medium text-charcoal transition hover:bg-linen"
-                >
-                  Save Outfit Memory
-                </Link>
+
+              <div className="mt-4 flex flex-col gap-3">
+                {detailLink ? (
+                  <Link
+                    to={detailLink}
+                    className="inline-flex h-12 min-h-[var(--touch-target-min)] items-center justify-center gap-2 rounded-full bg-charcoal px-5 text-sm font-medium text-ivory transition hover:bg-softblack sm:w-fit"
+                  >
+                    View Outfit
+                    <ArrowRight className="h-4 w-4" />
+                  </Link>
+                ) : (
+                  <Link
+                    to="/outfit-memory"
+                    className="inline-flex h-12 min-h-[var(--touch-target-min)] items-center justify-center rounded-full bg-charcoal px-5 text-sm font-medium text-ivory transition hover:bg-softblack sm:w-fit"
+                  >
+                    Save Outfit Memory
+                  </Link>
+                )}
+
+                {hasActions ? (
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={() => onFavorite?.(outfit)}
+                      disabled={isBusy}
+                      className="inline-flex h-10 min-h-[var(--touch-target-min)] items-center justify-center gap-1.5 rounded-full bg-white px-3 text-xs font-medium text-charcoal transition hover:bg-ivory"
+                    >
+                      <Heart
+                        className={`h-3.5 w-3.5 ${
+                          outfit.is_favorite ? "fill-current text-red-500" : ""
+                        }`}
+                      />
+                      {outfit.is_favorite ? "Saved" : "Favorite"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onMarkWorn?.(outfit)}
+                      disabled={isBusy}
+                      className="inline-flex h-10 min-h-[var(--touch-target-min)] items-center justify-center gap-1.5 rounded-full bg-white px-3 text-xs font-medium text-charcoal transition hover:bg-ivory"
+                    >
+                      <Check className="h-3.5 w-3.5" />
+                      Worn
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onEdit?.(outfit)}
+                      disabled={isBusy}
+                      className="inline-flex h-10 min-h-[var(--touch-target-min)] items-center justify-center gap-1.5 rounded-full bg-white px-3 text-xs font-medium text-charcoal transition hover:bg-ivory"
+                    >
+                      <Pencil className="h-3.5 w-3.5" />
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onDelete?.(outfit)}
+                      disabled={isBusy}
+                      className="inline-flex h-10 min-h-[var(--touch-target-min)] items-center justify-center gap-1.5 rounded-full bg-white px-3 text-xs font-medium text-red-600 transition hover:bg-red-50"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                      Delete
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex flex-wrap gap-2">
+                    <Link
+                      to="/wardrobe"
+                      className="inline-flex h-10 min-h-[var(--touch-target-min)] items-center justify-center rounded-full bg-white px-3 text-xs font-medium text-charcoal transition hover:bg-ivory"
+                    >
+                      Open Wardrobe
+                    </Link>
+                  </div>
+                )}
               </div>
-            )}
+            </div>
           </div>
         </div>
       </div>
@@ -576,36 +555,150 @@ function HeroOutfitCard({
   );
 }
 
-function WeatherSupportCard({ weatherAdvice, tempDisplay, weatherLabel, preferredSeason, WeatherIcon }) {
+function WeatherSupportCard({
+  weatherAdvice,
+  tempDisplay,
+  weatherLabel,
+  preferredSeason,
+  WeatherIcon,
+}) {
   return (
-    <section className="section-surface overflow-hidden p-4 sm:p-5">
-      <div className="grid gap-4 rounded-[1.7rem] bg-[linear-gradient(135deg,rgba(238,230,217,0.55)_0%,rgba(255,255,255,0.82)_100%)] p-4 sm:grid-cols-[auto_1fr] sm:items-center sm:p-5">
-        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white/85 text-brass shadow-sm">
-          <WeatherIcon className="h-6 w-6" />
-        </div>
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone">
+    <section className="section-surface overflow-hidden p-2.5">
+      <div className="rounded-[1.6rem] border border-[#e4d9c8] bg-[linear-gradient(135deg,rgba(255,255,255,0.94)_0%,rgba(246,241,232,0.98)_100%)] px-4 py-4 sm:px-5">
+        <div className="grid gap-3 sm:grid-cols-[auto_auto_1fr] sm:items-center">
+          <div className="flex h-11 w-11 items-center justify-center rounded-full bg-white text-brass shadow-sm">
+            <WeatherIcon className="h-5 w-5" />
+          </div>
+          <div className="space-y-0.5">
+            <p className="font-serif text-[1.9rem] leading-none text-charcoal">
+              {tempDisplay.replace("°C", "°")}
+            </p>
+            <p className="text-xs font-medium text-stone">{weatherLabel}</p>
+          </div>
+          <div className="pt-0.5 sm:border-l sm:border-[#e4d9c8] sm:pl-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-stone">
               Wear support
             </p>
-            <p className="mt-2 text-sm leading-6 text-stone">
+            <p className="mt-1.5 text-sm leading-6 text-stone">
               {weatherAdvice}
             </p>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <span className="rounded-full bg-white px-3 py-1.5 text-[11px] font-medium text-stone shadow-sm">
-              {tempDisplay}
-            </span>
-            <span className="rounded-full bg-white px-3 py-1.5 text-[11px] font-medium text-stone shadow-sm">
-              {weatherLabel}
-            </span>
-            <span className="rounded-full bg-white px-3 py-1.5 text-[11px] font-medium text-stone shadow-sm">
-              {formatSeasonLabel(preferredSeason)}
-            </span>
+            <div className="mt-2.5 flex flex-wrap gap-2">
+              <span className="rounded-full bg-white px-3 py-1.5 text-[11px] font-medium text-stone shadow-sm">
+                Feels like {tempDisplay}
+              </span>
+              <span className="rounded-full bg-white px-3 py-1.5 text-[11px] font-medium text-stone shadow-sm">
+                {formatSeasonLabel(preferredSeason)}
+              </span>
+            </div>
           </div>
         </div>
       </div>
     </section>
+  );
+}
+
+function HomeMemoryRailCard({ outfit, supportingText = "" }) {
+  const previewImages = getOutfitPreviewImages(outfit);
+  const imageUrl = previewImages[0] || "";
+
+  return (
+    <article className="overflow-hidden rounded-[1.5rem] border border-black/5 bg-white shadow-soft">
+      <Link
+        to={outfit?.synthetic ? "/wardrobe" : `/outfits/${outfit.id}`}
+        className="block focus:outline-none focus-visible:ring-4 focus-visible:ring-sage/20"
+      >
+        <div className="aspect-[4/5] overflow-hidden bg-[linear-gradient(135deg,#eee6d9_0%,#f8f5ee_100%)]">
+          {imageUrl ? (
+            <img
+              src={imageUrl}
+              alt={outfit.title}
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            <div className="flex h-full items-center justify-center px-4 text-center text-xs text-stone">
+              Saved look
+            </div>
+          )}
+        </div>
+      </Link>
+      <div className="p-3">
+        <div className="flex items-start justify-between gap-2">
+          <div className="min-w-0">
+            <p className="text-[11px] font-medium text-stone">
+              {formatMemoryDate(outfit.created_at) ||
+                formatSeasonLabel(outfit.season || "all")}
+            </p>
+            <h3 className="mt-1 line-clamp-2 text-sm font-medium leading-5 text-charcoal">
+              {outfit.title}
+            </h3>
+          </div>
+          {outfit.is_favorite ? (
+            <Heart className="h-4 w-4 shrink-0 fill-current text-red-500" />
+          ) : (
+            <MoreHorizontal className="h-4 w-4 shrink-0 text-stone/70" />
+          )}
+        </div>
+        {supportingText ? (
+          <p className="mt-2 line-clamp-2 text-xs leading-5 text-stone">
+            {supportingText}
+          </p>
+        ) : null}
+      </div>
+    </article>
+  );
+}
+
+function HomeCombinationRailCard({ outfit, supportingText = "" }) {
+  const previewImages = getOutfitPreviewImages(outfit);
+  const imageUrl = previewImages[0] || "";
+
+  return (
+    <article className="overflow-hidden rounded-[1.5rem] border border-black/5 bg-white shadow-soft">
+      <Link
+        to={outfit?.synthetic ? "/wardrobe" : `/outfits/${outfit.id}`}
+        className="grid min-h-[8.75rem] grid-cols-[0.92fr_1.08fr] focus:outline-none focus-visible:ring-4 focus-visible:ring-sage/20"
+      >
+        <div className="overflow-hidden bg-[linear-gradient(135deg,#eee6d9_0%,#f8f5ee_100%)]">
+          {imageUrl ? (
+            <img
+              src={imageUrl}
+              alt={outfit.title}
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            <div className="flex h-full items-center justify-center px-3 text-center text-xs text-stone">
+              Favorite look
+            </div>
+          )}
+        </div>
+        <div className="flex flex-col justify-between p-3.5">
+          <div>
+            <h3 className="line-clamp-2 text-base font-medium leading-6 text-charcoal">
+              {outfit.title}
+            </h3>
+            <p className="mt-2 line-clamp-2 text-xs leading-5 text-stone">
+              {supportingText ||
+                (outfit.last_worn_date
+                  ? `${Math.max(getDaysSince(outfit.last_worn_date) || 0, 0)} wears ago`
+                  : "Saved favorite combination")}
+            </p>
+          </div>
+          <div className="mt-3 flex items-center justify-between">
+            <span className="text-[11px] font-medium text-stone">
+              {formatMemoryDate(outfit.created_at) ||
+                formatSeasonLabel(outfit.season || "all")}
+            </span>
+            <Heart
+              className={`h-4 w-4 ${
+                outfit.is_favorite
+                  ? "fill-current text-red-500"
+                  : "text-stone/70"
+              }`}
+            />
+          </div>
+        </div>
+      </Link>
+    </article>
   );
 }
 
@@ -617,6 +710,7 @@ function RailSurface({
   emptyTitle,
   emptyDescription,
   renderItem,
+  compact = false,
 }) {
   if (items.length === 0 && !emptyTitle) {
     return null;
@@ -624,27 +718,34 @@ function RailSurface({
 
   return (
     <section className="section-surface overflow-hidden p-4 sm:p-5">
-      <div className="mb-5 flex items-end justify-between gap-4">
+      <div className="mb-4 flex items-end justify-between gap-4">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-stone">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-stone">
             {eyebrow}
           </p>
-          <h2 className="mt-2 font-serif text-[1.85rem] leading-tight text-charcoal sm:text-[2.05rem]">
+          <h2 className="mt-1.5 font-serif text-[1.45rem] leading-tight text-charcoal sm:text-[1.6rem]">
             {title}
           </h2>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-stone">
+          <p className="mt-1.5 max-w-xl text-sm leading-6 text-stone">
             {description}
           </p>
         </div>
-        <span className="rounded-full bg-ivory px-3 py-1 text-xs font-medium text-stone">
-          {items.length} saved
+        <span className="rounded-full bg-ivory px-3 py-1 text-[11px] font-medium text-stone">
+          {items.length}
         </span>
       </div>
 
       {items.length > 0 ? (
         <div className="memory-rail">
           {items.map((item) => (
-            <div key={item.id} className="memory-rail-card">
+            <div
+              key={item.id}
+              className={
+                compact
+                  ? "piece-rail-card !w-[18.5rem]"
+                  : "piece-rail-card !w-[12.75rem] sm:!w-[13.5rem]"
+              }
+            >
               {renderItem(item)}
             </div>
           ))}
@@ -901,31 +1002,18 @@ export default function Home() {
   }, [homeState, outfits, preferredSeason, starterLooks, todaysFit]);
 
   const startingPointsTitle =
-    outfits.length === 0 ? "From Your Closet" : "Good Starting Points";
+    outfits.length === 0 ? "From Your Closet" : "Looks Worth Returning To";
   const startingPointsDescription =
     outfits.length === 0
       ? "Simple combinations built from the pieces you already own, so the app still helps before your outfit history gets deep."
-      : "Useful saved looks that match today and help you get dressed without turning Home into a dashboard.";
-
-  const heroLabel =
-    homeState === "empty"
-      ? "Start building outfit memory"
-      : homeState === "starting-with-closet"
-        ? "Your closet can still help today"
-        : "Here are good looks you can wear today.";
-  const heroCopy =
-    homeState === "empty"
-      ? "Save your first complete look to make DigiCloset useful fast. If you add a few wardrobe pieces first, it can still begin with calm starting combinations."
-      : homeState === "starting-with-closet"
-        ? "You do not need a deep outfit history yet. DigiCloset can start from the pieces already in your closet and help you build from there."
-        : "Return to saved outfit memories, keep reliable combinations close, and let your wardrobe stay personal instead of operational.";
+      : "Saved outfits, weather support, and quiet reminders from your closet.";
 
   return (
-    <main className="page-shell max-w-6xl">
-      <HomeEditorialHeader heroLabel={heroLabel} heroCopy={heroCopy} />
+    <main className="page-shell max-w-[56rem]">
+      <HomeEditorialHeader />
 
       {error ? (
-        <div className="mt-6">
+        <div className="mt-5">
           <ErrorState
             title="Could not load your home view"
             message={error}
@@ -938,19 +1026,19 @@ export default function Home() {
       ) : null}
 
       {actionError ? (
-        <div className="mt-6">
+        <div className="mt-5">
           <ErrorState title="That action did not stick" message={actionError} />
         </div>
       ) : null}
 
       {isLoading ? (
-        <div className="mt-6">
+        <div className="mt-5">
           <LoadingState />
         </div>
       ) : null}
 
       {!isLoading && !error ? (
-        <div className="mt-5 space-y-5 sm:mt-7 sm:space-y-7">
+        <div className="mx-auto mt-4 w-full max-w-[54rem] space-y-4 sm:mt-5 sm:space-y-5">
           <HeroOutfitCard
             outfit={todaysFit}
             weatherLabel={weatherLabel}
@@ -979,15 +1067,8 @@ export default function Home() {
               emptyTitle={null}
               emptyDescription={null}
               renderItem={(outfit) => (
-                <OutfitShowcaseCard
+                <HomeMemoryRailCard
                   outfit={outfit}
-                  onFavorite={outfit.synthetic ? undefined : handleFavorite}
-                  onMarkWorn={outfit.synthetic ? undefined : handleMarkWorn}
-                  onEdit={outfit.synthetic ? undefined : setEditingOutfit}
-                  onDelete={outfit.synthetic ? undefined : handleDelete}
-                  showActions={!outfit.synthetic}
-                  isBusy={outfit.synthetic ? false : isOutfitPending(outfit.id)}
-                  showMeta={false}
                   supportingText={buildStartingPointNote(outfit, weatherLabel)}
                 />
               )}
@@ -997,42 +1078,27 @@ export default function Home() {
           {recentMemories.length > 0 ? (
             <RailSurface
               eyebrow="Memory"
-              title="Recent Outfit Memories"
-              description="The saved looks you added most recently, kept visible so your wardrobe memory feels alive and easy to return to."
+              title="Recent Memories"
+              description="The saved looks you added most recently, kept visible so your wardrobe memory feels alive and easy to revisit."
               items={recentMemories}
               emptyTitle={null}
               emptyDescription={null}
-              renderItem={(outfit) => (
-                <OutfitShowcaseCard
-                  outfit={outfit}
-                  onFavorite={handleFavorite}
-                  onMarkWorn={handleMarkWorn}
-                  onEdit={setEditingOutfit}
-                  onDelete={handleDelete}
-                  isBusy={isOutfitPending(outfit.id)}
-                  showMeta={false}
-                />
-              )}
+              renderItem={(outfit) => <HomeMemoryRailCard outfit={outfit} />}
             />
           ) : null}
 
           {favoriteFits.length > 0 && homeState !== "empty" ? (
             <RailSurface
               eyebrow="Favorites"
-              title="Favorite Fits"
-              description="Looks you already trust, kept close without pretending they belong to a separate wardrobe."
+              title="Favorite Combinations"
+              description="Looks you already trust, kept close without turning Home into a dashboard."
               items={favoriteFits}
               emptyTitle={null}
               emptyDescription={null}
+              compact
               renderItem={(outfit) => (
-                <OutfitShowcaseCard
+                <HomeCombinationRailCard
                   outfit={outfit}
-                  onFavorite={handleFavorite}
-                  onMarkWorn={handleMarkWorn}
-                  onEdit={setEditingOutfit}
-                  onDelete={handleDelete}
-                  isBusy={isOutfitPending(outfit.id)}
-                  showMeta={false}
                   supportingText="Saved as one of your dependable favorites."
                 />
               )}
@@ -1048,15 +1114,8 @@ export default function Home() {
               emptyTitle={null}
               emptyDescription={null}
               renderItem={(outfit) => (
-                <OutfitShowcaseCard
+                <HomeMemoryRailCard
                   outfit={outfit}
-                  onFavorite={outfit.synthetic ? undefined : handleFavorite}
-                  onMarkWorn={outfit.synthetic ? undefined : handleMarkWorn}
-                  onEdit={outfit.synthetic ? undefined : setEditingOutfit}
-                  onDelete={outfit.synthetic ? undefined : handleDelete}
-                  showActions={!outfit.synthetic}
-                  isBusy={outfit.synthetic ? false : isOutfitPending(outfit.id)}
-                  showMeta={false}
                   supportingText={buildSeasonalNote(outfit)}
                 />
               )}
@@ -1072,14 +1131,8 @@ export default function Home() {
               emptyTitle={null}
               emptyDescription={null}
               renderItem={(outfit) => (
-                <OutfitShowcaseCard
+                <HomeMemoryRailCard
                   outfit={outfit}
-                  onFavorite={handleFavorite}
-                  onMarkWorn={handleMarkWorn}
-                  onEdit={setEditingOutfit}
-                  onDelete={handleDelete}
-                  isBusy={isOutfitPending(outfit.id)}
-                  showMeta={false}
                   supportingText={buildQuietRediscoveryNote(outfit)}
                 />
               )}

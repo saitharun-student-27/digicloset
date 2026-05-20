@@ -4,6 +4,67 @@ All notable changes to DigiCloset are documented here in chronological order.
 
 This changelog tracks the product from the original full-stack scaffold to the current outfit-memory-first, mobile-first wardrobe experience.
 
+## 2026-05-20 - Correct Home toward the mobile editorial reference
+
+Commit: latest Phase 3G.2B checkpoint on `main`
+
+### Phase 3G.2B scope
+
+- corrected the earlier Home refresh so it no longer reads like a desktop landing page
+- reduced the oversized top copy block
+- made the hero outfit card the dominant visual focus
+- tightened rails so they feel more image-led and mobile-native
+- preserved all Home data and action behavior
+
+### What was corrected
+
+- replaced the wide landing-style intro with a smaller centered Home rhythm
+- removed the separate website-like text block above the hero
+- kept the page within a more mobile-app-like width on desktop
+- reduced visual dead space so the outfit hero and rails carry more of the page
+
+### Hero corrections
+
+- rebuilt the main hero into a single stronger outfit-first surface
+- made the outfit image area visually dominant again
+- kept title, metadata, and `View Outfit` inside the hero rather than in a detached promo-like block
+- kept quiet secondary actions inside the hero:
+  - favorite
+  - worn
+  - edit
+  - delete
+
+### Supporting section corrections
+
+- compressed weather support into a smaller strip directly below the hero
+- made Recent Memories more image-led with smaller supporting copy
+- made Favorite Combinations more compact and rail-like instead of widget-like
+- preserved the remaining adaptive Home rails without redesigning other pages
+
+### Verification
+
+- frontend production build passed
+- browser verification passed for:
+  - dev-user login
+  - Home load
+  - `View Outfit`
+  - favorite / unfavorite
+  - mark worn
+  - edit modal opening
+  - safe delete test using a temporary Home-created outfit
+  - new-user private empty Home state
+  - navigate away and back to Home
+  - viewport checks at:
+    - `390 x 844`
+    - desktop
+- reference screenshot comparison was performed against:
+  - `references/app-theme/01-home-reference.png`
+
+### Important boundary
+
+- no backend, auth, provider, or route logic changed
+- no other page was redesigned in this correction phase
+
 ## 2026-05-20 - Refresh Home into a calmer editorial outfit-memory experience
 
 Commit: latest Phase 3G.2 checkpoint on `main`
