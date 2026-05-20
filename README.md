@@ -49,6 +49,11 @@ DigiCloset currently includes:
   - stronger closet-zone section panels
   - earlier saved outfit memories
   - less empty dashboard-like stretch
+- corrected Wardrobe again so it stays closer to the reference:
+  - compressed filter area
+  - removed duplicate chip clutter
+  - fixed chip overlap/clipping
+  - kept category panels more prominent than controls
 - shared client-side wardrobe data layer for outfits and clothing
 - outfit lifecycle actions:
   - favorite / unfavorite
@@ -206,6 +211,7 @@ The current Wardrobe visual direction also pushes the page toward:
 - stronger category sections that feel like closet zones instead of admin groupings
 - saved outfit memories staying visible near the top as wardrobe anchors
 - a mobile-app feel on desktop instead of a wide utility page
+- compressed controls that support browsing without becoming the page
 
 ### Outfit Detail
 
@@ -347,6 +353,7 @@ Completed visual refresh phases:
 - `3G.2` Home visual refresh
 - `3G.2B` Home correction toward the reference structure
 - `3G.3` Wardrobe visual refresh
+- `3G.3B` Wardrobe correction toward the reference structure
 
 ## Repository Structure
 
@@ -565,6 +572,7 @@ Oversize message:
 - a calmer, more outfit-memory-first Home that better matches the editorial visual system
 - a corrected Home layout that now stays closer to the generated mobile reference instead of drifting toward a desktop landing page
 - a calmer Wardrobe layout that now feels more like a private digital closet than a utility-heavy management page
+- a corrected Wardrobe control area that now stays compact and avoids chip overlap or duplicate filter clutter
 
 ## Honest Current Gaps
 

@@ -4,6 +4,70 @@ All notable changes to DigiCloset are documented here in chronological order.
 
 This changelog tracks the product from the original full-stack scaffold to the current outfit-memory-first, mobile-first wardrobe experience.
 
+## 2026-05-20 - Correct Wardrobe toward the reference with compressed filters
+
+Commit: latest Phase 3G.3B checkpoint on `main`
+
+### Phase 3G.3B scope
+
+- corrected the first Wardrobe refresh so the control area no longer dominates the page
+- compressed filters and sorting without changing any existing search/filter/sort behavior
+- removed duplicate section-jump chip clutter
+- kept the page closer to the mobile editorial reference
+
+### What was corrected
+
+- removed the duplicated chip row that repeated section-navigation intent below the main filter area
+- compressed the filter surface into:
+  - search
+  - content chips
+  - section chips
+  - compact season toggle
+  - compact sort control
+- reduced the amount of vertical space consumed before real wardrobe content appears
+- tightened desktop width further so the page keeps an app-like rather than dashboard-like rhythm
+
+### Wardrobe control fixes
+
+- fixed chip overlap and clipping by keeping chip rows single-line and horizontally scrollable
+- hid season chips behind a small toggle unless season filtering is active
+- kept `Clear filters` small and conditional instead of giving it a dominant slot
+- preserved filtered-mode summary and result sections
+
+### Visual result
+
+- Wardrobe now feels more like closet browsing and less like a filter wall
+- category panels stay visually stronger than the controls
+- saved outfit memories remain visible as anchors below the category structure
+- reference comparison was performed again against:
+  - `references/app-theme/02-wardrobe-reference.png`
+
+### Verification
+
+- frontend production build passed
+- browser QA passed for:
+  - search
+  - content filters
+  - section filters
+  - season filters
+  - A-Z sort
+  - favorites-first sort
+  - clear filters
+  - piece detail navigation
+  - outfit detail navigation
+  - new-user private Wardrobe state
+  - viewport checks at:
+    - `360 x 800`
+    - `390 x 844`
+    - `414 x 896`
+    - desktop
+- chip clipping check passed at all tested viewports
+
+### Important boundary
+
+- no backend, auth, provider, or route logic changed
+- no other page was redesigned in this correction phase
+
 ## 2026-05-20 - Refresh Wardrobe toward a calmer mobile editorial closet
 
 Commit: latest Phase 3G.3 checkpoint on `main`

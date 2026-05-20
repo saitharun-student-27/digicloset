@@ -1,4 +1,4 @@
-import { ArrowUpDown, Plus, Search, Sparkles, X } from "lucide-react";
+import { ArrowUpDown, ChevronDown, Plus, Search, Sparkles, X } from "lucide-react";
 import { useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -23,7 +23,7 @@ function FilterChip({ label, active, onClick }) {
     <button
       type="button"
       onClick={onClick}
-      className={`inline-flex min-h-[var(--touch-target-min)] items-center justify-center rounded-full border px-4 py-2 text-sm font-medium whitespace-nowrap transition ${
+      className={`inline-flex min-h-[2.5rem] items-center justify-center rounded-full border px-3.5 py-2 text-[13px] font-medium whitespace-nowrap transition sm:min-h-[2.625rem] ${
         active
           ? "border-charcoal bg-charcoal text-ivory shadow-soft"
           : "border-[#e5dac9] bg-white/88 text-charcoal hover:bg-linen"
@@ -36,12 +36,12 @@ function FilterChip({ label, active, onClick }) {
 
 function FilterRow({ label, options, value, onChange, formatLabel = (item) => item.label }) {
   return (
-    <div className="space-y-2.5">
-      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-stone">
+    <div className="space-y-2">
+      <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-stone">
         {label}
       </p>
       <div className="-mx-1 overflow-x-auto px-1 pb-1">
-        <div className="flex min-w-max gap-2">
+        <div className="flex min-w-max gap-2 pr-1">
           {options.map((option) => (
             <FilterChip
               key={option.value}
@@ -425,6 +425,7 @@ export default function Vault() {
   const [sectionFilter, setSectionFilter] = useState("all_sections");
   const [seasonFilter, setSeasonFilter] = useState("all_seasons");
   const [sortBy, setSortBy] = useState("recent");
+  const [showSeasonFilters, setShowSeasonFilters] = useState(false);
 
   async function handleDeleteClothing(item) {
     if (!window.confirm(`Delete "${item.name}"?`)) {
@@ -600,15 +601,6 @@ export default function Vault() {
   const visibleOutfitCount = showOutfitResults ? matchingOutfits.length : 0;
   const visiblePieceCount = showPieceResults ? matchingPieces.length : 0;
   const hasVisibleMatches = visibleOutfitCount > 0 || visiblePieceCount > 0;
-  const sectionLinks = [
-    { id: "favorite-fits", label: "Favorite fits" },
-    { id: "outfit-memories", label: "Outfit memories" },
-    ...visibleWardrobeSections.map((section) => ({
-      id: sectionIdForLabel(section),
-      label: section,
-    })),
-  ];
-
   const isLoading = outfitsLoading || clothingLoading;
   const loadError = pageError || outfitsError || clothingError;
 
@@ -621,7 +613,7 @@ export default function Vault() {
   }
 
   return (
-    <main className="page-shell max-w-[58rem]">
+    <main className="page-shell max-w-[54rem]">
       {loadError ? (
         <div className="mb-6">
           <ErrorState
@@ -636,22 +628,22 @@ export default function Vault() {
       ) : null}
 
       <section className="section-surface overflow-hidden p-3 sm:p-4">
-        <div className="rounded-[1.95rem] border border-[#e6dac8] bg-[linear-gradient(180deg,rgba(255,255,255,0.96)_0%,rgba(248,245,238,0.98)_100%)] px-4 py-5 text-center sm:px-6 sm:py-6">
-          <div className="mx-auto max-w-[33rem]">
+        <div className="rounded-[1.95rem] border border-[#e6dac8] bg-[linear-gradient(180deg,rgba(255,255,255,0.96)_0%,rgba(248,245,238,0.98)_100%)] px-4 py-4 text-center sm:px-6 sm:py-5">
+          <div className="mx-auto max-w-[30rem]">
             <div className="inline-flex items-center gap-2 rounded-full bg-white/88 px-3 py-2 text-[11px] font-medium uppercase tracking-[0.16em] text-stone shadow-sm">
               <Sparkles className="h-3.5 w-3.5 text-brass" />
               Wardrobe
             </div>
-            <h1 className="mt-4 font-serif text-[1.85rem] leading-[1.03] text-charcoal sm:text-[2.2rem]">
-              Your wardrobe, organized softly.
+            <h1 className="mt-3.5 font-serif text-[1.75rem] leading-[1.04] text-charcoal sm:text-[2rem]">
+              Your closet, remembered.
             </h1>
-            <p className="mt-3 text-sm leading-6 text-stone">
+            <p className="mt-2.5 text-sm leading-6 text-stone">
               Saved outfit memories stay close, while individual pieces settle into
               calmer closet zones around them.
             </p>
           </div>
 
-          <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:justify-center">
+          <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:justify-center">
             <Link
               to="/outfit-memory"
               className="inline-flex h-11 min-h-[var(--touch-target-min)] items-center justify-center gap-2 rounded-full bg-charcoal px-5 text-sm font-medium text-ivory transition hover:bg-softblack"
@@ -668,9 +660,9 @@ export default function Vault() {
         </div>
       </section>
 
-      <section className="section-surface mt-5 overflow-hidden p-3 sm:p-4">
+      <section className="section-surface mt-4 overflow-hidden p-3 sm:p-4">
         <div className="rounded-[1.85rem] border border-[#e7dccb] bg-[linear-gradient(180deg,rgba(255,255,255,0.96)_0%,rgba(248,245,238,0.98)_100%)] p-4 sm:p-5">
-          <div className="space-y-5">
+          <div className="space-y-4">
             <div>
               <div className="relative">
                 <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-stone" />
@@ -699,7 +691,7 @@ export default function Vault() {
               </p>
             </div>
 
-            <div className="grid gap-4 border-t border-[#eadfce] pt-4">
+            <div className="grid gap-3 border-t border-[#eadfce] pt-4">
               <FilterRow
                 label="Content"
                 options={contentOptions}
@@ -712,24 +704,32 @@ export default function Vault() {
                 value={sectionFilter}
                 onChange={setSectionFilter}
               />
-              <FilterRow
-                label="Season"
-                options={seasonOptions}
-                value={seasonFilter}
-                onChange={setSeasonFilter}
-              />
 
-              <div className="flex flex-col gap-3 border-t border-[#eadfce] pt-4 sm:flex-row sm:items-center sm:justify-between">
-                <div className="flex items-center gap-2 text-sm text-stone">
-                  <ArrowUpDown className="h-4 w-4 text-brass" />
-                  <span className="font-medium text-charcoal">Sort</span>
-                </div>
+              <div className="flex flex-wrap items-center gap-2 border-t border-[#eadfce] pt-3">
+                <button
+                  type="button"
+                  onClick={() => setShowSeasonFilters((value) => !value)}
+                  className={`inline-flex h-10 min-h-[var(--touch-target-min)] items-center gap-2 rounded-full border px-3.5 text-sm font-medium transition ${
+                    showSeasonFilters || seasonFilter !== "all_seasons"
+                      ? "border-charcoal bg-charcoal text-ivory shadow-soft"
+                      : "border-[#e0d4c0] bg-white text-charcoal hover:bg-linen"
+                  }`}
+                >
+                  Season
+                  <ChevronDown
+                    className={`h-4 w-4 transition ${showSeasonFilters ? "rotate-180" : ""}`}
+                  />
+                </button>
 
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                <div className="flex min-w-0 flex-1 items-center gap-2 sm:flex-none">
+                  <div className="flex items-center gap-2 pl-1 text-sm text-stone">
+                    <ArrowUpDown className="h-4 w-4 text-brass" />
+                    <span className="font-medium text-charcoal">Sort</span>
+                  </div>
                   <select
                     value={sortBy}
                     onChange={(event) => setSortBy(event.target.value)}
-                    className="h-11 min-h-[var(--touch-target-min)] rounded-full border border-[#e0d4c0] bg-white px-4 text-sm text-charcoal shadow-soft outline-none transition focus:border-sage/40 focus:ring-4 focus:ring-sage/10"
+                    className="h-10 min-h-[var(--touch-target-min)] min-w-0 flex-1 rounded-full border border-[#e0d4c0] bg-white px-4 text-sm text-charcoal shadow-soft outline-none transition focus:border-sage/40 focus:ring-4 focus:ring-sage/10 sm:w-[12.5rem] sm:flex-none"
                     aria-label="Sort wardrobe content"
                   >
                     {sortOptions.map((option) => (
@@ -738,49 +738,39 @@ export default function Vault() {
                       </option>
                     ))}
                   </select>
-
-                  {hasNonDefaultControls ? (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setContentFilter("all");
-                        setSectionFilter("all_sections");
-                        setSeasonFilter("all_seasons");
-                        setSortBy("recent");
-                      }}
-                      className="inline-flex h-11 min-h-[var(--touch-target-min)] items-center justify-center rounded-full bg-ivory px-4 text-sm font-medium text-charcoal transition hover:bg-linen"
-                    >
-                      Clear filters
-                    </button>
-                  ) : null}
                 </div>
+
+                {hasNonDefaultControls ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setContentFilter("all");
+                      setSectionFilter("all_sections");
+                      setSeasonFilter("all_seasons");
+                      setSortBy("recent");
+                      setShowSeasonFilters(false);
+                    }}
+                    className="inline-flex h-10 min-h-[var(--touch-target-min)] items-center justify-center rounded-full bg-ivory px-3.5 text-sm font-medium text-charcoal transition hover:bg-linen"
+                  >
+                    Clear filters
+                  </button>
+                ) : null}
               </div>
+
+              {(showSeasonFilters || seasonFilter !== "all_seasons") ? (
+                <FilterRow
+                  label="Season"
+                  options={seasonOptions}
+                  value={seasonFilter}
+                  onChange={setSeasonFilter}
+                />
+              ) : null}
             </div>
           </div>
         </div>
       </section>
 
-      {!isFilteredMode ? (
-        <section className="mt-4">
-          <div className="memory-rail pb-1 pt-1">
-            {sectionLinks.map((section) => (
-              <button
-                key={section.id}
-                type="button"
-                onClick={() =>
-                  document.getElementById(section.id)?.scrollIntoView({
-                    behavior: "smooth",
-                    block: "start",
-                  })
-                }
-                className="flex h-10 min-h-[var(--touch-target-min)] items-center justify-center rounded-full border border-[#e4d8c7] bg-white/90 px-4 text-xs font-medium text-charcoal shadow-soft"
-              >
-                {section.label}
-              </button>
-            ))}
-          </div>
-        </section>
-      ) : (
+      {isFilteredMode ? (
         <section className="mt-4 section-surface overflow-hidden p-3 sm:p-4">
           <div className="rounded-[1.65rem] bg-linen px-4 py-3 text-sm leading-6 text-stone">
             {visibleOutfitCount} outfit
@@ -796,7 +786,7 @@ export default function Vault() {
             )}
           </div>
         </section>
-      )}
+      ) : null}
 
       {isFilteredMode ? (
         hasVisibleMatches ? (
@@ -907,12 +897,16 @@ export default function Vault() {
           />
 
           {visibleWardrobeSections.length > 0 ? (
-            visibleWardrobeSections.map((section) => (
+            visibleWardrobeSections.map((section, index) => (
               <WardrobeZoneSection
                 key={section}
                 id={sectionIdForLabel(section)}
                 title={section}
-                description="Supporting pieces grouped calmly by section, so the closet stays easy to browse without drifting into inventory mode."
+                description={
+                  index === 0
+                    ? "Your wardrobe opens into calmer sections here, using real saved pieces instead of dashboard categories."
+                    : "Supporting pieces grouped calmly by section, so the closet stays easy to browse without drifting into inventory mode."
+                }
                 items={groupedItems[section]}
                 emptyMessage={`No ${section.toLowerCase()} saved yet. Add pieces through outfit memory and DigiCloset will place them here automatically.`}
                 onEdit={(item) => navigate(`/pieces/${item.id}`)}
