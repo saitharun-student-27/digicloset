@@ -70,6 +70,11 @@ DigiCloset currently includes:
   - one stronger `For today` feature card
   - softer wear-support strip
   - calmer secondary suggestion rails
+- refreshed Outfit Detail and Piece Detail into calmer editorial detail views with:
+  - stronger hero image treatment
+  - softer metadata rhythm
+  - quieter action rows
+  - cleaner related piece / related outfit sections
 - shared client-side wardrobe data layer for outfits and clothing
 - outfit lifecycle actions:
   - favorite / unfavorite
@@ -242,6 +247,14 @@ Each saved look now has a dedicated detail route:
 
 This is where an outfit becomes a remembered look instead of only a rail card.
 
+The current Outfit Detail visual direction also pushes the page toward:
+
+- a centered editorial top rhythm
+- one stronger hero image surface
+- softer metadata pills instead of harsher info blocks
+- quieter action treatment
+- a calmer “pieces in this outfit” section
+
 ### Suggestions
 
 Suggestions is the quieter resurfacing page, not a second Home.
@@ -278,6 +291,13 @@ Each clothing piece has a dedicated detail page:
 - formality
 - source
 - related outfit memories
+
+The current Piece Detail visual direction also pushes the page toward:
+
+- a larger image-led hero
+- softer grouped metadata
+- calmer edit / remove actions
+- a cleaner outfit-memory rail for related looks
 
 ## Routes
 
@@ -382,6 +402,7 @@ Completed visual refresh phases:
 - `3G.3C` Wardrobe filter button + compact filter sheet correction
 - `3G.4` Outfit Memory / Capture visual refresh
 - `3G.5` Suggestions visual refresh
+- `3G.6` Outfit Detail + Piece Detail visual refresh
 
 ## Repository Structure
 
@@ -604,6 +625,7 @@ Oversize message:
 - a compact Wardrobe filter-button flow that lets content appear much sooner without losing filtering power
 - a calmer Capture page that now feels more like saving an outfit memory than filling out a utility form
 - a calmer Suggestions page that now feels more curated and editorial instead of reading like a stacked dashboard of rails
+- calmer Outfit Detail and Piece Detail pages that now feel more like wardrobe memories than utility detail screens
 
 ## Honest Current Gaps
 
@@ -620,7 +642,7 @@ The biggest remaining product-quality gap is now hosted-readiness planning plus 
 
 The highest-impact next refinement would be:
 
-- Phase `3G.6`: Outfit Detail + Piece Detail visual refresh, now that the shell, Home, Wardrobe, Capture, and Suggestions are aligned more closely with the editorial mobile visual system
+- Phase `3G.7`: final mobile visual QA, now that the shell, Home, Wardrobe, Capture, Suggestions, Outfit Detail, and Piece Detail are aligned more closely with the editorial mobile visual system
 
 ## Documentation Maintenance
 

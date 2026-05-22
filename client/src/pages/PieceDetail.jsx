@@ -1,4 +1,4 @@
-﻿import { ArrowLeft, Pencil, Shirt, Trash2 } from "lucide-react";
+import { ArrowLeft, Pencil, Shirt, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 
@@ -231,6 +231,29 @@ function PieceEditModal({ item, isOpen, isSaving, onClose, onSubmit }) {
   );
 }
 
+function DetailActionButton({
+  icon: Icon,
+  label,
+  onClick,
+  tone = "default",
+}) {
+  const toneClass =
+    tone === "danger"
+      ? "border-[rgba(185,28,28,0.16)] bg-white text-red-700 hover:bg-red-50"
+      : "border-transparent bg-charcoal text-ivory hover:bg-black";
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`inline-flex min-h-[var(--touch-target-min)] items-center justify-center gap-2 rounded-full border px-5 py-3 text-sm font-medium transition ${toneClass}`}
+    >
+      <Icon className="h-4 w-4" />
+      {label}
+    </button>
+  );
+}
+
 export default function PieceDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -248,7 +271,6 @@ export default function PieceDetail() {
     updateOutfit,
     deleteOutfit,
     isOutfitPending,
-    isPiecePending,
   } = useWardrobeData();
   const [isEditingPiece, setIsEditingPiece] = useState(false);
   const [isSavingPiece, setIsSavingPiece] = useState(false);
@@ -370,7 +392,7 @@ export default function PieceDetail() {
 
   if (loadError || !item) {
     return (
-      <main className="page-shell">
+      <main className="page-shell max-w-[56rem]">
         {loadError ? (
           <EmptyState title="Piece not available" description={loadError} />
         ) : (
@@ -384,11 +406,29 @@ export default function PieceDetail() {
   }
 
   const imageUrl = getImageUrl(item.image_url);
+  const sectionLabel = getWardrobeSection(item.category);
+  const metadataPills = [
+    { label: "Category", value: formatCategoryLabel(item.category) },
+    { label: "Section", value: sectionLabel },
+    { label: "Color", value: item.color ? formatColorLabel(item.color) : null },
+    { label: "Season", value: formatSeasonLabel(item.season || "all") },
+    {
+      label: "Occasion",
+      value: formatOccasionLabel(item.occasion || "casual"),
+    },
+    { label: "Style", value: item.style ? formatStyleLabel(item.style) : null },
+    {
+      label: "Formality",
+      value: item.formality_level
+        ? formatFormalityLabel(item.formality_level)
+        : null,
+    },
+  ].filter((entry) => entry.value);
 
   return (
-    <main className="page-shell max-w-5xl">
+    <main className="page-shell max-w-[56rem]">
       {actionError ? (
-        <div className="mb-6">
+        <div className="mb-5 sm:mb-6">
           <ErrorState
             title="That action did not stick"
             message={actionError}
@@ -396,126 +436,175 @@ export default function PieceDetail() {
         </div>
       ) : null}
 
-      <Link
-        to="/wardrobe"
-        className="inline-flex items-center gap-2 text-sm font-medium text-stone transition hover:text-charcoal"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        Back to wardrobe
-      </Link>
+      <section className="section-surface overflow-hidden px-4 py-5 sm:px-5 sm:py-6">
+        <div className="relative overflow-hidden rounded-[2rem] bg-[linear-gradient(180deg,#fbf8f2_0%,#f7f1e8_100%)] px-4 py-8 sm:px-6 sm:py-10">
+          <div className="pointer-events-none absolute inset-x-[-12%] top-[-14rem] h-[19rem] rounded-b-[50%] border border-[rgba(182,144,91,0.24)] bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.95),rgba(255,255,255,0.28)_70%)]" />
+          <div className="relative flex items-start justify-between gap-3">
+            <Link
+              to="/wardrobe"
+              className="inline-flex h-11 min-h-[var(--touch-target-min)] w-11 min-w-[var(--touch-target-min)] items-center justify-center rounded-full bg-white/86 text-charcoal shadow-soft transition hover:bg-white"
+              aria-label="Back to wardrobe"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Link>
+            <div className="min-w-0 flex-1 text-center">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-stone">
+                Wardrobe Piece
+              </p>
+              <h1 className="mt-3 font-serif text-[2.25rem] leading-none text-charcoal sm:text-[2.8rem]">
+                {item.name}
+              </h1>
+              <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-stone">
+                Used in {relatedOutfits.length} outfit memor
+                {relatedOutfits.length === 1 ? "y" : "ies"} from your closet.
+              </p>
+            </div>
+            <div className="h-11 w-11 shrink-0" />
+          </div>
+        </div>
+      </section>
 
-      <div className="mt-5 grid gap-5 lg:mt-6 lg:grid-cols-[0.95fr_1.05fr] lg:gap-8">
-        <section className="rounded-[2rem] border border-black/5 bg-white p-5 shadow-soft">
-          <div className="flex aspect-square min-h-[280px] items-center justify-center rounded-[1.5rem] bg-[linear-gradient(135deg,#f4efe6_0%,#fbf8f2_100%)] p-4 sm:min-h-[320px]">
-            {imageUrl ? (
-              <img
-                src={imageUrl}
-                alt={item.name}
-                className="h-full w-full object-contain"
-              />
-            ) : (
-              <div className="flex h-20 w-20 items-center justify-center rounded-full bg-white text-sage shadow-soft">
-                <Shirt className="h-9 w-9" />
+      <div className="mt-5 space-y-5 sm:mt-7 sm:space-y-7">
+        <section className="section-surface overflow-hidden p-3 sm:p-4">
+          <div className="overflow-hidden rounded-[2rem] bg-[linear-gradient(180deg,#f9f5ee_0%,#fffdf9_100%)]">
+            <div className="relative aspect-[4/4.8] min-h-[20rem] overflow-hidden sm:min-h-[24rem]">
+              {imageUrl ? (
+                <img
+                  src={imageUrl}
+                  alt={item.name}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <div className="flex h-full items-center justify-center bg-[linear-gradient(135deg,#f0e7d9_0%,#faf7f1_100%)] p-6">
+                  <div className="flex h-28 w-28 items-center justify-center rounded-full bg-white text-sage shadow-soft sm:h-32 sm:w-32">
+                    <Shirt className="h-12 w-12" />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="-mt-10 rounded-t-[2.25rem] bg-[linear-gradient(180deg,rgba(255,255,255,0.97)_0%,#fbf8f2_100%)] px-5 pb-5 pt-8 shadow-[0_-18px_40px_rgba(29,29,27,0.05)] sm:px-6 sm:pb-6 sm:pt-9">
+              <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full border border-[rgba(182,144,91,0.26)] bg-white text-brass shadow-soft">
+                <Shirt className="h-5 w-5" />
               </div>
-            )}
+
+              <div className="mt-4 text-center">
+                <h2 className="font-serif text-[2rem] leading-none text-charcoal sm:text-[2.3rem]">
+                  {item.name}
+                </h2>
+                <p className="mt-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-stone">
+                  Used in {relatedOutfits.length} outfit memor
+                  {relatedOutfits.length === 1 ? "y" : "ies"}
+                </p>
+              </div>
+
+              <div className="mt-6 flex flex-wrap gap-2">
+                {metadataPills.map((detail) => (
+                  <span
+                    key={detail.label}
+                    className="rounded-full bg-ivory px-3 py-1.5 text-[11px] font-medium text-stone"
+                  >
+                    {detail.value}
+                  </span>
+                ))}
+              </div>
+
+              <div className="mt-6 rounded-[1.5rem] bg-white/78 p-4">
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div>
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-stone">
+                      Category
+                    </p>
+                    <p className="mt-2 text-sm font-medium text-charcoal">
+                      {formatCategoryLabel(item.category)}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-stone">
+                      Section
+                    </p>
+                    <p className="mt-2 text-sm font-medium text-charcoal">
+                      {sectionLabel}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-stone">
+                      Source
+                    </p>
+                    <p className="mt-2 text-sm font-medium text-charcoal">
+                      {formatValue(item.source_type)}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-stone">
+                      Closet role
+                    </p>
+                    <p className="mt-2 text-sm font-medium text-charcoal">
+                      {sectionLabel}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
 
-        <section className="rounded-[2rem] border border-black/5 bg-white p-5 shadow-soft sm:p-6">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <section className="section-surface overflow-hidden p-4 sm:p-5">
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+            <DetailActionButton
+              icon={Pencil}
+              label="Edit Piece"
+              onClick={() => setIsEditingPiece(true)}
+            />
+            <DetailActionButton
+              icon={Trash2}
+              label="Remove from Closet"
+              onClick={handleDeletePiece}
+              tone="danger"
+            />
+          </div>
+        </section>
+
+        <section className="section-surface overflow-hidden p-4 sm:p-5">
+          <div className="mb-5 flex items-end justify-between gap-4">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone">
-                Piece detail
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-stone">
+                Related looks
               </p>
-              <h1 className="mt-2 text-3xl font-semibold text-charcoal">
-                {item.name}
-              </h1>
-              <p className="mt-2 text-sm leading-6 text-stone">
-                Section: {getWardrobeSection(item.category)}
-              </p>
+              <h2 className="mt-2 font-serif text-[1.85rem] leading-none text-charcoal">
+                Outfit memories using this piece
+              </h2>
             </div>
-            <span className="w-fit rounded-full bg-ivory px-4 py-2 text-sm font-medium text-charcoal">
-              {formatColorLabel(item.color)}
+            <span className="rounded-full bg-ivory px-3 py-1.5 text-xs font-medium text-stone">
+              {relatedOutfits.length} saved
             </span>
           </div>
 
-          <div className="mt-6 grid gap-3 sm:grid-cols-2">
-            {[
-              ["Category", formatCategoryLabel(item.category)],
-              ["Season", formatSeasonLabel(item.season || "all")],
-              ["Occasion", formatOccasionLabel(item.occasion || "casual")],
-              ["Style", item.style ? formatStyleLabel(item.style) : "Not set"],
-              [
-                "Formality",
-                item.formality_level
-                  ? formatFormalityLabel(item.formality_level)
-                  : "Not set",
-              ],
-              ["Source", formatValue(item.source_type)],
-            ].map(([label, value]) => (
-              <div key={label} className="rounded-2xl bg-ivory p-4">
-                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-stone">
-                  {label}
-                </p>
-                <p className="mt-2 text-sm font-medium text-charcoal">{value}</p>
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-            <button
-              type="button"
-              onClick={() => setIsEditingPiece(true)}
-              className="inline-flex h-11 min-h-[var(--touch-target-min)] items-center justify-center gap-2 rounded-full bg-charcoal px-5 text-sm font-medium text-ivory transition hover:bg-softblack"
-            >
-              <Pencil className="h-4 w-4" />
-              Edit piece
-            </button>
-            <button
-              type="button"
-              onClick={handleDeletePiece}
-              className="inline-flex h-11 min-h-[var(--touch-target-min)] items-center justify-center gap-2 rounded-full bg-white px-5 text-sm font-medium text-red-600 transition hover:bg-red-50"
-            >
-              <Trash2 className="h-4 w-4" />
-              Delete piece
-            </button>
-          </div>
+          {relatedOutfits.length > 0 ? (
+            <div className="memory-rail">
+              {relatedOutfits.map((outfit) => (
+                <div key={outfit.id} className="memory-rail-card">
+                  <OutfitShowcaseCard
+                    outfit={outfit}
+                    onFavorite={handleFavorite}
+                    onMarkWorn={handleMarkWorn}
+                    onEdit={setEditingOutfit}
+                    onDelete={handleDeleteOutfit}
+                    isBusy={isOutfitPending(outfit.id)}
+                    showMeta={false}
+                    supportingText="Pulled from your saved looks that already rely on this piece."
+                  />
+                </div>
+              ))}
+            </div>
+          ) : (
+            <EmptyState
+              title="No related outfits yet"
+              description="This piece is saved in your wardrobe, but it has not been linked to an outfit memory yet."
+            />
+          )}
         </section>
       </div>
-
-      <section className="mt-8 sm:mt-10">
-        <div className="mb-5">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone">
-            Related outfits
-          </p>
-          <h2 className="mt-2 text-2xl font-semibold text-charcoal">
-            Outfit memories using this piece
-          </h2>
-        </div>
-
-        {relatedOutfits.length > 0 ? (
-          <div className="memory-rail">
-            {relatedOutfits.map((outfit) => (
-              <div key={outfit.id} className="memory-rail-card">
-                <OutfitShowcaseCard
-                  outfit={outfit}
-                  onFavorite={handleFavorite}
-                  onMarkWorn={handleMarkWorn}
-                  onEdit={setEditingOutfit}
-                  onDelete={handleDeleteOutfit}
-                  isBusy={isOutfitPending(outfit.id)}
-                  showMeta={false}
-                />
-              </div>
-            ))}
-          </div>
-        ) : (
-          <EmptyState
-            title="No related outfits yet"
-            description="This piece is saved in the wardrobe, but it is not linked to any outfit memories yet."
-          />
-        )}
-      </section>
 
       <PieceEditModal
         item={item}
@@ -535,4 +624,3 @@ export default function PieceDetail() {
     </main>
   );
 }
-

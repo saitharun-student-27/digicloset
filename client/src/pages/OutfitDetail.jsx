@@ -3,7 +3,6 @@ import {
   CalendarDays,
   CheckCircle2,
   Heart,
-  Layers3,
   Pencil,
   Shirt,
   Sparkles,
@@ -21,6 +20,7 @@ import { formatValue } from "../utils/outfitUtils";
 import {
   formatCategoryLabel,
   formatColorLabel,
+  formatFormalityLabel,
   formatOccasionLabel,
   formatSeasonLabel,
   formatStyleLabel,
@@ -77,57 +77,16 @@ function groupPiecesBySection(outfitItems) {
   return base;
 }
 
-function MemorySurface({ outfit }) {
-  const imageUrl = getImageUrl(outfit.image_url);
-  const outfitItems = outfit.outfit_items || [];
+function getOutfitHeroImage(outfit) {
+  if (outfit?.image_url) {
+    return getImageUrl(outfit.image_url);
+  }
 
-  return (
-    <section className="overflow-hidden rounded-[2rem] border border-black/5 bg-white shadow-soft">
-      <div className="aspect-[4/5] min-h-[17rem] bg-[linear-gradient(135deg,#eee6d9_0%,#f8f5ee_100%)] p-3 sm:aspect-[5/4] sm:min-h-[20rem]">
-        <div className="relative h-full overflow-hidden rounded-[1.5rem]">
-          {imageUrl ? (
-            <img
-              src={imageUrl}
-              alt={outfit.title}
-              className="h-full w-full object-cover"
-            />
-          ) : (
-            <div className="flex h-full items-center justify-center rounded-[1.5rem] bg-white/60 text-stone">
-              <div className="relative mx-4 flex h-[220px] w-full max-w-[20rem] items-center justify-center rounded-[1.35rem] border border-white/70 bg-white/55 shadow-inner backdrop-blur-md">
-                {outfitItems.length > 0 ? (
-                  outfitItems.slice(0, 4).map((item, index) => (
-                    <div
-                      key={item.id}
-                      className="absolute inset-4 flex items-center justify-center opacity-80"
-                      style={{
-                        transform: `rotate(${index * 4 - 6}deg) translateY(${index * 8}px)`,
-                      }}
-                    >
-                      {item.clothing_item?.image_url ? (
-                        <img
-                          src={getImageUrl(item.clothing_item.image_url)}
-                          alt={item.clothing_item.name}
-                          className="h-24 w-24 object-contain mix-blend-multiply"
-                        />
-                      ) : (
-                        <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-white text-sage shadow-soft">
-                          <Shirt className="h-8 w-8" />
-                        </div>
-                      )}
-                    </div>
-                  ))
-                ) : (
-                  <div className="flex h-24 w-24 items-center justify-center rounded-full bg-white text-sage shadow-soft">
-                    <Sparkles className="h-10 w-10" />
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-    </section>
+  const linkedImage = (outfit?.outfit_items || []).find(
+    (item) => item?.clothing_item?.image_url,
   );
+
+  return linkedImage ? getImageUrl(linkedImage.clothing_item.image_url) : "";
 }
 
 function ActionButton({
@@ -140,21 +99,115 @@ function ActionButton({
 }) {
   const toneClass =
     tone === "danger"
-      ? "bg-white text-red-600 hover:bg-red-50"
+      ? "border-red-100 bg-white text-red-600 hover:bg-red-50"
       : active
-        ? "bg-charcoal text-ivory hover:bg-softblack"
-        : "bg-ivory text-charcoal hover:bg-linen";
+        ? "border-transparent bg-charcoal text-ivory hover:bg-black"
+        : "border-black/8 bg-white text-charcoal hover:bg-ivory";
 
   return (
     <button
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className={`inline-flex h-11 min-h-[var(--touch-target-min)] items-center justify-center gap-2 rounded-full px-4 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-60 ${toneClass}`}
+      className={`inline-flex min-h-[var(--touch-target-min)] items-center justify-center gap-2 rounded-full border px-4 py-2.5 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-60 ${toneClass}`}
     >
       <Icon className={`h-4 w-4 ${active ? "fill-current" : ""}`} />
       {label}
     </button>
+  );
+}
+
+function OutfitHero({ outfit }) {
+  const imageUrl = getOutfitHeroImage(outfit);
+  const outfitItems = outfit.outfit_items || [];
+
+  return (
+    <section className="section-surface overflow-hidden p-3 sm:p-4">
+      <div className="overflow-hidden rounded-[2rem] bg-[linear-gradient(135deg,#f8f4eb_0%,#fdfbf7_100%)]">
+        <div className="relative aspect-[4/5] min-h-[19rem] overflow-hidden sm:min-h-[24rem] lg:min-h-[28rem]">
+          {imageUrl ? (
+            <img
+              src={imageUrl}
+              alt={outfit.title}
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            <div className="flex h-full items-center justify-center bg-[linear-gradient(135deg,#efe6d8_0%,#faf7f1_100%)] p-6">
+              <div className="relative flex h-full w-full max-w-[26rem] items-center justify-center overflow-hidden rounded-[1.8rem] border border-white/70 bg-white/58 shadow-inner backdrop-blur-md">
+                {outfitItems.length > 0 ? (
+                  outfitItems.slice(0, 4).map((item, index) => (
+                    <div
+                      key={item.id}
+                      className="absolute inset-6 flex items-center justify-center opacity-80"
+                      style={{
+                        transform: `rotate(${index * 4 - 6}deg) translateY(${index * 10}px)`,
+                      }}
+                    >
+                      {item.clothing_item?.image_url ? (
+                        <img
+                          src={getImageUrl(item.clothing_item.image_url)}
+                          alt={item.clothing_item.name}
+                          className="h-28 w-28 object-contain mix-blend-multiply sm:h-32 sm:w-32"
+                        />
+                      ) : (
+                        <div className="flex h-24 w-24 items-center justify-center rounded-[1.6rem] bg-white text-sage shadow-soft">
+                          <Shirt className="h-10 w-10" />
+                        </div>
+                      )}
+                    </div>
+                  ))
+                ) : (
+                  <div className="flex h-24 w-24 items-center justify-center rounded-full bg-white text-sage shadow-soft sm:h-28 sm:w-28">
+                    <Sparkles className="h-10 w-10" />
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          <div className="absolute left-4 top-4 rounded-full bg-white/88 px-3 py-1 text-[11px] font-medium tracking-[0.16em] text-charcoal shadow-soft backdrop-blur sm:left-5 sm:top-5">
+            Saved look
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function PieceLinkCard({ piece }) {
+  const pieceImage = getImageUrl(piece?.image_url);
+
+  return (
+    <Link
+      to={`/pieces/${piece?.id}`}
+      className="block rounded-[1.5rem] bg-white/92 p-2.5 transition hover:-translate-y-0.5 hover:shadow-soft focus:outline-none focus-visible:ring-4 focus-visible:ring-sage/20"
+    >
+      <div className="aspect-square overflow-hidden rounded-[1.15rem] bg-[linear-gradient(135deg,#f4efe6_0%,#fbf8f2_100%)]">
+        {pieceImage ? (
+          <img
+            src={pieceImage}
+            alt={piece?.name}
+            className="h-full w-full object-cover"
+          />
+        ) : (
+          <div className="flex h-full items-center justify-center">
+            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-white text-sage shadow-soft">
+              <Shirt className="h-6 w-6" />
+            </div>
+          </div>
+        )}
+      </div>
+      <div className="px-1 pb-1 pt-3">
+        <p className="line-clamp-1 text-sm font-medium text-charcoal">
+          {piece?.name}
+        </p>
+        <p className="mt-1 line-clamp-2 text-xs leading-5 text-stone">
+          {[formatColorLabel(piece?.color), formatCategoryLabel(piece?.category)]
+            .filter(Boolean)
+            .join(" · ")}
+        </p>
+      </div>
+    </Link>
   );
 }
 
@@ -309,11 +362,16 @@ export default function OutfitDetail() {
 
   if (isLoading) {
     return (
-      <main className="page-shell max-w-5xl">
+      <main className="page-shell max-w-[56rem]">
         <section className="section-surface p-5 sm:p-6">
-          <p className="text-sm font-medium text-stone">
-            Finding this outfit memory...
-          </p>
+          <div className="mx-auto max-w-lg py-8 text-center sm:py-10">
+            <p className="font-serif text-2xl text-charcoal">
+              Finding this outfit memory
+            </p>
+            <p className="mt-2 text-sm leading-6 text-stone">
+              Pulling the saved look, pieces, and context back into view.
+            </p>
+          </div>
         </section>
       </main>
     );
@@ -321,7 +379,7 @@ export default function OutfitDetail() {
 
   if (loadError === "This saved look could not be found.") {
     return (
-      <main className="page-shell max-w-5xl">
+      <main className="page-shell max-w-[56rem]">
         <EmptyState
           title="This saved look could not be found."
           description="The outfit memory may have been removed, or the link may no longer be valid."
@@ -332,7 +390,7 @@ export default function OutfitDetail() {
 
   if (!outfit && outfitsError) {
     return (
-      <main className="page-shell max-w-5xl">
+      <main className="page-shell max-w-[56rem]">
         <ErrorState
           title="We could not load this outfit right now."
           message={outfitsError}
@@ -353,7 +411,7 @@ export default function OutfitDetail() {
 
   if (!outfit && loadError) {
     return (
-      <main className="page-shell max-w-5xl">
+      <main className="page-shell max-w-[56rem]">
         <ErrorState
           title="We could not load this outfit right now."
           message={loadError}
@@ -374,7 +432,7 @@ export default function OutfitDetail() {
 
   if (!outfit) {
     return (
-      <main className="page-shell max-w-5xl">
+      <main className="page-shell max-w-[56rem]">
         <EmptyState
           title="This saved look could not be found."
           description="The outfit memory may have been removed, or the link may no longer be valid."
@@ -383,74 +441,125 @@ export default function OutfitDetail() {
     );
   }
 
+  const memoryDetails = [
+    { label: "Season", value: formatSeasonLabel(outfit.season || "all") },
+    { label: "Occasion", value: formatOccasionLabel(outfit.occasion || "casual") },
+    { label: "Style", value: outfit.style ? formatStyleLabel(outfit.style) : null },
+    {
+      label: "Formality",
+      value: outfit.formality_level
+        ? formatFormalityLabel(outfit.formality_level)
+        : null,
+    },
+  ].filter((entry) => entry.value);
+
   return (
-    <main className="page-shell max-w-5xl">
+    <main className="page-shell max-w-[56rem]">
       {actionError ? (
-        <div className="mb-6">
+        <div className="mb-5 sm:mb-6">
           <ErrorState title="That action did not stick" message={actionError} />
         </div>
       ) : null}
 
-      <button
-        type="button"
-        onClick={handleBack}
-        className="inline-flex h-10 min-h-[var(--touch-target-min)] items-center gap-2 text-sm font-medium text-stone transition hover:text-charcoal"
-      >
-        <ArrowLeft className="h-4 w-4" />
-        Back
-      </button>
-
-      <section className="mt-5 grid gap-5 lg:grid-cols-[0.95fr_1.05fr] lg:gap-8">
-        <MemorySurface outfit={outfit} />
-
-        <div className="space-y-5">
-          <section className="rounded-[2rem] border border-black/5 bg-white p-5 shadow-soft sm:p-6">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone">
-              Saved look
-            </p>
-            <h1 className="mt-2 text-[2rem] font-semibold leading-tight text-charcoal sm:text-[2.3rem]">
-              {outfit.title}
-            </h1>
-            <p className="mt-3 text-sm leading-6 text-stone">
-              {outfit.description || "A saved outfit memory worth coming back to."}
-            </p>
-
-            <div className="mt-5 flex flex-wrap gap-2">
-              <span className="rounded-full bg-ivory px-3 py-1 text-[11px] font-medium capitalize text-stone">
-                {formatOccasionLabel(outfit.occasion)}
-              </span>
-              <span className="rounded-full bg-ivory px-3 py-1 text-[11px] font-medium capitalize text-stone">
-                {formatSeasonLabel(outfit.season)}
-              </span>
-              {outfit.style ? (
-                <span className="rounded-full bg-ivory px-3 py-1 text-[11px] font-medium capitalize text-stone">
-                  {formatStyleLabel(outfit.style)}
-                </span>
-              ) : null}
+      <section className="section-surface overflow-hidden px-4 py-5 sm:px-5 sm:py-6">
+        <div className="relative overflow-hidden rounded-[2rem] bg-[linear-gradient(180deg,#fbf8f2_0%,#f7f1e8_100%)] px-4 py-8 sm:px-6 sm:py-10">
+          <div className="pointer-events-none absolute inset-x-[-12%] top-[-14rem] h-[19rem] rounded-b-[50%] border border-[rgba(182,144,91,0.24)] bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.95),rgba(255,255,255,0.28)_70%)]" />
+          <div className="relative flex items-start justify-between gap-3">
+            <button
+              type="button"
+              onClick={handleBack}
+              className="inline-flex h-11 min-h-[var(--touch-target-min)] w-11 min-w-[var(--touch-target-min)] items-center justify-center rounded-full bg-white/86 text-charcoal shadow-soft transition hover:bg-white"
+              aria-label="Go back"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </button>
+            <div className="min-w-0 flex-1 text-center">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-stone">
+                Outfit Memory
+              </p>
+              <h1 className="mt-3 font-serif text-[2.25rem] leading-none text-charcoal sm:text-[2.8rem]">
+                {outfit.title}
+              </h1>
+              <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-stone">
+                {outfit.description ||
+                  "A saved look worth returning to when you want the day to feel familiar."}
+              </p>
             </div>
+            <div className="h-11 w-11 shrink-0" />
+          </div>
+        </div>
+      </section>
 
-            <div className="mt-6 grid gap-3 sm:grid-cols-2">
-              <div className="rounded-2xl bg-ivory p-4">
-                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-stone">
-                  Saved
-                </p>
-                <p className="mt-2 text-sm font-medium text-charcoal">
-                  {formatSavedDate(outfit.created_at)}
-                </p>
-              </div>
-              <div className="rounded-2xl bg-ivory p-4">
-                <p className="text-xs font-semibold uppercase tracking-[0.14em] text-stone">
-                  Last worn
-                </p>
-                <p className="mt-2 text-sm font-medium text-charcoal">
-                  {formatDate(outfit.last_worn_date)}
-                </p>
-              </div>
-            </div>
-          </section>
+      <div className="mt-5 space-y-5 sm:mt-7 sm:space-y-7">
+        <section className="section-surface overflow-hidden p-3 sm:p-4">
+          <div className="grid gap-4 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
+            <OutfitHero outfit={outfit} />
 
-          <section className="rounded-[2rem] border border-black/5 bg-white p-5 shadow-soft sm:p-6">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone">
+            <section className="section-surface overflow-hidden p-5 sm:p-6">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-stone">
+                Saved look
+              </p>
+              <h2 className="mt-3 font-serif text-[2rem] leading-tight text-charcoal sm:text-[2.35rem]">
+                {outfit.title}
+              </h2>
+              <p className="mt-4 text-sm leading-6 text-stone">
+                {outfit.description ||
+                  "Pulled from your wardrobe memory with the pieces and context that still make it worth returning to."}
+              </p>
+
+              <div className="mt-5 flex flex-wrap gap-2">
+                {memoryDetails.map((detail) => (
+                  <span
+                    key={detail.label}
+                    className="rounded-full bg-ivory px-3 py-1.5 text-[11px] font-medium text-stone"
+                  >
+                    {detail.value}
+                  </span>
+                ))}
+              </div>
+
+              <div className="mt-6 grid gap-3 sm:grid-cols-2">
+                <div className="rounded-[1.5rem] bg-ivory p-4">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-stone">
+                    Saved
+                  </p>
+                  <p className="mt-2 text-sm font-medium text-charcoal">
+                    {formatSavedDate(outfit.created_at)}
+                  </p>
+                </div>
+                <div className="rounded-[1.5rem] bg-ivory p-4">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-stone">
+                    Last worn
+                  </p>
+                  <p className="mt-2 text-sm font-medium text-charcoal">
+                    {formatDate(outfit.last_worn_date)}
+                  </p>
+                </div>
+                <div className="rounded-[1.5rem] bg-ivory p-4">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-stone">
+                    Source
+                  </p>
+                  <p className="mt-2 text-sm font-medium text-charcoal">
+                    {formatValue(outfit.source_type || "saved")}
+                  </p>
+                </div>
+                <div className="rounded-[1.5rem] bg-ivory p-4">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-stone">
+                    Piece count
+                  </p>
+                  <p className="mt-2 text-sm font-medium text-charcoal">
+                    {(outfit.outfit_items || []).length} piece
+                    {(outfit.outfit_items || []).length === 1 ? "" : "s"}
+                  </p>
+                </div>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <section className="section-surface overflow-hidden p-4 sm:p-5">
+          <div className="rounded-[1.75rem] border border-black/5 bg-[linear-gradient(180deg,#fbf8f2_0%,#f7f1e8_100%)] p-4 sm:p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-stone">
               Actions
             </p>
             <div className="mt-4 flex flex-wrap gap-3">
@@ -481,124 +590,45 @@ export default function OutfitDetail() {
                 tone="danger"
               />
             </div>
-          </section>
-        </div>
-      </section>
+          </div>
+        </section>
 
-      <section className="mt-8 rounded-[2rem] border border-black/5 bg-white p-5 shadow-soft sm:mt-10 sm:p-6">
-        <div className="mb-5">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone">
-            Piece breakdown
-          </p>
-          <h2 className="mt-2 text-2xl font-semibold text-charcoal">
-            Built from these wardrobe pieces
-          </h2>
-        </div>
-
-        <div className="space-y-5">
-          {Object.entries(groupedPieces).map(([section, items]) =>
-            items.length > 0 ? (
-              <div key={section}>
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone">
-                  {section}
-                </p>
-                <div className="mt-3 grid gap-3 sm:grid-cols-2">
-                  {items.map((item) => {
-                    const piece = item.clothing_item;
-                    const pieceImage = getImageUrl(piece?.image_url);
-
-                    return (
-                      <Link
-                        key={item.id}
-                        to={`/pieces/${piece?.id}`}
-                        className="flex items-center gap-3 rounded-[1.5rem] bg-ivory p-3 transition hover:bg-linen focus:outline-none focus-visible:ring-4 focus-visible:ring-sage/20"
-                      >
-                        <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-2xl bg-white">
-                          {pieceImage ? (
-                            <img
-                              src={pieceImage}
-                              alt={piece?.name}
-                              className="h-full w-full object-cover"
-                            />
-                          ) : (
-                            <Shirt className="h-6 w-6 text-sage" />
-                          )}
-                        </div>
-                        <div className="min-w-0">
-                          <p className="text-sm font-medium text-charcoal">
-                            {piece?.name}
-                          </p>
-                          <p className="mt-1 text-xs capitalize leading-5 text-stone">
-                            {[formatColorLabel(piece?.color), formatCategoryLabel(piece?.category)]
-                              .filter(Boolean)
-                              .join(" · ")}
-                          </p>
-                        </div>
-                      </Link>
-                    );
-                  })}
-                </div>
-              </div>
-            ) : null,
-          )}
-        </div>
-      </section>
-
-      <section className="mt-8 rounded-[2rem] border border-black/5 bg-white p-5 shadow-soft sm:mt-10 sm:p-6">
-        <div className="mb-5">
-          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone">
-            Memory context
-          </p>
-          <h2 className="mt-2 text-2xl font-semibold text-charcoal">
-            Context that still matters
-          </h2>
-        </div>
-
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {[
-            {
-              label: "Occasion",
-              value: formatOccasionLabel(outfit.occasion),
-              icon: Layers3,
-            },
-            {
-              label: "Season",
-              value: formatSeasonLabel(outfit.season),
-              icon: CalendarDays,
-            },
-            {
-              label: "Style",
-              value: outfit.style ? formatStyleLabel(outfit.style) : "Not set",
-              icon: Sparkles,
-            },
-            {
-              label: "Source",
-              value: formatValue(outfit.source_type || "saved"),
-              icon: Sparkles,
-            },
-            {
-              label: "Saved on",
-              value: formatSavedDate(outfit.created_at),
-              icon: CalendarDays,
-            },
-            {
-              label: "Wear status",
-              value: outfit.last_worn_date
-                ? `Last worn ${formatDate(outfit.last_worn_date)}`
-                : "Not marked worn yet",
-              icon: CheckCircle2,
-            },
-          ].map(({ label, value, icon: Icon }) => (
-            <div key={label} className="rounded-2xl bg-ivory p-4">
-              <Icon className="h-4 w-4 text-sage" />
-              <p className="mt-2 text-xs font-semibold uppercase tracking-[0.14em] text-stone">
-                {label}
+        <section className="section-surface overflow-hidden p-4 sm:p-5">
+          <div className="mb-5 flex items-end justify-between gap-4">
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-stone">
+                Pieces in this outfit
               </p>
-              <p className="mt-2 text-sm font-medium text-charcoal">{value}</p>
+              <h2 className="mt-2 font-serif text-[1.85rem] leading-none text-charcoal">
+                Built from your wardrobe
+              </h2>
             </div>
-          ))}
-        </div>
-      </section>
+            <span className="rounded-full bg-ivory px-3 py-1.5 text-xs font-medium text-stone">
+              {(outfit.outfit_items || []).length} saved
+            </span>
+          </div>
+
+          <div className="space-y-6">
+            {Object.entries(groupedPieces).map(([section, items]) =>
+              items.length > 0 ? (
+                <div key={section}>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-stone">
+                    {section}
+                  </p>
+                  <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+                    {items.map((item) => (
+                      <PieceLinkCard
+                        key={item.id}
+                        piece={item.clothing_item || { id: item.clothing_item_id }}
+                      />
+                    ))}
+                  </div>
+                </div>
+              ) : null,
+            )}
+          </div>
+        </section>
+      </div>
 
       <OutfitEditModal
         outfit={editingOutfit}

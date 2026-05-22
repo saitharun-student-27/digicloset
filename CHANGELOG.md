@@ -4,6 +4,80 @@ All notable changes to DigiCloset are documented here in chronological order.
 
 This changelog tracks the product from the original full-stack scaffold to the current outfit-memory-first, mobile-first wardrobe experience.
 
+## 2026-05-22 - Refresh Outfit Detail and Piece Detail into calmer editorial layouts
+
+Commit: latest Phase 3G.6 checkpoint on `main`
+
+### Phase 3G.6 scope
+
+- refreshed only:
+  - Outfit Detail
+  - Piece Detail
+- kept detail-page functionality intact:
+  - favorite / unfavorite
+  - mark worn
+  - edit
+  - delete
+  - linked navigation between outfits and pieces
+- moved both pages closer to the generated mobile editorial references
+
+### What was corrected
+
+- replaced the more utility-like detail layouts with calmer editorial structure
+- made hero imagery carry more of the emotional weight on both pages
+- softened metadata presentation so it reads less like fields and more like memory context
+- kept the pages centered and app-like on desktop instead of widening into dashboard-style layouts
+
+### Outfit Detail refresh
+
+- added a calmer editorial header for saved looks
+- strengthened the hero image treatment with a fuller image-first surface
+- refined metadata into softer pills and quieter grouped context cards
+- kept the action row compact and calm for:
+  - favorite
+  - mark worn
+  - edit
+  - delete
+- refined “Pieces in this outfit” into a more image-led linked section
+
+### Piece Detail refresh
+
+- added a calmer editorial header for wardrobe pieces
+- strengthened the main piece image treatment
+- refined piece metadata into softer grouped rhythm with cleaner taxonomy labels
+- kept edit and remove actions clear without making them feel like utility controls
+- refined related outfit memories into a calmer linked rail
+
+### Verification
+
+- frontend production build passed
+- browser verification passed for:
+  - dev-user outfit detail load
+  - favorite / unfavorite from outfit detail
+  - mark worn from outfit detail
+  - outfit edit modal opening
+  - linked piece navigation from outfit detail
+  - dev-user piece detail load
+  - piece edit modal opening
+  - linked outfit navigation from piece detail
+  - safe delete verification using:
+    - one temporary outfit
+    - one temporary standalone piece
+  - new-user cross-user access checks returning not found
+  - viewport checks at:
+    - `360 x 800`
+    - `390 x 844`
+    - `414 x 896`
+    - desktop
+- reference screenshot comparison was performed against:
+  - `references/app-theme/05-outfit-detail-reference.png`
+  - `references/app-theme/06-piece-detail-reference.png`
+
+### Important boundary
+
+- no backend, auth, provider, or route logic changed
+- no other page was redesigned in this phase
+
 ## 2026-05-22 - Refresh Suggestions into a calmer editorial wardrobe page
 
 Commit: latest Phase 3G.5 checkpoint on `main`
