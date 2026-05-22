@@ -4,6 +4,69 @@ All notable changes to DigiCloset are documented here in chronological order.
 
 This changelog tracks the product from the original full-stack scaffold to the current outfit-memory-first, mobile-first wardrobe experience.
 
+## 2026-05-22 - Refresh Suggestions into a calmer editorial wardrobe page
+
+Commit: latest Phase 3G.5 checkpoint on `main`
+
+### Phase 3G.5 scope
+
+- refreshed only the Suggestions page visuals
+- kept deterministic suggestion behavior intact
+- kept suggestion actions intact:
+  - favorite / unfavorite
+  - mark worn
+  - edit
+  - delete
+- moved the page closer to the generated mobile editorial reference
+
+### What was corrected
+
+- replaced the old stacked rail-first layout with a clearer editorial hierarchy
+- added a centered DigiCloset / Suggestions header
+- promoted one stronger `For today` suggestion into the page's main visual moment
+- softened the surrounding sections so the page reads as curated wardrobe guidance instead of a dashboard
+
+### Suggestions structure refresh
+
+- added one stronger feature outfit card with:
+  - larger image treatment
+  - calmer explanation copy
+  - softer metadata pills
+  - preserved outfit actions and detail navigation
+- compressed weather support into a smaller wear-support strip
+- refined secondary sections into calmer editorial rails for:
+  - Occasion ideas
+  - Seasonal rotation
+  - Favorite combinations
+  - Recently worn
+  - Pieces you already use
+- removed fake AI or over-claimed recommendation language
+
+### Verification
+
+- frontend production build passed
+- browser verification passed for:
+  - dev-user login
+  - Suggestions page load
+  - `View Outfit` navigation
+  - favorite / unfavorite from the feature card
+  - mark worn from the feature card
+  - edit modal opening from Suggestions
+  - navigation away from and back to Suggestions
+  - new-user private empty Suggestions state
+  - viewport checks at:
+    - `360 x 800`
+    - `390 x 844`
+    - `414 x 896`
+    - desktop
+- reference screenshot comparison was performed against:
+  - `references/app-theme/04-suggestions-reference.png`
+
+### Important boundary
+
+- no backend, auth, provider, or route logic changed
+- no other page was redesigned in this phase
+
 ## 2026-05-20 - Move Wardrobe filters behind a compact Filter button
 
 Commit: latest Phase 3G.3C checkpoint on `main`

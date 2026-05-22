@@ -65,6 +65,11 @@ DigiCloset currently includes:
   - stronger reuse-from-wardrobe treatment
   - softer selected-piece and create-new-piece sections
   - anchored black pill save CTA
+- refreshed Suggestions into a calmer editorial resurfacing page with:
+  - centered DigiCloset / Suggestions header
+  - one stronger `For today` feature card
+  - softer wear-support strip
+  - calmer secondary suggestion rails
 - shared client-side wardrobe data layer for outfits and clothing
 - outfit lifecycle actions:
   - favorite / unfavorite
@@ -243,14 +248,22 @@ Suggestions is the quieter resurfacing page, not a second Home.
 
 It can surface:
 
-- Useful for today
-- Favorite Fits
-- Recently Worn
-- Seasonal Rotation
-- Quiet Rediscovery
-- Most Reused Pieces
+- one stronger `For today` outfit moment
+- Occasion ideas
+- Favorite combinations
+- Seasonal rotation
+- Recently worn
+- pieces you already use
 
 These sections are deterministic and based on real data only.
+
+The current Suggestions visual direction also pushes the page toward:
+
+- a centered editorial header
+- one image-led feature card instead of a stack of equal-weight rails
+- calmer language with no fake AI framing
+- softer supporting rails for rotation, favorites, and reuse
+- a mobile-app feeling on desktop instead of a recommendation dashboard
 
 ### Piece Detail
 
@@ -368,6 +381,7 @@ Completed visual refresh phases:
 - `3G.3B` Wardrobe correction toward the reference structure
 - `3G.3C` Wardrobe filter button + compact filter sheet correction
 - `3G.4` Outfit Memory / Capture visual refresh
+- `3G.5` Suggestions visual refresh
 
 ## Repository Structure
 
@@ -589,6 +603,7 @@ Oversize message:
 - a corrected Wardrobe control area that now stays compact and avoids chip overlap or duplicate filter clutter
 - a compact Wardrobe filter-button flow that lets content appear much sooner without losing filtering power
 - a calmer Capture page that now feels more like saving an outfit memory than filling out a utility form
+- a calmer Suggestions page that now feels more curated and editorial instead of reading like a stacked dashboard of rails
 
 ## Honest Current Gaps
 
@@ -605,7 +620,7 @@ The biggest remaining product-quality gap is now hosted-readiness planning plus 
 
 The highest-impact next refinement would be:
 
-- Phase `3G.5`: Suggestions visual refresh, now that the shell, Home, Wardrobe, and Capture are aligned more closely with the editorial mobile visual system
+- Phase `3G.6`: Outfit Detail + Piece Detail visual refresh, now that the shell, Home, Wardrobe, Capture, and Suggestions are aligned more closely with the editorial mobile visual system
 
 ## Documentation Maintenance
 
