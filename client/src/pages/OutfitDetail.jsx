@@ -362,7 +362,7 @@ export default function OutfitDetail() {
 
   if (isLoading) {
     return (
-      <main className="page-shell max-w-[56rem]">
+      <main className="page-shell max-w-[50rem]">
         <section className="section-surface p-5 sm:p-6">
           <div className="mx-auto max-w-lg py-8 text-center sm:py-10">
             <p className="font-serif text-2xl text-charcoal">
@@ -379,7 +379,7 @@ export default function OutfitDetail() {
 
   if (loadError === "This saved look could not be found.") {
     return (
-      <main className="page-shell max-w-[56rem]">
+      <main className="page-shell max-w-[50rem]">
         <EmptyState
           title="This saved look could not be found."
           description="The outfit memory may have been removed, or the link may no longer be valid."
@@ -390,7 +390,7 @@ export default function OutfitDetail() {
 
   if (!outfit && outfitsError) {
     return (
-      <main className="page-shell max-w-[56rem]">
+      <main className="page-shell max-w-[50rem]">
         <ErrorState
           title="We could not load this outfit right now."
           message={outfitsError}
@@ -411,7 +411,7 @@ export default function OutfitDetail() {
 
   if (!outfit && loadError) {
     return (
-      <main className="page-shell max-w-[56rem]">
+      <main className="page-shell max-w-[50rem]">
         <ErrorState
           title="We could not load this outfit right now."
           message={loadError}
@@ -432,7 +432,7 @@ export default function OutfitDetail() {
 
   if (!outfit) {
     return (
-      <main className="page-shell max-w-[56rem]">
+      <main className="page-shell max-w-[50rem]">
         <EmptyState
           title="This saved look could not be found."
           description="The outfit memory may have been removed, or the link may no longer be valid."
@@ -454,7 +454,7 @@ export default function OutfitDetail() {
   ].filter((entry) => entry.value);
 
   return (
-    <main className="page-shell max-w-[56rem]">
+    <main className="page-shell max-w-[50rem]">
       {actionError ? (
         <div className="mb-5 sm:mb-6">
           <ErrorState title="That action did not stick" message={actionError} />

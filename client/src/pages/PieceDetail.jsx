@@ -392,7 +392,7 @@ export default function PieceDetail() {
 
   if (loadError || !item) {
     return (
-      <main className="page-shell max-w-[56rem]">
+      <main className="page-shell max-w-[50rem]">
         {loadError ? (
           <EmptyState title="Piece not available" description={loadError} />
         ) : (
@@ -426,7 +426,7 @@ export default function PieceDetail() {
   ].filter((entry) => entry.value);
 
   return (
-    <main className="page-shell max-w-[56rem]">
+    <main className="page-shell max-w-[50rem]">
       {actionError ? (
         <div className="mb-5 sm:mb-6">
           <ErrorState

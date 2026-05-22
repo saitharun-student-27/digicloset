@@ -1009,7 +1009,7 @@ export default function Home() {
       : "Saved outfits, weather support, and quiet reminders from your closet.";
 
   return (
-    <main className="page-shell max-w-[56rem]">
+    <main className="page-shell max-w-[50rem]">
       <HomeEditorialHeader />
 
       {error ? (
@@ -1038,7 +1038,7 @@ export default function Home() {
       ) : null}
 
       {!isLoading && !error ? (
-        <div className="mx-auto mt-4 w-full max-w-[54rem] space-y-4 sm:mt-5 sm:space-y-5">
+        <div className="mx-auto mt-4 w-full max-w-[48rem] space-y-4 sm:mt-5 sm:space-y-5">
           <HeroOutfitCard
             outfit={todaysFit}
             weatherLabel={weatherLabel}

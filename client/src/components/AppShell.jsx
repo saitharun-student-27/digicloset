@@ -49,12 +49,12 @@ export default function AppShell({ children }) {
   return (
     <div className="app-canvas relative min-h-[100vh] min-h-[100dvh] overflow-x-hidden pb-[var(--bottom-dock-clearance)] text-charcoal">
       <div className="pointer-events-none absolute inset-x-0 top-0 z-0 flex justify-center">
-        <div className="shell-curve h-[15.5rem] w-[min(100%,72rem)]" />
+        <div className="shell-curve h-[15.5rem] w-[min(100%,calc(var(--app-canvas-max)+4rem))]" />
       </div>
 
       <div className="relative z-10">
         <div className="sticky top-0 z-40 px-3 pt-[max(0.75rem,env(safe-area-inset-top))] sm:px-4">
-          <div className="mx-auto max-w-6xl">
+          <div className="app-frame">
             <div className="shell-header">
               <div className="shell-brand">
                 <div className="shell-brand-mark" aria-hidden="true">
@@ -90,11 +90,14 @@ export default function AppShell({ children }) {
           </div>
         </div>
 
-        {children}
+        <div className="app-frame">
+          {children}
+        </div>
       </div>
 
       <div className="pointer-events-none fixed bottom-[max(0.75rem,env(safe-area-inset-bottom))] left-0 right-0 z-50 flex justify-center px-3 sm:px-4">
-        <nav className="shell-dock pointer-events-auto" aria-label="Primary">
+        <div className="app-frame flex justify-center">
+          <nav className="shell-dock pointer-events-auto" aria-label="Primary">
           {navigationItems.map(({ to, label, icon: Icon }) => (
             <NavLink
               key={to}
@@ -115,7 +118,8 @@ export default function AppShell({ children }) {
               </span>
             </NavLink>
           ))}
-        </nav>
+          </nav>
+        </div>
       </div>
     </div>
   );

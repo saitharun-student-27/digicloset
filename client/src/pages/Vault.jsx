@@ -658,7 +658,7 @@ export default function Vault() {
   }
 
   return (
-    <main className="page-shell max-w-[54rem]">
+    <main className="page-shell max-w-[50rem]">
       {loadError ? (
         <div className="mb-6">
           <ErrorState

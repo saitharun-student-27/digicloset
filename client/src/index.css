@@ -13,6 +13,7 @@
   --section-gap-tablet: 22px;
   --bottom-dock-clearance: calc(96px + env(safe-area-inset-bottom));
   --touch-target-min: 44px;
+  --app-canvas-max: 50rem;
   --outfit-rail-card-width: clamp(244px, 74vw, 296px);
   --piece-rail-card-width: clamp(146px, 41vw, 188px);
 }
@@ -53,6 +54,11 @@ button {
     background:
       radial-gradient(circle at top, rgba(255, 255, 255, 0.76), transparent 26rem),
       linear-gradient(180deg, #f6f1e8 0%, #f8f5ee 18%, #f5efe6 100%);
+  }
+
+  .app-frame {
+    @apply mx-auto w-full;
+    max-width: var(--app-canvas-max);
   }
 
   .shell-curve {
@@ -112,7 +118,8 @@ button {
   }
 
   .page-shell {
-    @apply mx-auto w-full max-w-6xl;
+    @apply mx-auto w-full;
+    max-width: var(--app-canvas-max);
     padding-inline: var(--page-padding-mobile);
     padding-block: 1rem;
   }

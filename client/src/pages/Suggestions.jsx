@@ -609,7 +609,7 @@ export default function Suggestions() {
 
   if (isLoading) {
     return (
-      <main className="page-shell max-w-[56rem]">
+      <main className="page-shell max-w-[50rem]">
         <section className="section-surface overflow-hidden p-4 sm:p-5">
           <div className="mx-auto max-w-xl py-12 text-center sm:py-16">
             <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-ivory text-brass shadow-soft">
@@ -628,7 +628,7 @@ export default function Suggestions() {
   }
 
   return (
-    <main className="page-shell max-w-[56rem]">
+    <main className="page-shell max-w-[50rem]">
       <section className="section-surface overflow-hidden px-4 py-4 sm:px-5 sm:py-5">
         <div className="relative overflow-hidden rounded-[2rem] bg-[linear-gradient(180deg,#fbf8f2_0%,#f7f1e8_100%)] px-4 py-7 sm:px-6 sm:py-8">
           <div className="pointer-events-none absolute inset-x-[-12%] top-[-14rem] h-[17rem] rounded-b-[50%] border border-[rgba(182,144,91,0.24)] bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.95),rgba(255,255,255,0.28)_70%)]" />

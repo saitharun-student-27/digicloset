@@ -80,6 +80,10 @@ DigiCloset currently includes:
   - calmer but denser mobile spacing
   - safer bottom-dock clearance
   - more consistent app-like desktop framing
+- centered protected-app canvas correction with:
+  - shared desktop max width around `800px`
+  - header, pages, and dock aligned to one app canvas
+  - less full-width website stretch on larger screens
 - shared client-side wardrobe data layer for outfits and clothing
 - outfit lifecycle actions:
   - favorite / unfavorite
@@ -395,6 +399,7 @@ Current visual refresh roadmap:
 - `3G.5` Suggestions visual refresh
 - `3G.6` Outfit Detail + Piece Detail visual refresh
 - `3G.7` final mobile visual QA
+- `3G.7A` centered app-canvas correction
 
 Completed visual refresh phases:
 
@@ -409,6 +414,7 @@ Completed visual refresh phases:
 - `3G.5` Suggestions visual refresh
 - `3G.6` Outfit Detail + Piece Detail visual refresh
 - `3G.7` final mobile visual QA + space-efficiency polish
+- `3G.7A` balanced app-canvas frame correction
 
 ## Repository Structure
 
@@ -633,6 +639,7 @@ Oversize message:
 - a calmer Suggestions page that now feels more curated and editorial instead of reading like a stacked dashboard of rails
 - calmer Outfit Detail and Piece Detail pages that now feel more like wardrobe memories than utility detail screens
 - tighter cross-page spacing and card sizing so the app reads more like a mobile app than a stretched website
+- a centered protected-app canvas so the refreshed shell and pages feel like one mobile-first app instead of full-width website sections
 
 ## Honest Current Gaps
 
@@ -649,7 +656,7 @@ The biggest remaining product-quality gap is now hosted-readiness planning plus 
 
 The highest-impact next refinement would be:
 
-- refreshing the stored docs screenshots so the repository visuals match the fully polished 3G.7 app state
+- refreshing the stored docs screenshots so the repository visuals match the fully polished 3G.7A app state
 
 ## Documentation Maintenance
 

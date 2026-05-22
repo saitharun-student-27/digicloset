@@ -343,7 +343,7 @@ export default function Capture() {
     "w-full rounded-[1.15rem] border border-[#e1d5c3] bg-white px-3.5 py-2.5 text-sm text-charcoal outline-none transition focus:border-charcoal/30 focus:ring-4 focus:ring-sage/10";
 
   return (
-    <main className="mx-auto w-full max-w-[54rem] px-4 py-4 sm:px-5 sm:py-5">
+    <main className="mx-auto w-full max-w-[50rem] px-4 py-4 sm:px-5 sm:py-5">
       <section className="section-surface overflow-hidden px-4 py-4 sm:px-5 sm:py-5">
         <div className="relative rounded-[2rem] border border-[#e7dccb] bg-[linear-gradient(180deg,rgba(251,248,242,0.98)_0%,rgba(247,242,234,0.95)_100%)] px-5 pb-7 pt-6 text-center shadow-soft sm:px-6">
           <div className="absolute left-1/2 top-0 h-[11rem] w-[138%] -translate-x-1/2 -translate-y-[48%] rounded-[50%] border border-[#d6c5ab] bg-[linear-gradient(180deg,rgba(255,255,255,0.9)_0%,rgba(246,239,230,0.32)_100%)]" />

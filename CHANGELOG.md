@@ -4,6 +4,77 @@ All notable changes to DigiCloset are documented here in chronological order.
 
 This changelog tracks the product from the original full-stack scaffold to the current outfit-memory-first, mobile-first wardrobe experience.
 
+## 2026-05-22 - Constrain DigiCloset to a centered mobile-first app canvas
+
+Commit: latest Phase 3G.7A checkpoint on `main`
+
+### Phase 3G.7A scope
+
+- corrected the global protected-app canvas only
+- kept all page functionality, auth, routes, and ownership logic unchanged
+- stopped the refreshed pages from reading like a full-width desktop website
+- kept the app roomy on laptop instead of forcing it into a tiny phone mockup
+
+### What was wrong before
+
+- the refreshed app pages still stretched too wide on desktop and laptop
+- the header felt browser-wide instead of app-contained
+- the bottom dock floated in the viewport, but not clearly inside the same visual canvas
+- large sections and cards looked more like website modules than app surfaces
+
+### App-canvas correction
+
+- added one shared centered app canvas for the protected experience
+- constrained the protected app to an approximately `800px` canvas width
+- kept the outer browser background warm and editorial
+- kept mobile full-width behavior unchanged
+
+### Header and dock containment
+
+- moved the AppShell header into the same centered app canvas as the page content
+- aligned the floating bottom dock with the same canvas rhythm
+- kept auth screens dock-free and separate from the protected shell
+
+### Page-width normalization
+
+- normalized width on:
+  - Home
+  - Wardrobe
+  - Outfit Memory / Capture
+  - Suggestions
+  - Outfit Detail
+  - Piece Detail
+- avoided re-redesigning the pages and only corrected width behavior where it still felt too web-like
+
+### Verification
+
+- frontend production build passed
+- browser QA passed for:
+  - public auth routes staying dock-free
+  - dev-user login
+  - centered protected-app canvas on desktop
+  - header staying inside the app canvas
+  - dock staying aligned to the app canvas
+  - viewport checks at:
+    - `360 x 800`
+    - `390 x 844`
+    - `414 x 896`
+    - desktop
+  - Home favorite / mark-worn / open-outfit flow
+  - Wardrobe search / filter button / sort / piece and outfit navigation
+  - Capture existing-piece reuse and mixed outfit creation
+  - Suggestions favorite / mark-worn / open-outfit flow
+  - Outfit Detail and Piece Detail action/navigation flow
+  - logout back to `/welcome`
+  - new-user isolation with no dev-data leak
+
+### Important boundary
+
+- no backend changes
+- no auth changes
+- no feature expansion
+- no page-level redesign reopen
+
 ## 2026-05-22 - Polish mobile visual consistency and spacing
 
 Commit: latest Phase 3G.7 checkpoint on `main`
