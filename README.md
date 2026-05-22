@@ -84,6 +84,11 @@ DigiCloset currently includes:
   - shared desktop max width around `800px`
   - header, pages, and dock aligned to one app canvas
   - less full-width website stretch on larger screens
+- auth-screen alignment with the final app canvas:
+  - welcome, login, and signup now share the same warm product family as the protected app
+  - centered public auth frame on desktop
+  - compact mobile-first form rhythm
+  - dock-free entry flow that still feels like DigiCloset
 - shared client-side wardrobe data layer for outfits and clothing
 - outfit lifecycle actions:
   - favorite / unfavorite
@@ -400,6 +405,7 @@ Current visual refresh roadmap:
 - `3G.6` Outfit Detail + Piece Detail visual refresh
 - `3G.7` final mobile visual QA
 - `3G.7A` centered app-canvas correction
+- `3G.8` auth-screen alignment with the final app canvas
 
 Completed visual refresh phases:
 
@@ -415,6 +421,7 @@ Completed visual refresh phases:
 - `3G.6` Outfit Detail + Piece Detail visual refresh
 - `3G.7` final mobile visual QA + space-efficiency polish
 - `3G.7A` balanced app-canvas frame correction
+- `3G.8` auth-screen alignment with the final app visual system
 
 ## Repository Structure
 
@@ -640,6 +647,7 @@ Oversize message:
 - calmer Outfit Detail and Piece Detail pages that now feel more like wardrobe memories than utility detail screens
 - tighter cross-page spacing and card sizing so the app reads more like a mobile app than a stretched website
 - a centered protected-app canvas so the refreshed shell and pages feel like one mobile-first app instead of full-width website sections
+- auth entry screens that now feel like the same DigiCloset product as the protected app instead of a separate auth composition
 
 ## Honest Current Gaps
 
@@ -650,7 +658,6 @@ The biggest remaining product-quality gap is now hosted-readiness planning plus 
 - some secondary derived sections could still feel fresher after mutations
 - old orphaned upload files from earlier bugs can now be detected, but are not auto-deleted by default
 - local dev access to the backfilled dev user now has a dedicated reset utility for safe frontend-auth testing
-- signup is now visually present and reachable, but the auth entry flow could still use one more tiny spacing pass if we later want even tighter parity with the reference image
 - taxonomy, metadata entry, search, and basic filtering are now much stronger, but Wardrobe still does not yet have deeper metadata-aware narrowing like occasion refinement
 - outfit creation now encourages reuse first, but it still does not surface broader duplicate-similarity suggestions beyond the current lightweight search/select flow
 

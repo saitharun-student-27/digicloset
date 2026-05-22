@@ -4,6 +4,80 @@ All notable changes to DigiCloset are documented here in chronological order.
 
 This changelog tracks the product from the original full-stack scaffold to the current outfit-memory-first, mobile-first wardrobe experience.
 
+## 2026-05-22 - Align auth screens with the final app visual system
+
+Commit: latest Phase 3G.8 checkpoint on `main`
+
+### Phase 3G.8 scope
+
+- refreshed only the public auth entry flow:
+  - `/welcome`
+  - `/login`
+  - `/signup`
+- kept auth logic, token handling, protected routes, and logout behavior unchanged
+- aligned auth visuals with the final centered protected-app canvas
+
+### What was inconsistent before
+
+- auth still felt like a slightly separate visual system from the protected app
+- the public frame was warm, but it read more like an isolated auth-card composition
+- desktop auth screens did not feel clearly related to the centered inside-app canvas
+- welcome, login, and signup were calmer than before, but not yet fully in the same product family as the final 3G pages
+
+### Auth-shell alignment
+
+- refined the shared auth shell into a calmer centered app-like public frame
+- kept mobile full-screen behavior natural
+- tightened desktop auth width into a compact but comfortable entry canvas
+- softened the top curve, lockup rhythm, icon treatment, and form spacing so the auth flow now feels like the front door to DigiCloset rather than a parallel mini-site
+
+### Welcome alignment
+
+- kept:
+  - DigiCloset identity
+  - `Your wardrobe, remembered.`
+  - `Open My Closet`
+  - `Create New Closet`
+- tightened the welcome composition so it feels more like the first app screen and less like a splash card
+- aligned CTA styling and lower-surface rhythm with the protected app's calmer editorial system
+
+### Login and signup alignment
+
+- kept login and signup forms compact and fully functional
+- tightened heading rhythm, input height, button styling, and helper/error presentation
+- preserved the tiny development helper on login without making it visually prominent
+- kept signup aligned with login without adding onboarding or new auth features
+
+### Verification
+
+- frontend production build passed
+- browser QA passed for:
+  - `/welcome`
+  - `/login`
+  - `/signup`
+  - viewport checks at:
+    - `360 x 800`
+    - `390 x 844`
+    - `414 x 896`
+    - desktop
+  - welcome -> login
+  - welcome -> signup
+  - invalid login error
+  - dev-user login
+  - refresh persistence after login
+  - logout -> `/welcome`
+  - signup for a new user
+  - duplicate-signup error
+  - new-user private empty wardrobe state
+  - no dev-data leak for a new user
+
+### Important boundary
+
+- no backend changes
+- no auth logic changes
+- no protected-page redesigns
+- no feature expansion
+
 ## 2026-05-22 - Constrain DigiCloset to a centered mobile-first app canvas
 
 Commit: latest Phase 3G.7A checkpoint on `main`

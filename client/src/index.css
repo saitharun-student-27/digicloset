@@ -56,6 +56,12 @@ button {
       linear-gradient(180deg, #f6f1e8 0%, #f8f5ee 18%, #f5efe6 100%);
   }
 
+  .auth-canvas {
+    background:
+      radial-gradient(circle at top, rgba(255, 255, 255, 0.72), transparent 24rem),
+      linear-gradient(180deg, #f4ede2 0%, #f8f5ee 20%, #f3ebdf 100%);
+  }
+
   .app-frame {
     @apply mx-auto w-full;
     max-width: var(--app-canvas-max);

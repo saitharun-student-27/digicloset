@@ -15,7 +15,7 @@ function getFriendlyAuthError(error) {
 }
 
 const inputClass =
-  "mt-2 h-[3.35rem] w-full rounded-[1.15rem] border border-black/10 bg-[#fffdf9] px-4 text-base text-charcoal outline-none transition placeholder:text-stone/60 focus:border-sage focus:ring-4 focus:ring-sage/10";
+  "mt-2 h-[3.2rem] w-full rounded-[1.1rem] border border-black/10 bg-[#fffdf9] px-4 text-base text-charcoal outline-none transition placeholder:text-stone/60 focus:border-sage focus:ring-4 focus:ring-sage/10";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -79,28 +79,28 @@ export default function Login() {
       }
     >
       {helperMessage ? (
-        <p className="rounded-[1.25rem] border border-brass/15 bg-[#f6f0e7] px-4 py-3 text-sm leading-6 text-stone">
+        <p className="rounded-[1.15rem] border border-brass/15 bg-[#f6f0e7] px-4 py-3 text-sm leading-6 text-stone">
           {helperMessage}
         </p>
       ) : null}
 
       {authError ? (
-        <p className="mt-3 rounded-[1.25rem] border border-brass/15 bg-[#f6f0e7] px-4 py-3 text-sm leading-6 text-stone">
+        <p className="mt-3 rounded-[1.15rem] border border-brass/15 bg-[#f6f0e7] px-4 py-3 text-sm leading-6 text-stone">
           {authError}
         </p>
       ) : null}
 
-      <div className="min-h-[2.75rem]">
+      <div className="min-h-[2.5rem]">
         {formError ? (
-          <p className="mt-2 rounded-[1.25rem] border border-red-100 bg-red-50 px-4 py-3 text-sm leading-6 text-red-700">
+          <p className="mt-2 rounded-[1.15rem] border border-red-100 bg-red-50 px-4 py-3 text-sm leading-6 text-red-700">
             {formError}
           </p>
         ) : null}
       </div>
 
-      <form className="mt-1 space-y-4" onSubmit={handleSubmit}>
+      <form className="mt-1 space-y-3.5" onSubmit={handleSubmit}>
         <label className="block">
-          <span className="text-[0.98rem] font-medium text-charcoal">Email</span>
+          <span className="text-[0.93rem] font-medium text-charcoal">Email</span>
           <input
             type="email"
             value={email}
@@ -113,7 +113,7 @@ export default function Login() {
         </label>
 
         <label className="block">
-          <span className="text-[0.98rem] font-medium text-charcoal">Password</span>
+          <span className="text-[0.93rem] font-medium text-charcoal">Password</span>
           <input
             type="password"
             value={password}
@@ -128,7 +128,7 @@ export default function Login() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="inline-flex h-[3.35rem] w-full items-center justify-center rounded-full bg-[#11110f] px-5 text-base font-medium text-ivory shadow-[0_18px_30px_rgba(17,17,15,0.22)] transition hover:bg-charcoal disabled:cursor-not-allowed disabled:opacity-60"
+          className="inline-flex h-[3.2rem] w-full items-center justify-center rounded-full bg-[#11110f] px-5 text-base font-medium text-ivory shadow-[0_18px_30px_rgba(17,17,15,0.2)] transition hover:bg-charcoal disabled:cursor-not-allowed disabled:opacity-60"
         >
           {isSubmitting ? "Opening..." : "Open My Closet"}
         </button>
