@@ -315,10 +315,10 @@ function WardrobeZoneSection({
 
   return (
     <section id={id} className="section-surface overflow-hidden p-3 sm:p-4">
-      <div className="grid gap-4 rounded-[1.85rem] border border-[#e6dac7] bg-[linear-gradient(180deg,rgba(255,255,255,0.96)_0%,rgba(248,245,238,0.98)_100%)] p-4 sm:p-5 md:grid-cols-[15.5rem_minmax(0,1fr)] md:items-start">
-        <div className="space-y-4">
+      <div className="grid gap-4 rounded-[1.7rem] border border-[#e6dac7] bg-[linear-gradient(180deg,rgba(255,255,255,0.96)_0%,rgba(248,245,238,0.98)_100%)] p-4 md:grid-cols-[14rem_minmax(0,1fr)] md:items-start">
+        <div className="space-y-3.5">
           <div className="overflow-hidden rounded-[1.65rem] border border-[#e7dccb] bg-[linear-gradient(135deg,#f5efe5_0%,#fbf8f3_100%)]">
-            <div className="relative aspect-[4/4.65] overflow-hidden">
+            <div className="relative grid min-h-[8.5rem] grid-cols-[7.75rem_minmax(0,1fr)] overflow-hidden md:block md:aspect-[4/4.45] md:min-h-0">
               {leadImage ? (
                 <img
                   src={leadImage}
@@ -326,15 +326,23 @@ function WardrobeZoneSection({
                   className="h-full w-full object-cover"
                 />
               ) : (
-                <div className="flex h-full items-center justify-center px-5 text-center text-sm leading-6 text-stone">
+                <div className="flex h-full items-center justify-center px-4 text-center text-sm leading-6 text-stone">
                   Pieces you save here will gather into a calmer closet zone.
                 </div>
               )}
-              <div className="absolute inset-x-0 bottom-0 bg-[linear-gradient(180deg,transparent_0%,rgba(29,29,27,0.42)_100%)] px-4 py-4">
+              <div className="absolute inset-x-0 bottom-0 hidden bg-[linear-gradient(180deg,transparent_0%,rgba(29,29,27,0.42)_100%)] px-4 py-4 md:block">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/80">
                   Closet zone
                 </p>
-                <p className="mt-1 font-serif text-[1.25rem] leading-tight text-white">
+                <p className="mt-1 font-serif text-[1.2rem] leading-tight text-white">
+                  {title}
+                </p>
+              </div>
+              <div className="flex flex-col justify-center px-4 py-3 md:hidden">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-stone">
+                  Closet zone
+                </p>
+                <p className="mt-1 font-serif text-[1.15rem] leading-tight text-charcoal">
                   {title}
                 </p>
               </div>

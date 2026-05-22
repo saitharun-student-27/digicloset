@@ -4,6 +4,77 @@ All notable changes to DigiCloset are documented here in chronological order.
 
 This changelog tracks the product from the original full-stack scaffold to the current outfit-memory-first, mobile-first wardrobe experience.
 
+## 2026-05-22 - Polish mobile visual consistency and spacing
+
+Commit: latest Phase 3G.7 checkpoint on `main`
+
+### Phase 3G.7 scope
+
+- ran a final cross-page mobile visual QA pass
+- tightened shared card sizing and rail width without redesigning pages again
+- reduced wasted vertical space while keeping the editorial breathing room intact
+- kept all core functionality, auth, routing, and ownership behavior unchanged
+
+### Cross-page polish
+
+- reduced oversized outfit and clothing card proportions so rails reveal more content per screen
+- tightened shared page spacing and section gaps to make the app feel more phone-native
+- reduced a few oversized hero and header treatments so content appears sooner on mobile
+- kept desktop centered and app-like instead of letting surfaces drift wider like website sections
+
+### Route-level refinements
+
+- Home:
+  - reduced empty-state hero bulk
+  - tightened hero image and weather-support spacing
+  - made rail cards slightly shorter and easier to scan
+- Wardrobe:
+  - made closet-zone panels more compact on mobile
+  - let category content appear sooner below the controls
+- Outfit Memory / Capture:
+  - tightened mode cards, section paddings, preview sizing, and supporting tool panels
+  - kept the form detailed, but less wall-like
+- Suggestions:
+  - tightened the feature card, rails, and page header
+- Outfit Detail / Piece Detail:
+  - reduced oversized hero/header height
+  - kept metadata and actions closer to the image-led content
+
+### Verification
+
+- frontend production build passed
+- browser route QA passed at:
+  - `360 x 800`
+  - `390 x 844`
+  - `414 x 896`
+  - desktop
+- verified across:
+  - `/welcome`
+  - `/login`
+  - `/signup`
+  - `/`
+  - `/wardrobe`
+  - `/outfit-memory`
+  - `/suggestions`
+  - `/outfits/:id`
+  - `/pieces/:id`
+- confirmed:
+  - no horizontal overflow on audited routes
+  - bottom dock stayed within the viewport and auth pages remained dock-free
+  - home favorite / mark-worn / open-outfit flow still worked
+  - wardrobe search / filter button / filter selections / sort / detail navigation still worked
+  - capture mode switching, existing-piece search, and mixed outfit creation still worked
+  - suggestions favorite / mark-worn / open-outfit flow still worked
+  - outfit and piece detail actions plus linked navigation still worked
+  - new-user isolation still showed no dev-user wardrobe data
+
+### Important boundary
+
+- no backend changes
+- no auth or ownership changes
+- no feature expansion
+- no full-page redesigns were re-opened in this phase
+
 ## 2026-05-22 - Refresh Outfit Detail and Piece Detail into calmer editorial layouts
 
 Commit: latest Phase 3G.6 checkpoint on `main`

@@ -110,27 +110,27 @@ export default function OutfitShowcaseCard({
 
   return (
     <article
-      className={`group relative h-full overflow-hidden rounded-2xl border border-black/5 bg-white shadow-soft transition duration-300 hover:-translate-y-0.5 hover:shadow-xl ${
+      className={`group relative h-full overflow-hidden rounded-[1.65rem] border border-black/5 bg-white shadow-soft transition duration-300 hover:-translate-y-0.5 hover:shadow-xl ${
         isBusy ? "opacity-80" : ""
       }`}
       aria-busy={isBusy}
     >
-      <div className="relative aspect-[4/5] min-h-[14.5rem] bg-linen sm:min-h-[15rem]">
-        <PreviewSurface className="block h-full rounded-t-2xl focus:outline-none focus-visible:ring-4 focus-visible:ring-sage/20">
+      <div className="relative aspect-[4/4.8] min-h-[12.75rem] bg-linen sm:min-h-[13.5rem]">
+        <PreviewSurface className="block h-full rounded-t-[1.65rem] focus:outline-none focus-visible:ring-4 focus-visible:ring-sage/20">
           <div className="absolute left-3 top-3 z-10 rounded-full bg-white/88 px-3 py-1 text-[11px] font-medium tracking-[0.08em] text-charcoal shadow-soft backdrop-blur">
             Saved look
           </div>
           {imageUrl ? (
-            <div className="h-full bg-[linear-gradient(135deg,#eee6d9_0%,#f8f5ee_100%)] p-2.5 sm:p-3">
+            <div className="h-full bg-[linear-gradient(135deg,#eee6d9_0%,#f8f5ee_100%)] p-2 sm:p-2.5">
               <img
                 src={imageUrl}
                 alt={outfit.title}
-                className="h-full w-full rounded-[1.15rem] object-cover transition duration-500 group-hover:scale-[1.015]"
+                className="h-full w-full rounded-[1rem] object-cover transition duration-500 group-hover:scale-[1.015]"
               />
             </div>
           ) : (
             <div className="flex h-full items-center justify-center bg-[linear-gradient(135deg,#eee6d9_0%,#f8f5ee_100%)]">
-              <div className="relative m-4 flex h-[180px] flex-1 items-center justify-center rounded-xl border border-white/50 bg-white/50 shadow-inner backdrop-blur-md">
+              <div className="relative m-3.5 flex h-[150px] flex-1 items-center justify-center rounded-xl border border-white/50 bg-white/50 shadow-inner backdrop-blur-md sm:h-[164px]">
                 {outfitItems.map((item, index) => (
                   <div
                     key={item.id}
@@ -187,15 +187,15 @@ export default function OutfitShowcaseCard({
         ) : null}
       </div>
 
-      <div className="p-4 sm:p-5">
+      <div className="p-3.5 sm:p-4">
         <div className="flex items-start justify-between gap-4">
           <PreviewSurface className="min-w-0 flex-1 rounded-xl focus:outline-none focus-visible:ring-4 focus-visible:ring-sage/20">
             <div className="min-w-0">
-              <h3 className="line-clamp-2 text-base font-semibold leading-6 text-charcoal sm:text-lg">
+              <h3 className="line-clamp-2 text-[15px] font-semibold leading-6 text-charcoal sm:text-base">
                 {outfit.title}
               </h3>
               {showDescription ? (
-                <p className="mt-1 line-clamp-2 text-sm leading-5 text-stone">
+                <p className="mt-1 line-clamp-2 text-[13px] leading-5 text-stone">
                   {outfit.description || "Saved outfit memory"}
                 </p>
               ) : null}
@@ -262,7 +262,7 @@ export default function OutfitShowcaseCard({
         ) : null}
 
         {showMeta ? (
-          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          <div className="mt-3.5 grid gap-2.5 sm:grid-cols-2">
             <div className="rounded-2xl bg-ivory p-3">
               <CalendarDays className="h-4 w-4 text-sage" />
               <p className="mt-2 text-xs uppercase tracking-[0.12em] text-stone">
@@ -283,7 +283,7 @@ export default function OutfitShowcaseCard({
             </div>
           </div>
         ) : (
-          <div className="mt-4 flex flex-wrap gap-2">
+          <div className="mt-3.5 flex flex-wrap gap-2">
             <span className="rounded-full bg-ivory px-3 py-1 text-[11px] font-medium capitalize text-stone">
               {formatSeasonLabel(outfit.season || "all")}
             </span>
@@ -294,7 +294,7 @@ export default function OutfitShowcaseCard({
         )}
 
         {supportingText ? (
-          <p className="mt-3 text-xs leading-5 text-stone">{supportingText}</p>
+          <p className="mt-2.5 text-xs leading-5 text-stone">{supportingText}</p>
         ) : null}
       </div>
     </article>

@@ -21,13 +21,13 @@ export default function ClothingCard({
 
   return (
     <article
-      className={`group h-full overflow-hidden rounded-[1.75rem] border border-black/5 bg-white shadow-soft transition duration-300 hover:-translate-y-0.5 hover:shadow-xl ${
+      className={`group h-full overflow-hidden rounded-[1.45rem] border border-black/5 bg-white shadow-soft transition duration-300 hover:-translate-y-0.5 hover:shadow-xl ${
         isBusy ? "opacity-80" : ""
       }`}
       aria-busy={isBusy}
     >
       <Link to={`/pieces/${item.id}`} className="block focus:outline-none">
-        <div className="relative aspect-square overflow-hidden bg-[linear-gradient(135deg,#f4efe6_0%,#fbf8f2_100%)] p-3 sm:p-4">
+        <div className="relative aspect-[1/1.02] overflow-hidden bg-[linear-gradient(135deg,#f4efe6_0%,#fbf8f2_100%)] p-2.5 sm:p-3">
           {imageUrl ? (
             <img
               src={imageUrl}
@@ -45,10 +45,10 @@ export default function ClothingCard({
           </div>
         </div>
 
-        <div className="p-4">
+        <div className="p-3.5">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <h3 className="line-clamp-1 text-base font-semibold text-charcoal">
+              <h3 className="line-clamp-1 text-[15px] font-semibold text-charcoal">
                 {item.name}
               </h3>
               <p className="mt-1 text-xs font-medium uppercase tracking-[0.14em] text-stone">
@@ -64,11 +64,11 @@ export default function ClothingCard({
           </div>
 
           {supportingText ? (
-            <p className="mt-3 text-xs leading-5 text-stone">{supportingText}</p>
+            <p className="mt-2.5 text-xs leading-5 text-stone">{supportingText}</p>
           ) : null}
 
           {showActions ? (
-            <div className="mt-4 flex items-center gap-2">
+            <div className="mt-3.5 flex items-center gap-2">
               <button
                 type="button"
                 onClick={(event) => {

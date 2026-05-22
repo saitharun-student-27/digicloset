@@ -124,7 +124,7 @@ function OutfitHero({ outfit }) {
   return (
     <section className="section-surface overflow-hidden p-3 sm:p-4">
       <div className="overflow-hidden rounded-[2rem] bg-[linear-gradient(135deg,#f8f4eb_0%,#fdfbf7_100%)]">
-        <div className="relative aspect-[4/5] min-h-[19rem] overflow-hidden sm:min-h-[24rem] lg:min-h-[28rem]">
+        <div className="relative aspect-[4/4.75] min-h-[16rem] overflow-hidden sm:min-h-[20rem] lg:min-h-[22rem]">
           {imageUrl ? (
             <img
               src={imageUrl}
@@ -461,9 +461,9 @@ export default function OutfitDetail() {
         </div>
       ) : null}
 
-      <section className="section-surface overflow-hidden px-4 py-5 sm:px-5 sm:py-6">
-        <div className="relative overflow-hidden rounded-[2rem] bg-[linear-gradient(180deg,#fbf8f2_0%,#f7f1e8_100%)] px-4 py-8 sm:px-6 sm:py-10">
-          <div className="pointer-events-none absolute inset-x-[-12%] top-[-14rem] h-[19rem] rounded-b-[50%] border border-[rgba(182,144,91,0.24)] bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.95),rgba(255,255,255,0.28)_70%)]" />
+      <section className="section-surface overflow-hidden px-4 py-4 sm:px-5 sm:py-5">
+        <div className="relative overflow-hidden rounded-[2rem] bg-[linear-gradient(180deg,#fbf8f2_0%,#f7f1e8_100%)] px-4 py-7 sm:px-6 sm:py-8">
+          <div className="pointer-events-none absolute inset-x-[-12%] top-[-14rem] h-[17rem] rounded-b-[50%] border border-[rgba(182,144,91,0.24)] bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.95),rgba(255,255,255,0.28)_70%)]" />
           <div className="relative flex items-start justify-between gap-3">
             <button
               type="button"
@@ -477,7 +477,7 @@ export default function OutfitDetail() {
               <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-stone">
                 Outfit Memory
               </p>
-              <h1 className="mt-3 font-serif text-[2.25rem] leading-none text-charcoal sm:text-[2.8rem]">
+              <h1 className="mt-3 font-serif text-[2.05rem] leading-none text-charcoal sm:text-[2.45rem]">
                 {outfit.title}
               </h1>
               <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-stone">
@@ -499,7 +499,7 @@ export default function OutfitDetail() {
               <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-stone">
                 Saved look
               </p>
-              <h2 className="mt-3 font-serif text-[2rem] leading-tight text-charcoal sm:text-[2.35rem]">
+              <h2 className="mt-3 font-serif text-[1.8rem] leading-tight text-charcoal sm:text-[2.05rem]">
                 {outfit.title}
               </h2>
               <p className="mt-4 text-sm leading-6 text-stone">
@@ -518,8 +518,8 @@ export default function OutfitDetail() {
                 ))}
               </div>
 
-              <div className="mt-6 grid gap-3 sm:grid-cols-2">
-                <div className="rounded-[1.5rem] bg-ivory p-4">
+              <div className="mt-5 grid gap-2.5 sm:grid-cols-2">
+                <div className="rounded-[1.35rem] bg-ivory p-3.5">
                   <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-stone">
                     Saved
                   </p>
@@ -527,7 +527,7 @@ export default function OutfitDetail() {
                     {formatSavedDate(outfit.created_at)}
                   </p>
                 </div>
-                <div className="rounded-[1.5rem] bg-ivory p-4">
+                <div className="rounded-[1.35rem] bg-ivory p-3.5">
                   <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-stone">
                     Last worn
                   </p>
@@ -535,7 +535,7 @@ export default function OutfitDetail() {
                     {formatDate(outfit.last_worn_date)}
                   </p>
                 </div>
-                <div className="rounded-[1.5rem] bg-ivory p-4">
+                <div className="rounded-[1.35rem] bg-ivory p-3.5">
                   <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-stone">
                     Source
                   </p>
@@ -543,7 +543,7 @@ export default function OutfitDetail() {
                     {formatValue(outfit.source_type || "saved")}
                   </p>
                 </div>
-                <div className="rounded-[1.5rem] bg-ivory p-4">
+                <div className="rounded-[1.35rem] bg-ivory p-3.5">
                   <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-stone">
                     Piece count
                   </p>

@@ -231,8 +231,8 @@ function FeatureSuggestionCard({
   const featureReason = buildFeatureReason(outfit, weather);
 
   return (
-    <section className="section-surface overflow-hidden p-2.5 sm:p-3">
-      <div className="rounded-[1.85rem] bg-[linear-gradient(135deg,#f8f4eb_0%,#fdfbf7_100%)] p-3 sm:p-4">
+      <section className="section-surface overflow-hidden p-2 sm:p-2.5">
+      <div className="rounded-[1.85rem] bg-[linear-gradient(135deg,#f8f4eb_0%,#fdfbf7_100%)] p-3 sm:p-3.5">
         <div className="mb-4 flex items-center justify-between gap-3">
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-stone">
@@ -251,7 +251,7 @@ function FeatureSuggestionCard({
           <div className="grid gap-0 md:grid-cols-[1.05fr_0.95fr]">
             <Link
               to={`/outfits/${outfit.id}`}
-              className="relative block aspect-[4/4.3] min-h-[17rem] overflow-hidden bg-[linear-gradient(135deg,#ede4d7_0%,#faf7f1_100%)] focus:outline-none focus-visible:ring-4 focus-visible:ring-sage/20 sm:min-h-[20rem]"
+              className="relative block aspect-[4/4.1] min-h-[14.75rem] overflow-hidden bg-[linear-gradient(135deg,#ede4d7_0%,#faf7f1_100%)] focus:outline-none focus-visible:ring-4 focus-visible:ring-sage/20 sm:min-h-[17.5rem]"
             >
               {imageUrl ? (
                 <img
@@ -271,12 +271,12 @@ function FeatureSuggestionCard({
               )}
             </Link>
 
-            <div className="flex flex-col justify-between p-4 sm:p-5">
+            <div className="flex flex-col justify-between p-4">
               <div>
                 <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-stone">
                   Today&apos;s suggestion
                 </p>
-                <h3 className="mt-3 font-serif text-[1.9rem] leading-tight text-charcoal">
+                <h3 className="mt-3 font-serif text-[1.7rem] leading-tight text-charcoal">
                   {outfit.title}
                 </h3>
                 <p className="mt-3 text-sm leading-6 text-stone">
@@ -629,9 +629,9 @@ export default function Suggestions() {
 
   return (
     <main className="page-shell max-w-[56rem]">
-      <section className="section-surface overflow-hidden px-4 py-5 sm:px-5 sm:py-6">
-        <div className="relative overflow-hidden rounded-[2rem] bg-[linear-gradient(180deg,#fbf8f2_0%,#f7f1e8_100%)] px-4 py-8 sm:px-6 sm:py-10">
-          <div className="pointer-events-none absolute inset-x-[-12%] top-[-14rem] h-[19rem] rounded-b-[50%] border border-[rgba(182,144,91,0.24)] bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.95),rgba(255,255,255,0.28)_70%)]" />
+      <section className="section-surface overflow-hidden px-4 py-4 sm:px-5 sm:py-5">
+        <div className="relative overflow-hidden rounded-[2rem] bg-[linear-gradient(180deg,#fbf8f2_0%,#f7f1e8_100%)] px-4 py-7 sm:px-6 sm:py-8">
+          <div className="pointer-events-none absolute inset-x-[-12%] top-[-14rem] h-[17rem] rounded-b-[50%] border border-[rgba(182,144,91,0.24)] bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.95),rgba(255,255,255,0.28)_70%)]" />
           <div className="relative text-center">
             <div className="mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-full border border-black/6 bg-white/80 text-charcoal shadow-soft">
               <Sparkles className="h-5 w-5 text-brass" />
@@ -639,7 +639,7 @@ export default function Suggestions() {
             <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-stone">
               DigiCloset
             </p>
-            <h1 className="mt-3 font-serif text-[2.35rem] leading-none text-charcoal sm:text-[2.8rem]">
+            <h1 className="mt-3 font-serif text-[2.05rem] leading-none text-charcoal sm:text-[2.45rem]">
               Suggestions
             </h1>
             <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-stone sm:text-[15px]">

@@ -47,7 +47,7 @@ function ToolPanel({
   children,
 }) {
   return (
-    <section className="rounded-[1.8rem] border border-[#e7dccb] bg-[linear-gradient(180deg,rgba(255,255,255,0.94)_0%,rgba(248,245,238,0.98)_100%)] p-5 shadow-soft">
+      <section className="rounded-[1.65rem] border border-[#e7dccb] bg-[linear-gradient(180deg,rgba(255,255,255,0.94)_0%,rgba(248,245,238,0.98)_100%)] p-4 shadow-soft">
       <button
         type="button"
         onClick={onToggle}
@@ -57,7 +57,7 @@ function ToolPanel({
           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-stone">
             {eyebrow}
           </p>
-          <h2 className="mt-2 font-serif text-[1.55rem] leading-tight text-charcoal">
+          <h2 className="mt-2 font-serif text-[1.35rem] leading-tight text-charcoal">
             {title}
           </h2>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-stone">
@@ -73,7 +73,7 @@ function ToolPanel({
         </span>
       </button>
 
-      {isOpen ? <div className="mt-5">{children}</div> : null}
+      {isOpen ? <div className="mt-4">{children}</div> : null}
     </section>
   );
 }
@@ -343,21 +343,21 @@ export default function Capture() {
     "w-full rounded-[1.15rem] border border-[#e1d5c3] bg-white px-3.5 py-2.5 text-sm text-charcoal outline-none transition focus:border-charcoal/30 focus:ring-4 focus:ring-sage/10";
 
   return (
-    <main className="mx-auto w-full max-w-[56rem] px-4 py-5 sm:px-5 sm:py-6">
-      <section className="section-surface overflow-hidden px-4 py-5 sm:px-5 sm:py-6">
-        <div className="relative rounded-[2.2rem] border border-[#e7dccb] bg-[linear-gradient(180deg,rgba(251,248,242,0.98)_0%,rgba(247,242,234,0.95)_100%)] px-5 pb-8 pt-7 text-center shadow-soft sm:px-7">
-          <div className="absolute left-1/2 top-0 h-[13rem] w-[140%] -translate-x-1/2 -translate-y-[46%] rounded-[50%] border border-[#d6c5ab] bg-[linear-gradient(180deg,rgba(255,255,255,0.9)_0%,rgba(246,239,230,0.32)_100%)]" />
+    <main className="mx-auto w-full max-w-[54rem] px-4 py-4 sm:px-5 sm:py-5">
+      <section className="section-surface overflow-hidden px-4 py-4 sm:px-5 sm:py-5">
+        <div className="relative rounded-[2rem] border border-[#e7dccb] bg-[linear-gradient(180deg,rgba(251,248,242,0.98)_0%,rgba(247,242,234,0.95)_100%)] px-5 pb-7 pt-6 text-center shadow-soft sm:px-6">
+          <div className="absolute left-1/2 top-0 h-[11rem] w-[138%] -translate-x-1/2 -translate-y-[48%] rounded-[50%] border border-[#d6c5ab] bg-[linear-gradient(180deg,rgba(255,255,255,0.9)_0%,rgba(246,239,230,0.32)_100%)]" />
           <div className="relative">
             <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full border border-[#d8c8b2] bg-white/88 text-brass shadow-soft">
               <Sparkles className="h-5 w-5" />
             </div>
-            <p className="mt-4 font-serif text-[2.15rem] leading-none text-charcoal">
+            <p className="mt-4 font-serif text-[1.95rem] leading-none text-charcoal">
               DigiCloset
             </p>
             <p className="mt-5 text-[11px] font-semibold uppercase tracking-[0.18em] text-stone">
               Outfit Memory
             </p>
-            <p className="mx-auto mt-3 max-w-[26rem] text-base leading-7 text-charcoal/82">
+            <p className="mx-auto mt-3 max-w-[24rem] text-sm leading-6 text-charcoal/82 sm:text-base">
               Capture an outfit so you can remember it, rewear it, and rediscover it.
             </p>
           </div>

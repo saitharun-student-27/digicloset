@@ -436,9 +436,9 @@ export default function PieceDetail() {
         </div>
       ) : null}
 
-      <section className="section-surface overflow-hidden px-4 py-5 sm:px-5 sm:py-6">
-        <div className="relative overflow-hidden rounded-[2rem] bg-[linear-gradient(180deg,#fbf8f2_0%,#f7f1e8_100%)] px-4 py-8 sm:px-6 sm:py-10">
-          <div className="pointer-events-none absolute inset-x-[-12%] top-[-14rem] h-[19rem] rounded-b-[50%] border border-[rgba(182,144,91,0.24)] bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.95),rgba(255,255,255,0.28)_70%)]" />
+      <section className="section-surface overflow-hidden px-4 py-4 sm:px-5 sm:py-5">
+        <div className="relative overflow-hidden rounded-[2rem] bg-[linear-gradient(180deg,#fbf8f2_0%,#f7f1e8_100%)] px-4 py-7 sm:px-6 sm:py-8">
+          <div className="pointer-events-none absolute inset-x-[-12%] top-[-14rem] h-[17rem] rounded-b-[50%] border border-[rgba(182,144,91,0.24)] bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.95),rgba(255,255,255,0.28)_70%)]" />
           <div className="relative flex items-start justify-between gap-3">
             <Link
               to="/wardrobe"
@@ -451,7 +451,7 @@ export default function PieceDetail() {
               <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-stone">
                 Wardrobe Piece
               </p>
-              <h1 className="mt-3 font-serif text-[2.25rem] leading-none text-charcoal sm:text-[2.8rem]">
+              <h1 className="mt-3 font-serif text-[2.05rem] leading-none text-charcoal sm:text-[2.45rem]">
                 {item.name}
               </h1>
               <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-stone">
@@ -467,7 +467,7 @@ export default function PieceDetail() {
       <div className="mt-5 space-y-5 sm:mt-7 sm:space-y-7">
         <section className="section-surface overflow-hidden p-3 sm:p-4">
           <div className="overflow-hidden rounded-[2rem] bg-[linear-gradient(180deg,#f9f5ee_0%,#fffdf9_100%)]">
-            <div className="relative aspect-[4/4.8] min-h-[20rem] overflow-hidden sm:min-h-[24rem]">
+            <div className="relative aspect-[4/4.5] min-h-[16rem] overflow-hidden sm:min-h-[19rem]">
               {imageUrl ? (
                 <img
                   src={imageUrl}
@@ -483,13 +483,13 @@ export default function PieceDetail() {
               )}
             </div>
 
-            <div className="-mt-10 rounded-t-[2.25rem] bg-[linear-gradient(180deg,rgba(255,255,255,0.97)_0%,#fbf8f2_100%)] px-5 pb-5 pt-8 shadow-[0_-18px_40px_rgba(29,29,27,0.05)] sm:px-6 sm:pb-6 sm:pt-9">
+            <div className="-mt-9 rounded-t-[2rem] bg-[linear-gradient(180deg,rgba(255,255,255,0.97)_0%,#fbf8f2_100%)] px-5 pb-5 pt-7 shadow-[0_-18px_40px_rgba(29,29,27,0.05)] sm:px-6 sm:pb-6 sm:pt-8">
               <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full border border-[rgba(182,144,91,0.26)] bg-white text-brass shadow-soft">
                 <Shirt className="h-5 w-5" />
               </div>
 
               <div className="mt-4 text-center">
-                <h2 className="font-serif text-[2rem] leading-none text-charcoal sm:text-[2.3rem]">
+                <h2 className="font-serif text-[1.8rem] leading-none text-charcoal sm:text-[2.05rem]">
                   {item.name}
                 </h2>
                 <p className="mt-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-stone">
@@ -509,8 +509,8 @@ export default function PieceDetail() {
                 ))}
               </div>
 
-              <div className="mt-6 rounded-[1.5rem] bg-white/78 p-4">
-                <div className="grid gap-3 sm:grid-cols-2">
+              <div className="mt-5 rounded-[1.35rem] bg-white/78 p-4">
+                <div className="grid gap-2.5 sm:grid-cols-2">
                   <div>
                     <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-stone">
                       Category

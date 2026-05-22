@@ -9,12 +9,12 @@
   color-scheme: light;
   --page-padding-mobile: 14px;
   --page-padding-tablet: 20px;
-  --section-gap-mobile: 20px;
-  --section-gap-tablet: 24px;
-  --bottom-dock-clearance: calc(104px + env(safe-area-inset-bottom));
+  --section-gap-mobile: 18px;
+  --section-gap-tablet: 22px;
+  --bottom-dock-clearance: calc(96px + env(safe-area-inset-bottom));
   --touch-target-min: 44px;
-  --outfit-rail-card-width: clamp(280px, 82vw, 336px);
-  --piece-rail-card-width: clamp(154px, 45vw, 214px);
+  --outfit-rail-card-width: clamp(244px, 74vw, 296px);
+  --piece-rail-card-width: clamp(146px, 41vw, 188px);
 }
 
 html,
@@ -114,7 +114,7 @@ button {
   .page-shell {
     @apply mx-auto w-full max-w-6xl;
     padding-inline: var(--page-padding-mobile);
-    padding-block: 1.25rem;
+    padding-block: 1rem;
   }
 
   .page-stack {
@@ -160,9 +160,9 @@ button {
 @media (min-width: 640px) {
   :root {
     --page-padding-mobile: 16px;
-    --bottom-dock-clearance: calc(110px + env(safe-area-inset-bottom));
-    --outfit-rail-card-width: clamp(292px, 44vw, 344px);
-    --piece-rail-card-width: clamp(176px, 28vw, 220px);
+    --bottom-dock-clearance: calc(102px + env(safe-area-inset-bottom));
+    --outfit-rail-card-width: clamp(260px, 40vw, 318px);
+    --piece-rail-card-width: clamp(164px, 26vw, 202px);
   }
 }
 
@@ -170,8 +170,8 @@ button {
   :root {
     --page-padding-mobile: var(--page-padding-tablet);
     --section-gap-mobile: var(--section-gap-tablet);
-    --bottom-dock-clearance: calc(116px + env(safe-area-inset-bottom));
-    --outfit-rail-card-width: clamp(304px, 34vw, 360px);
-    --piece-rail-card-width: clamp(190px, 22vw, 236px);
+    --bottom-dock-clearance: calc(108px + env(safe-area-inset-bottom));
+    --outfit-rail-card-width: clamp(272px, 30vw, 328px);
+    --piece-rail-card-width: clamp(176px, 20vw, 214px);
   }
 }

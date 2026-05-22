@@ -142,11 +142,11 @@ const captureModes = [
 function SectionCard({ title, description, children, className = "" }) {
   return (
     <section
-      className={`rounded-[1.7rem] border border-[#e8ddcd] bg-[linear-gradient(180deg,rgba(251,248,242,0.98)_0%,rgba(247,242,234,0.94)_100%)] p-4 sm:p-5 ${className}`}
+      className={`rounded-[1.55rem] border border-[#e8ddcd] bg-[linear-gradient(180deg,rgba(251,248,242,0.98)_0%,rgba(247,242,234,0.94)_100%)] p-3.5 sm:p-4 ${className}`}
     >
       {title ? (
-        <div className="mb-4">
-          <p className="font-serif text-[1.45rem] leading-tight text-charcoal">
+        <div className="mb-3.5">
+          <p className="font-serif text-[1.28rem] leading-tight text-charcoal">
             {title}
           </p>
           {description ? (
@@ -210,7 +210,7 @@ function ModeCard({ mode, activeMode, onClick }) {
     <button
       type="button"
       onClick={() => onClick(mode.id)}
-      className={`min-h-[7.75rem] rounded-[1.45rem] border px-4 py-4 text-left transition ${
+      className={`min-h-[6.75rem] rounded-[1.35rem] border px-3.5 py-3.5 text-left transition ${
         isActive
           ? "border-charcoal bg-white shadow-soft"
           : "border-[#e4d8c7] bg-white/88 hover:border-[#d8c8b0] hover:bg-white"
@@ -223,8 +223,8 @@ function ModeCard({ mode, activeMode, onClick }) {
       >
         <Icon className="h-5 w-5" />
       </div>
-      <p className="mt-3.5 text-[15px] font-semibold text-charcoal">{mode.title}</p>
-      <p className="mt-1 text-sm leading-6 text-stone">{mode.description}</p>
+      <p className="mt-3 text-[15px] font-semibold text-charcoal">{mode.title}</p>
+      <p className="mt-1 text-sm leading-5 text-stone">{mode.description}</p>
     </button>
   );
 }
@@ -347,7 +347,7 @@ function ImagePicker({
       <div className="rounded-[1.55rem] border border-dashed border-[#d7c8b2] bg-white/94 p-4">
         {imagePreviewUrl ? (
           <div className="space-y-4">
-            <div className="flex h-56 items-center justify-center rounded-[1.35rem] bg-[linear-gradient(135deg,#f4efe6_0%,#fbf8f2_100%)] p-3 sm:h-72 sm:p-4">
+            <div className="flex h-44 items-center justify-center rounded-[1.35rem] bg-[linear-gradient(135deg,#f4efe6_0%,#fbf8f2_100%)] p-3 sm:h-56 sm:p-4">
               <img
                 src={imagePreviewUrl}
                 alt="Outfit preview"
@@ -387,7 +387,7 @@ function ImagePicker({
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="flex w-full cursor-pointer flex-col items-center justify-center rounded-[1.35rem] bg-[linear-gradient(135deg,#f4efe6_0%,#fbf8f2_100%)] px-4 py-8 text-center transition hover:bg-white sm:py-10"
+            className="flex w-full cursor-pointer flex-col items-center justify-center rounded-[1.35rem] bg-[linear-gradient(135deg,#f4efe6_0%,#fbf8f2_100%)] px-4 py-6 text-center transition hover:bg-white sm:py-8"
           >
             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-sage shadow-soft">
               <ImagePlus className="h-5 w-5" />
@@ -890,9 +890,9 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="rounded-[2rem] border border-[#e7dccb] bg-[linear-gradient(180deg,rgba(255,255,255,0.96)_0%,rgba(248,245,238,0.98)_100%)] p-4 shadow-soft sm:p-5"
+      className="rounded-[1.8rem] border border-[#e7dccb] bg-[linear-gradient(180deg,rgba(255,255,255,0.96)_0%,rgba(248,245,238,0.98)_100%)] p-3.5 shadow-soft sm:p-4"
     >
-      <div className="mb-6 rounded-[1.7rem] border border-[#eadfce] bg-white/78 px-4 py-4 text-center sm:px-5">
+      <div className="mb-5 rounded-[1.55rem] border border-[#eadfce] bg-white/78 px-4 py-3.5 text-center sm:px-5">
         <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-stone">
           How would you like to capture this outfit?
         </p>
@@ -910,7 +910,7 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
         </div>
       ) : null}
 
-      <section className="mb-6">
+      <section className="mb-5">
         <div className="grid gap-3 sm:grid-cols-3">
           {captureModes.map((mode) => (
             <ModeCard
@@ -923,7 +923,7 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
         </div>
       </section>
 
-      <div className="space-y-5">
+      <div className="space-y-4.5">
         {captureMode === "image_only" ? (
           <>
             <ImagePicker
@@ -1121,7 +1121,7 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
 
           {imagePreviewUrl ? (
             <div className="rounded-[1.5rem] border border-[#eadfce] bg-white p-4">
-              <div className="flex h-56 items-center justify-center rounded-[1.25rem] bg-[linear-gradient(135deg,#f4efe6_0%,#fbf8f2_100%)] p-3 sm:h-72 sm:p-4">
+              <div className="flex h-44 items-center justify-center rounded-[1.25rem] bg-[linear-gradient(135deg,#f4efe6_0%,#fbf8f2_100%)] p-3 sm:h-56 sm:p-4">
                 <img
                   src={imagePreviewUrl}
                   alt="Outfit memory preview"
@@ -1131,9 +1131,9 @@ export default function OutfitMemoryForm({ onSubmit, isSubmitting }) {
             </div>
           ) : (
             <div className="rounded-[1.5rem] border border-[#eadfce] bg-white p-4">
-              <div className="flex min-h-[14rem] flex-col justify-between rounded-[1.25rem] bg-[linear-gradient(135deg,#f4efe6_0%,#fbf8f2_100%)] p-4 sm:min-h-72">
-                <div className="mx-auto flex h-36 w-24 items-end justify-center rounded-[999px] border border-dashed border-charcoal/10 bg-white/70">
-                  <div className="flex h-24 w-14 items-center justify-center rounded-t-[999px] bg-charcoal/6" />
+              <div className="flex min-h-[11rem] flex-col justify-between rounded-[1.25rem] bg-[linear-gradient(135deg,#f4efe6_0%,#fbf8f2_100%)] p-4 sm:min-h-[14rem]">
+                <div className="mx-auto flex h-28 w-20 items-end justify-center rounded-[999px] border border-dashed border-charcoal/10 bg-white/70">
+                  <div className="flex h-20 w-12 items-center justify-center rounded-t-[999px] bg-charcoal/6" />
                 </div>
                 <div className="grid gap-2">
                   <PieceSlot label="Upper" piece={previewSlots.upper} />

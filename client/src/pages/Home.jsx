@@ -326,7 +326,7 @@ function getOutfitPreviewImages(outfit) {
 
 function HomeEditorialHeader() {
   return (
-    <section className="px-2 pt-1 text-center sm:px-3">
+    <section className="px-2 pt-0.5 text-center sm:px-3">
       <div className="mx-auto max-w-[30rem]">
         <div className="inline-flex items-center gap-2 rounded-full bg-white/72 px-3 py-2 text-xs font-medium text-charcoal shadow-sm backdrop-blur">
           <Sparkles className="h-3.5 w-3.5 text-brass" />
@@ -335,10 +335,10 @@ function HomeEditorialHeader() {
         <p className="mt-4 font-serif text-[1.15rem] leading-none text-charcoal">
           DigiCloset
         </p>
-        <h1 className="mt-2 font-serif text-[1.8rem] leading-[1.02] text-charcoal sm:text-[1.95rem]">
+        <h1 className="mt-2 font-serif text-[1.62rem] leading-[1.04] text-charcoal sm:text-[1.82rem]">
           Looks worth returning to
         </h1>
-        <p className="mt-2.5 text-sm leading-6 text-stone">
+        <p className="mt-2 text-sm leading-6 text-stone">
           Saved outfits, weather support, and quiet reminders from your closet.
         </p>
       </div>
@@ -363,12 +363,12 @@ function HeroOutfitCard({
 
   if (!outfit) {
     return (
-      <section className="section-surface overflow-hidden p-2.5">
+      <section className="section-surface overflow-hidden p-2">
         <div className="rounded-[2rem] border border-[#e2d6c4] bg-[linear-gradient(180deg,rgba(255,255,255,0.88)_0%,rgba(248,245,238,0.98)_100%)] p-5 sm:p-6">
           <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-stone">
             {"Today's wardrobe memory"}
           </p>
-          <h2 className="mt-3 font-serif text-[1.9rem] leading-tight text-charcoal sm:text-[2.15rem]">
+          <h2 className="mt-3 font-serif text-[1.7rem] leading-tight text-charcoal sm:text-[1.95rem]">
             Your wardrobe memory starts with one saved look.
           </h2>
           <p className="mt-3 max-w-xl text-sm leading-6 text-stone">
@@ -397,16 +397,16 @@ function HeroOutfitCard({
   }
 
   return (
-    <section className="section-surface overflow-hidden p-2.5">
-      <div className="rounded-[2rem] border border-[#dccfb9] bg-[linear-gradient(180deg,rgba(255,255,255,0.95)_0%,rgba(248,245,238,0.98)_100%)] p-4 sm:p-5">
-        <div className="grid gap-4 rounded-[1.8rem] border border-[#e6dac8] bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.96),rgba(246,241,232,0.98))] p-4 sm:p-5 md:grid-cols-[0.88fr_1.12fr] md:items-center">
+      <section className="section-surface overflow-hidden p-2">
+      <div className="rounded-[2rem] border border-[#dccfb9] bg-[linear-gradient(180deg,rgba(255,255,255,0.95)_0%,rgba(248,245,238,0.98)_100%)] p-3.5 sm:p-4">
+        <div className="grid gap-3.5 rounded-[1.8rem] border border-[#e6dac8] bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.96),rgba(246,241,232,0.98))] p-3.5 sm:p-4 md:grid-cols-[0.82fr_1.18fr] md:items-center">
           <div className="order-1">
-            <div className="relative flex min-h-[18.75rem] items-end justify-center overflow-hidden rounded-[1.75rem] bg-[linear-gradient(180deg,rgba(255,255,255,0.88)_0%,rgba(232,223,207,0.92)_100%)] px-3 pt-5 sm:min-h-[23rem] sm:px-4">
+            <div className="relative flex min-h-[15.75rem] items-end justify-center overflow-hidden rounded-[1.75rem] bg-[linear-gradient(180deg,rgba(255,255,255,0.88)_0%,rgba(232,223,207,0.92)_100%)] px-3 pt-4 sm:min-h-[19.5rem] sm:px-4">
               {primaryImageUrl ? (
                 <img
                   src={primaryImageUrl}
                   alt={outfit.title}
-                  className="max-h-[18rem] w-auto max-w-full object-contain drop-shadow-[0_18px_35px_rgba(79,60,34,0.14)] sm:max-h-[22rem]"
+                  className="max-h-[15rem] w-auto max-w-full object-contain drop-shadow-[0_18px_35px_rgba(79,60,34,0.14)] sm:max-h-[18.25rem]"
                 />
               ) : (
                 <div className="relative flex h-full w-full items-center justify-center">
@@ -448,21 +448,21 @@ function HeroOutfitCard({
             </div>
           </div>
 
-          <div className="order-2 flex flex-col justify-between md:min-h-[23rem]">
-            <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-stone">
-                {isStarterLook ? "From your closet" : "Today's best fit"}
-              </p>
-              <h2 className="mt-3 font-serif text-[2rem] leading-[0.95] text-charcoal sm:text-[2.45rem]">
-                {outfit.title}
-              </h2>
-              <p className="mt-4 max-w-[18rem] text-sm leading-7 text-stone sm:max-w-[20rem]">
-                {outfit.description ||
+            <div className="order-2 flex flex-col justify-between md:min-h-[19.5rem]">
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-stone">
+                  {isStarterLook ? "From your closet" : "Today's best fit"}
+                </p>
+              <h2 className="mt-3 font-serif text-[1.8rem] leading-[0.98] text-charcoal sm:text-[2.1rem]">
+                  {outfit.title}
+                </h2>
+              <p className="mt-3 max-w-[18rem] text-sm leading-6 text-stone sm:max-w-[20rem]">
+                  {outfit.description ||
                   `A strong starting point for ${weatherLabel.toLowerCase()}.`}
-              </p>
-            </div>
+                </p>
+              </div>
 
-            <div className="mt-5">
+            <div className="mt-4">
               <div className="flex flex-wrap gap-2">
                 <span className="rounded-full bg-white px-3 py-1.5 text-[11px] font-medium text-stone shadow-sm">
                   {formatOccasionLabel(outfit.occasion || "casual")}
@@ -475,7 +475,7 @@ function HeroOutfitCard({
                 </span>
               </div>
 
-              <div className="mt-4 flex flex-col gap-3">
+              <div className="mt-3.5 flex flex-col gap-3">
                 {detailLink ? (
                   <Link
                     to={detailLink}
@@ -563,14 +563,14 @@ function WeatherSupportCard({
   WeatherIcon,
 }) {
   return (
-    <section className="section-surface overflow-hidden p-2.5">
-      <div className="rounded-[1.6rem] border border-[#e4d9c8] bg-[linear-gradient(135deg,rgba(255,255,255,0.94)_0%,rgba(246,241,232,0.98)_100%)] px-4 py-4 sm:px-5">
+    <section className="section-surface overflow-hidden p-2">
+      <div className="rounded-[1.6rem] border border-[#e4d9c8] bg-[linear-gradient(135deg,rgba(255,255,255,0.94)_0%,rgba(246,241,232,0.98)_100%)] px-4 py-3.5 sm:px-5">
         <div className="grid gap-3 sm:grid-cols-[auto_auto_1fr] sm:items-center">
           <div className="flex h-11 w-11 items-center justify-center rounded-full bg-white text-brass shadow-sm">
             <WeatherIcon className="h-5 w-5" />
           </div>
           <div className="space-y-0.5">
-            <p className="font-serif text-[1.9rem] leading-none text-charcoal">
+            <p className="font-serif text-[1.7rem] leading-none text-charcoal">
               {tempDisplay.replace("°C", "°")}
             </p>
             <p className="text-xs font-medium text-stone">{weatherLabel}</p>
@@ -602,12 +602,12 @@ function HomeMemoryRailCard({ outfit, supportingText = "" }) {
   const imageUrl = previewImages[0] || "";
 
   return (
-    <article className="overflow-hidden rounded-[1.5rem] border border-black/5 bg-white shadow-soft">
+    <article className="overflow-hidden rounded-[1.4rem] border border-black/5 bg-white shadow-soft">
       <Link
         to={outfit?.synthetic ? "/wardrobe" : `/outfits/${outfit.id}`}
         className="block focus:outline-none focus-visible:ring-4 focus-visible:ring-sage/20"
       >
-        <div className="aspect-[4/5] overflow-hidden bg-[linear-gradient(135deg,#eee6d9_0%,#f8f5ee_100%)]">
+        <div className="aspect-[4/4.7] overflow-hidden bg-[linear-gradient(135deg,#eee6d9_0%,#f8f5ee_100%)]">
           {imageUrl ? (
             <img
               src={imageUrl}
@@ -653,10 +653,10 @@ function HomeCombinationRailCard({ outfit, supportingText = "" }) {
   const imageUrl = previewImages[0] || "";
 
   return (
-    <article className="overflow-hidden rounded-[1.5rem] border border-black/5 bg-white shadow-soft">
+    <article className="overflow-hidden rounded-[1.4rem] border border-black/5 bg-white shadow-soft">
       <Link
         to={outfit?.synthetic ? "/wardrobe" : `/outfits/${outfit.id}`}
-        className="grid min-h-[8.75rem] grid-cols-[0.92fr_1.08fr] focus:outline-none focus-visible:ring-4 focus-visible:ring-sage/20"
+        className="grid min-h-[7.75rem] grid-cols-[0.9fr_1.1fr] focus:outline-none focus-visible:ring-4 focus-visible:ring-sage/20"
       >
         <div className="overflow-hidden bg-[linear-gradient(135deg,#eee6d9_0%,#f8f5ee_100%)]">
           {imageUrl ? (
@@ -671,7 +671,7 @@ function HomeCombinationRailCard({ outfit, supportingText = "" }) {
             </div>
           )}
         </div>
-        <div className="flex flex-col justify-between p-3.5">
+        <div className="flex flex-col justify-between p-3">
           <div>
             <h3 className="line-clamp-2 text-base font-medium leading-6 text-charcoal">
               {outfit.title}

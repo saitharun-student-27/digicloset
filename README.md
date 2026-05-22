@@ -75,6 +75,11 @@ DigiCloset currently includes:
   - softer metadata rhythm
   - quieter action rows
   - cleaner related piece / related outfit sections
+- final mobile visual QA + space-efficiency polish across the refreshed app with:
+  - tighter shared card/image sizing
+  - calmer but denser mobile spacing
+  - safer bottom-dock clearance
+  - more consistent app-like desktop framing
 - shared client-side wardrobe data layer for outfits and clothing
 - outfit lifecycle actions:
   - favorite / unfavorite
@@ -403,6 +408,7 @@ Completed visual refresh phases:
 - `3G.4` Outfit Memory / Capture visual refresh
 - `3G.5` Suggestions visual refresh
 - `3G.6` Outfit Detail + Piece Detail visual refresh
+- `3G.7` final mobile visual QA + space-efficiency polish
 
 ## Repository Structure
 
@@ -626,6 +632,7 @@ Oversize message:
 - a calmer Capture page that now feels more like saving an outfit memory than filling out a utility form
 - a calmer Suggestions page that now feels more curated and editorial instead of reading like a stacked dashboard of rails
 - calmer Outfit Detail and Piece Detail pages that now feel more like wardrobe memories than utility detail screens
+- tighter cross-page spacing and card sizing so the app reads more like a mobile app than a stretched website
 
 ## Honest Current Gaps
 
@@ -642,7 +649,7 @@ The biggest remaining product-quality gap is now hosted-readiness planning plus 
 
 The highest-impact next refinement would be:
 
-- Phase `3G.7`: final mobile visual QA, now that the shell, Home, Wardrobe, Capture, Suggestions, Outfit Detail, and Piece Detail are aligned more closely with the editorial mobile visual system
+- refreshing the stored docs screenshots so the repository visuals match the fully polished 3G.7 app state
 
 ## Documentation Maintenance
 
