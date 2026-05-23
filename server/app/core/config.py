@@ -3,6 +3,8 @@ from pathlib import Path
 from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from app.db.url import normalize_database_url
+
 
 class Settings(BaseSettings):
     APP_NAME: str = "DigiCloset API"
@@ -118,16 +120,7 @@ class Settings(BaseSettings):
 
     @property
     def database_url_resolved(self) -> str:
-        sqlite_prefix = "sqlite:///"
-        if not self.DATABASE_URL.startswith(sqlite_prefix):
-            return self.DATABASE_URL
-
-        database_path = self.DATABASE_URL[len(sqlite_prefix) :]
-        if Path(database_path).is_absolute():
-            return self.DATABASE_URL
-
-        resolved_path = (self.base_dir / database_path).resolve()
-        return f"{sqlite_prefix}{resolved_path.as_posix()}"
+        return normalize_database_url(self.DATABASE_URL, self.base_dir)
 
 
 settings = Settings()
