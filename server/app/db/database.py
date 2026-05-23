@@ -177,6 +177,9 @@ def create_db_tables() -> None:
     from app.models.outfit import Outfit, OutfitItem  # noqa: F401
     from app.models.user import User  # noqa: F401
 
+    if not settings.should_run_local_bootstrap:
+        return
+
     Base.metadata.create_all(bind=engine)
     _sync_sqlite_schema()
     db = SessionLocal()

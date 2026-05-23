@@ -739,6 +739,7 @@ Deployment work must stay staged and reversible.
 Do:
 - separate local-development defaults from production-required configuration
 - require explicit production environment variables for secrets, database access, CORS, and storage providers
+- require explicit environment-mode handling so production paths do not silently inherit development bootstrap behavior
 - keep the local dev user and reset utilities development-only
 - move infrastructure in phases:
   - config cleanup

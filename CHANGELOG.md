@@ -4,6 +4,65 @@ All notable changes to DigiCloset are documented here in chronological order.
 
 This changelog tracks the product from the original full-stack scaffold to the current outfit-memory-first, mobile-first wardrobe experience.
 
+## 2026-05-23 - Harden environment configuration for deployment
+
+Commit: latest Phase 3H.2 checkpoint on `main`
+
+### Phase 3H.2 scope
+
+- hardened local-versus-production configuration behavior
+- kept local development easy
+- blocked production from silently inheriting development bootstrap and secret defaults
+- avoided PostgreSQL migration, Cloudinary integration, and deployment changes
+
+### Backend environment cleanup
+
+- added explicit `APP_ENV=development|production` handling
+- made production require:
+  - real `SECRET_KEY`
+  - explicit non-local `CORS_ORIGINS`
+- added `ENABLE_API_DOCS` control with:
+  - development default: enabled
+  - production default: disabled
+
+### Startup guardrails
+
+- limited local bootstrap behavior to development only:
+  - `create_all()`
+  - SQLite schema sync
+  - ownership backfill
+  - default dev-user creation
+- kept local uploads working
+- kept auth and ownership behavior unchanged
+
+### Frontend env cleanup
+
+- moved the documented frontend API env var to:
+  - `VITE_API_BASE_URL`
+- kept localhost fallback for development only
+- made production require an explicit frontend API base URL at runtime
+
+### Documentation updates
+
+- updated:
+  - `README.md`
+  - `server/README.md`
+  - `PROJECT_RULES.md`
+  - `docs/DEPLOYMENT_PLAN.md`
+- clarified:
+  - dev defaults are local-only
+  - production must set real secrets and CORS origins
+  - dev-user seeding must not run in production
+  - PostgreSQL and cloud-storage migration are later phases
+
+### Important boundary
+
+- no schema migration happened
+- no PostgreSQL migration happened
+- no Cloudinary integration happened
+- no deployment happened
+- no auth or ownership rules changed
+
 ## 2026-05-23 - Add deployment readiness plan and hosted-architecture roadmap
 
 Commit: latest Phase 3H.1 checkpoint on `main`

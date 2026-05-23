@@ -98,6 +98,7 @@ After reset, the default dev login is:
 
 Important values in `.env` / `.env.example`:
 
+- `APP_ENV`
 - `DATABASE_URL`
 - `CORS_ORIGINS`
 - `UPLOAD_DIR`
@@ -106,6 +107,15 @@ Important values in `.env` / `.env.example`:
 - `SECRET_KEY`
 - `ACCESS_TOKEN_EXPIRE_MINUTES`
 - `JWT_ALGORITHM`
+- `ENABLE_API_DOCS`
+
+Current environment behavior:
+
+- local development defaults to `APP_ENV=development`
+- production must set a real `SECRET_KEY`
+- production must set explicit non-local `CORS_ORIGINS`
+- FastAPI docs are enabled by default in development and disabled by default in production
+- local SQLite bootstrap and default dev-user backfill are development-only and must not run in production
 
 ## Current Boundary
 
@@ -142,7 +152,7 @@ Current outfit-builder contract boundary:
 
 Next backend-adjacent phase:
 
-- Phase `3E.5`: PostgreSQL migration planning and hosted deployment readiness
+- Phase `3H.3`: PostgreSQL compatibility and migration preparation
 
 ## User-Scoped Upload QA Notes
 

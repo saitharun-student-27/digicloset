@@ -1,8 +1,25 @@
 import axios from "axios";
 
 export const AUTH_TOKEN_STORAGE_KEY = "digicloset_access_token";
+const LOCAL_DEV_API_URL = "http://127.0.0.1:8000/api";
 
 let unauthorizedHandler = null;
+
+function getApiBaseUrl() {
+  const configuredUrl = import.meta.env.VITE_API_BASE_URL || import.meta.env.VITE_API_URL;
+
+  if (configuredUrl) {
+    return configuredUrl;
+  }
+
+  if (import.meta.env.DEV) {
+    return LOCAL_DEV_API_URL;
+  }
+
+  throw new Error(
+    "Missing VITE_API_BASE_URL for production build. Set it to your hosted backend API origin.",
+  );
+}
 
 export function getStoredAccessToken() {
   if (typeof window === "undefined") {
@@ -33,7 +50,7 @@ export function setUnauthorizedHandler(handler) {
 }
 
 export const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "http://localhost:8000/api",
+  baseURL: getApiBaseUrl(),
 });
 
 api.interceptors.request.use((config) => {

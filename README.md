@@ -486,6 +486,19 @@ copy .env.example .env
 python -m uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
 ```
 
+Key local backend defaults in `.env`:
+
+- `APP_ENV=development`
+- `DATABASE_URL=sqlite:///./digicloset.db`
+- `CORS_ORIGINS=http://127.0.0.1:5173,http://localhost:5173`
+- `ENABLE_API_DOCS=true`
+
+Production note:
+
+- production must set a real `SECRET_KEY`
+- production must set explicit non-local `CORS_ORIGINS`
+- production must not rely on local SQLite bootstrap or dev-user seeding
+
 ### Frontend
 
 ```powershell
@@ -493,6 +506,10 @@ cd D:\projects\digicloset\client
 npm install
 npm.cmd run dev -- --host 127.0.0.1 --port 5173
 ```
+
+Frontend env example:
+
+- `VITE_API_BASE_URL=http://127.0.0.1:8000/api`
 
 Open:
 
@@ -680,6 +697,7 @@ DigiCloset is still local-first today:
 - local `server/uploads` remains the active development image store
 - the local dev account remains a development-only utility path
 - production deployment work has not started yet
+- backend startup bootstrap remains development-only for now
 
 Deployment planning now lives in [docs/DEPLOYMENT_PLAN.md](docs/DEPLOYMENT_PLAN.md).
 
@@ -691,6 +709,14 @@ That plan is the source of truth for:
 - cloud image storage planning
 - production security review
 - staged rollout and rollback sequencing
+
+Current environment hardening status:
+
+- backend now supports explicit `APP_ENV=development|production`
+- production requires a real `SECRET_KEY`
+- production requires explicit non-local `CORS_ORIGINS`
+- local SQLite bootstrap and dev-user seeding are blocked when `APP_ENV=production`
+- API docs are enabled by default in development and disabled by default in production
 
 ## Documentation Maintenance
 

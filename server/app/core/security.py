@@ -71,7 +71,7 @@ def create_access_token(subject: str) -> str:
     )
     signing_input = f"{encoded_header}.{encoded_payload}".encode("ascii")
     signature = hmac.new(
-        settings.SECRET_KEY.encode("utf-8"),
+        settings.secret_key_resolved.encode("utf-8"),
         signing_input,
         hashlib.sha256,
     ).digest()
@@ -87,7 +87,7 @@ def decode_access_token(token: str) -> dict:
 
     signing_input = f"{encoded_header}.{encoded_payload}".encode("ascii")
     expected_signature = hmac.new(
-        settings.SECRET_KEY.encode("utf-8"),
+        settings.secret_key_resolved.encode("utf-8"),
         signing_input,
         hashlib.sha256,
     ).digest()

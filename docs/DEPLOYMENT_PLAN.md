@@ -32,18 +32,17 @@
 
 ### Frontend
 
-- `client/src/lib/api.js` falls back to `http://localhost:8000/api`.
-- `client/.env` and `client/.env.example` are still localhost-oriented.
-- Frontend env naming is workable, but should be cleaned up and documented before hosting.
+- `client/src/lib/api.js` now expects `VITE_API_BASE_URL` in production and only falls back to localhost during development.
+- `client/.env.example` now documents `VITE_API_BASE_URL`, but hosted env wiring still needs provider setup.
 
 ### Backend
 
-- `server/app/core/config.py` includes a development-safe-looking but production-unsafe default `SECRET_KEY`.
-- `server/app/main.py` enables FastAPI docs/OpenAPI by default.
+- `server/app/core/config.py` now supports explicit `APP_ENV=development|production`.
+- production now requires an explicit non-placeholder `SECRET_KEY`.
+- production now requires explicit non-local `CORS_ORIGINS`.
+- `server/app/main.py` now disables FastAPI docs/OpenAPI by default in production.
 - `server/app/main.py` always mounts local `uploads/` static files.
-- `server/app/db/database.py` calls `Base.metadata.create_all()` at startup.
-- `server/app/db/database.py` always runs ownership backfill on startup.
-- `server/app/db/database.py` always ensures the default local dev user exists.
+- `server/app/db/database.py` now limits `create_all()`, SQLite sync, ownership backfill, and default dev-user creation to development bootstrap only.
 - `_sync_sqlite_schema()` uses SQLite-specific DDL assumptions.
 - Local upload persistence and cleanup assume filesystem-backed storage.
 - AI route is mounted regardless of whether `GEMINI_API_KEY` exists.
@@ -61,13 +60,14 @@
 
 ### Frontend
 
-- `VITE_API_URL`
+- `VITE_API_BASE_URL`
   - local: `http://127.0.0.1:8000/api`
   - production: hosted backend URL plus `/api`
 
 ### Backend
 
 - `APP_NAME`
+- `APP_ENV`
 - `API_PREFIX`
 - `DATABASE_URL`
 - `CORS_ORIGINS`
@@ -77,6 +77,7 @@
 - `SECRET_KEY`
 - `ACCESS_TOKEN_EXPIRE_MINUTES`
 - `JWT_ALGORITHM`
+- `ENABLE_API_DOCS`
 - `GEMINI_API_KEY` (optional)
 
 ### Cloudinary (planned)
@@ -204,7 +205,7 @@
 
 ## Frontend Production Checklist
 
-- Set `VITE_API_URL` to the real hosted backend origin.
+- Set `VITE_API_BASE_URL` to the real hosted backend origin.
 - Keep local `.env` and hosted env values separate.
 - Vite build command remains:
   - `npm.cmd run build`
