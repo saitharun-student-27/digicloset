@@ -43,14 +43,14 @@
 - `server/app/main.py` now disables FastAPI docs/OpenAPI by default in production.
 - `server/app/main.py` always mounts local `uploads/` static files.
 - `server/app/db/database.py` now limits `create_all()`, SQLite sync, ownership backfill, and default dev-user creation to development bootstrap only.
+- `server/alembic/` and `server/alembic.ini` now provide explicit schema-migration wiring.
 - `_sync_sqlite_schema()` uses SQLite-specific DDL assumptions.
 - Local upload persistence and cleanup assume filesystem-backed storage.
 - AI route is mounted regardless of whether `GEMINI_API_KEY` exists.
 
 ### Data and operations
 
-- No production-safe database migration workflow is defined yet.
-- Alembic is installed, but no migration discipline is documented for hosted environments.
+- A migration workflow now exists, but it still needs a future hosted PostgreSQL test pass before deployment.
 - Local-only scripts still exist in the normal repo flow:
   - `scripts/migrate_user_ownership.py`
   - `scripts/reset_dev_user_password.py`
@@ -70,6 +70,8 @@
 - `APP_ENV`
 - `API_PREFIX`
 - `DATABASE_URL`
+  - preferred: `postgresql+psycopg://USER:PASSWORD@HOST/DBNAME`
+  - accepted and normalized: `postgresql://USER:PASSWORD@HOST/DBNAME`
 - `CORS_ORIGINS`
 - `UPLOAD_DIR` (development/local only)
 - `UPLOAD_URL_PREFIX`
@@ -96,6 +98,7 @@
 - Local development is using SQLite through `.env`.
 - The codebase already includes `psycopg[binary]`.
 - SQLAlchemy models are mostly portable and should work on PostgreSQL without model redesign.
+- Alembic is now configured with an initial schema migration.
 
 ### Likely compatible already
 
@@ -103,30 +106,29 @@
 - Auth, ownership, and relationship modeling are PostgreSQL-friendly.
 - Backend already accepts `DATABASE_URL`, which is the right production shape.
 
-### What needs to change before migration
+### What changed in preparation
 
-- Stop treating startup `create_all()` as the production schema strategy.
-- Gate SQLite-only schema sync and backfill logic away from PostgreSQL production startup.
-- Stop auto-seeding the local dev user in production.
-- Add an explicit migration path for future schema changes.
+- startup `create_all()` remains development-only
+- SQLite-only schema sync and ownership backfill remain development-only
+- PostgreSQL URL normalization now supports:
+  - `postgresql://...`
+  - `postgresql+psycopg://...`
+- Alembic is configured as the explicit production schema path
 
-### Recommendation
+### Current schema strategy
 
-- **Phase 3H.2:** clean environment/config behavior first.
-- **Phase 3H.3:** prepare PostgreSQL compatibility and migration discipline.
-- Use **Alembic** before real hosted rollout, even if the first staging database can be bootstrapped from a known schema.
-- For first hosted staging, one acceptable temporary stop condition is:
-  - initialize PostgreSQL on an empty database
-  - run a single controlled migration/bootstrap
-  - do not rely on repeated startup `create_all()` in production
+- local development may keep using SQLite bootstrap
+- hosted/staging databases should use:
+  - `alembic upgrade head`
+- production should not rely on repeated startup `create_all()`
+- local data migration is still intentionally out of scope for this phase
 
 ### Files likely changed
 
 - `server/app/core/config.py`
 - `server/app/db/database.py`
-- `server/app/main.py`
-- `server/requirements.txt` (only if dependency cleanup is needed)
-- future Alembic files/config
+- `server/alembic.ini`
+- `server/alembic/`
 - deployment service config files
 
 ### Local-only scripts that must stay local-only
@@ -134,6 +136,8 @@
 - `scripts/migrate_user_ownership.py`
 - `scripts/reset_dev_user_password.py`
 - SQLite backfill/startup ownership bootstrap behavior
+- `scripts/check-orphaned-uploads.py` while uploads are still filesystem-backed
+- these scripts should fail fast in production-mode environments
 
 ### Main migration risks
 
@@ -141,6 +145,7 @@
 - schema drift between local SQLite and hosted PostgreSQL
 - startup-time table creation hiding migration mistakes
 - relying on SQLite-specific assumptions in a PostgreSQL environment
+- divergence between future model changes and migration files if Alembic discipline is skipped
 
 ## Cloud Image Storage Plan
 
@@ -257,6 +262,7 @@
 - **Stop condition:**
   - empty PostgreSQL database can be initialized safely
   - startup no longer depends on SQLite-specific sync behavior
+  - Alembic migration path exists and is documented
 
 ### 3H.4 - Cloudinary image storage integration
 

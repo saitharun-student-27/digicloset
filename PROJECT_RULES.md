@@ -380,6 +380,16 @@ Do not paint the schema into a single-user-only corner.
 ### 8.6 Migration discipline
 Do not add speculative tables without a product reason and a near-term usage path.
 
+Production schema creation must be explicit.
+
+Do:
+- use versioned migrations for hosted schema changes
+- keep local bootstrap separate from production schema application
+
+Do not:
+- rely on startup `create_all()` as the production schema strategy
+- run local SQLite backfill/bootstrap behavior against hosted production databases
+
 ### 8.7 Auth sequencing rule
 Authentication foundation may be introduced before full wardrobe ownership, but private-user claims must not be made until backend ownership filtering is actually enforced.
 

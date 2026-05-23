@@ -116,6 +116,31 @@ Current environment behavior:
 - production must set explicit non-local `CORS_ORIGINS`
 - FastAPI docs are enabled by default in development and disabled by default in production
 - local SQLite bootstrap and default dev-user backfill are development-only and must not run in production
+- production schema creation must be explicit through Alembic
+
+PostgreSQL notes:
+
+- local SQLite is still supported for development
+- PostgreSQL URLs using either:
+  - `postgresql+psycopg://...`
+  - `postgresql://...`
+  are normalized for SQLAlchemy/psycopg use
+- production should use Alembic migrations instead of startup `create_all()`
+
+## Alembic
+
+Safe migration commands from the `server` folder:
+
+```powershell
+.\venv\Scripts\python.exe -m alembic -c alembic.ini heads
+.\venv\Scripts\python.exe -m alembic -c alembic.ini upgrade head
+```
+
+Important boundary:
+
+- do not run local-only ownership backfill or dev-reset scripts against a hosted production database
+- local-only scripts now fail fast when `APP_ENV=production`
+- do not rely on startup bootstrap for PostgreSQL schema creation
 
 ## Current Boundary
 
@@ -152,7 +177,7 @@ Current outfit-builder contract boundary:
 
 Next backend-adjacent phase:
 
-- Phase `3H.3`: PostgreSQL compatibility and migration preparation
+- Phase `3H.4`: Cloudinary image storage integration
 
 ## User-Scoped Upload QA Notes
 

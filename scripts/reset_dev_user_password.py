@@ -9,6 +9,7 @@ SERVER_DIR = ROOT / "server"
 if str(SERVER_DIR) not in sys.path:
     sys.path.insert(0, str(SERVER_DIR))
 
+from app.core.config import settings  # noqa: E402
 from app.core.security import hash_password  # noqa: E402
 from app.db.database import (  # noqa: E402
     DEFAULT_DEV_USER_DISPLAY_NAME,
@@ -21,6 +22,11 @@ from app.models.user import User  # noqa: E402
 
 
 def main() -> None:
+    if settings.is_production:
+        raise RuntimeError(
+            "scripts/reset_dev_user_password.py is a local-only utility and must not run with APP_ENV=production."
+        )
+
     create_db_tables()
 
     db = SessionLocal()

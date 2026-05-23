@@ -4,6 +4,73 @@ All notable changes to DigiCloset are documented here in chronological order.
 
 This changelog tracks the product from the original full-stack scaffold to the current outfit-memory-first, mobile-first wardrobe experience.
 
+## 2026-05-23 - Prepare the database layer for PostgreSQL migrations
+
+Commit: latest Phase 3H.3 checkpoint on `main`
+
+### Phase 3H.3 scope
+
+- prepared the backend database layer for PostgreSQL and Neon-style connection strings
+- configured Alembic for explicit schema creation
+- preserved local SQLite development
+- avoided data migration, deployment, and cloud-storage work
+
+### Database compatibility preparation
+
+- added database URL normalization support for:
+  - `sqlite:///...`
+  - `postgresql://...`
+  - `postgresql+psycopg://...`
+- kept SQLite-specific engine arguments limited to SQLite only
+- preserved `psycopg[binary]` as the PostgreSQL driver path
+
+### Alembic setup
+
+- added:
+  - `server/alembic.ini`
+  - `server/alembic/env.py`
+  - `server/alembic/script.py.mako`
+  - `server/alembic/versions/20260523_3h3_initial_schema.py`
+- added model import wiring so Alembic can target the current metadata safely
+- created an initial migration covering:
+  - `users`
+  - `clothing_items`
+  - `outfits`
+  - `outfit_items`
+
+### Production schema boundary
+
+- production schema creation now has an explicit migration path:
+  - `alembic upgrade head`
+- production startup still does not run local bootstrap
+- local SQLite bootstrap remains development-only
+
+### Script and documentation cleanup
+
+- marked local-only utility scripts more clearly
+- made local-only database/upload scripts fail fast when `APP_ENV=production`
+- updated deployment docs and backend docs for:
+  - PostgreSQL URL format
+  - Alembic commands
+  - local-only script boundaries
+  - explicit production schema creation
+
+### Verification
+
+- backend compile passed
+- Alembic `heads` passed
+- Alembic upgrade/current passed against a throwaway SQLite verification database
+- local production-mode bootstrap skip simulation passed
+- local dev login smoke test still passed
+
+### Important boundary
+
+- no local SQLite data was migrated
+- no PostgreSQL database was connected live
+- no deployment happened
+- no Cloudinary work happened
+- no frontend UI changed
+
 ## 2026-05-23 - Harden environment configuration for deployment
 
 Commit: latest Phase 3H.2 checkpoint on `main`

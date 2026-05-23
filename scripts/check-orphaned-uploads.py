@@ -1,3 +1,5 @@
+"""Local development utility only. Assumes filesystem-backed uploads."""
+
 from __future__ import annotations
 
 import os
@@ -13,6 +15,7 @@ SERVER_ROOT = PROJECT_ROOT / "server"
 sys.path.insert(0, str(SERVER_ROOT))
 os.chdir(SERVER_ROOT)
 
+from app.core.config import settings  # noqa: E402
 from app.db.database import engine  # noqa: E402
 from app.utils.upload import ensure_upload_dir, resolve_local_upload_path  # noqa: E402
 
@@ -33,6 +36,11 @@ def collect_db_image_urls() -> set[str]:
 
 
 def main() -> int:
+    if settings.is_production:
+        raise RuntimeError(
+            "scripts/check-orphaned-uploads.py is a local-only utility and must not run with APP_ENV=production."
+        )
+
     upload_dir = ensure_upload_dir()
     disk_files = {
         path.resolve()

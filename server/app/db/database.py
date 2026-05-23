@@ -6,9 +6,19 @@ from sqlalchemy.orm import Session, sessionmaker
 from app.core.config import settings
 from app.core.security import hash_password
 from app.db.base import Base
+from app.db.url import is_sqlite_url
 
 
-engine = create_engine(settings.database_url_resolved, pool_pre_ping=True)
+def get_engine_kwargs(database_url: str) -> dict:
+    engine_kwargs: dict = {"pool_pre_ping": True}
+
+    if is_sqlite_url(database_url):
+        engine_kwargs["connect_args"] = {"check_same_thread": False}
+
+    return engine_kwargs
+
+
+engine = create_engine(settings.database_url_resolved, **get_engine_kwargs(settings.database_url_resolved))
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 DEFAULT_DEV_USER_EMAIL = "dev@digicloset.local"
 DEFAULT_DEV_USER_DISPLAY_NAME = "Dev User"

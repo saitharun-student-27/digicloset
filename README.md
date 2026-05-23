@@ -498,6 +498,7 @@ Production note:
 - production must set a real `SECRET_KEY`
 - production must set explicit non-local `CORS_ORIGINS`
 - production must not rely on local SQLite bootstrap or dev-user seeding
+- production schema creation must run through Alembic, not startup `create_all()`
 
 ### Frontend
 
@@ -510,6 +511,15 @@ npm.cmd run dev -- --host 127.0.0.1 --port 5173
 Frontend env example:
 
 - `VITE_API_BASE_URL=http://127.0.0.1:8000/api`
+
+Hosted database note:
+
+- local development still uses SQLite
+- hosted PostgreSQL is prepared for later phases
+- `DATABASE_URL` may use either:
+  - `postgresql+psycopg://USER:PASSWORD@HOST/DBNAME`
+  - `postgresql://USER:PASSWORD@HOST/DBNAME`
+- Alembic is now the intended production schema path
 
 Open:
 
@@ -531,6 +541,13 @@ npm.cmd run build
 ```powershell
 cd D:\projects\digicloset
 python -m compileall server\app
+```
+
+### Alembic sanity check
+
+```powershell
+cd D:\projects\digicloset\server
+.\venv\Scripts\python.exe -m alembic -c alembic.ini heads
 ```
 
 ### Backend auth verification
@@ -717,6 +734,7 @@ Current environment hardening status:
 - production requires explicit non-local `CORS_ORIGINS`
 - local SQLite bootstrap and dev-user seeding are blocked when `APP_ENV=production`
 - API docs are enabled by default in development and disabled by default in production
+- Alembic is now configured for explicit schema creation before hosted rollout
 
 ## Documentation Maintenance
 
