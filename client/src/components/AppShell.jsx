@@ -3,9 +3,10 @@ import {
   Home as HomeIcon,
   LogOut,
   Plus,
+  UserRound,
   Sparkles,
 } from "lucide-react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 
 import { useAuth } from "../context/AuthContext.jsx";
 
@@ -73,9 +74,18 @@ export default function AppShell({ children }) {
               </div>
 
               <div className="shell-profile-pill">
-                <span className="max-w-[8.75rem] truncate text-[11px] font-medium text-stone sm:max-w-[12rem]">
-                  {profileLabel}
-                </span>
+                <Link
+                  to="/profile"
+                  className="inline-flex min-w-0 items-center gap-2 rounded-full px-2 py-1.5 text-left transition hover:bg-white/70"
+                  aria-label="Open profile"
+                >
+                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-white text-brass shadow-sm">
+                    <UserRound className="h-3.5 w-3.5" />
+                  </div>
+                  <span className="max-w-[7rem] truncate text-[11px] font-medium text-stone sm:max-w-[10rem]">
+                    {profileLabel}
+                  </span>
+                </Link>
                 <button
                   type="button"
                   onClick={handleLogout}

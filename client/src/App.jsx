@@ -11,6 +11,7 @@ const Capture = lazy(() => import("./pages/Capture"));
 const Suggestions = lazy(() => import("./pages/Suggestions"));
 const PieceDetail = lazy(() => import("./pages/PieceDetail"));
 const OutfitDetail = lazy(() => import("./pages/OutfitDetail"));
+const Profile = lazy(() => import("./pages/Profile"));
 const AuthWelcome = lazy(() => import("./pages/AuthWelcome"));
 const Login = lazy(() => import("./pages/Login"));
 const Signup = lazy(() => import("./pages/Signup"));
@@ -89,6 +90,14 @@ function App() {
         element={
           <AppRoute>
             <Suggestions />
+          </AppRoute>
+        }
+      />
+      <Route
+        path="/profile"
+        element={
+          <AppRoute>
+            <Profile />
           </AppRoute>
         }
       />

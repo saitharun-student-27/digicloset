@@ -4,6 +4,70 @@ All notable changes to DigiCloset are documented here in chronological order.
 
 This changelog tracks the product from the original full-stack scaffold to the current outfit-memory-first, mobile-first wardrobe experience.
 
+## 2026-05-23 - Add a protected Profile page and verify dev helpers stay development-only
+
+Commit: latest Phase 3H.0 checkpoint on `main`
+
+### Phase 3H.0 scope
+
+- added a private protected Profile page
+- added a protected `/profile` route
+- added a quiet shell entry point into Profile from the existing signed-in user pill
+- audited local dev-helper auth UI so it stays out of production
+
+### Dev-helper audit
+
+- confirmed the only visible dev-helper copy remains in `Login.jsx`
+- confirmed all local-dev helper strings are wrapped in `import.meta.env.DEV`
+- confirmed the dev password is never shown by default
+- confirmed welcome and signup do not expose dev-only helper UI
+- confirmed the production build output does not contain:
+  - `dev@digicloset.local`
+  - `devpassword123`
+  - `Fill dev login`
+  - `Local dev account available`
+
+### Profile page
+
+- added a calmer editorial Profile page that shows only the current signed-in account
+- added:
+  - display name
+  - email
+  - joined date
+  - privacy note
+  - wardrobe summary cards for:
+    - total outfit memories
+    - total wardrobe pieces
+    - favorite outfits
+    - recently worn outfits
+- kept Profile private and backed only by the current auth user plus already-loaded wardrobe data
+
+### Navigation and protection
+
+- made the signed-in user pill in the top shell open `/profile`
+- kept logout available both in the shell and on the Profile page
+- confirmed direct unauthenticated access to `/profile` redirects back to auth entry
+
+### Verification
+
+- frontend production build passed
+- browser QA passed for:
+  - no-token redirect to `/welcome`
+  - dev-user login
+  - `/profile` load
+  - profile-pill navigation
+  - logout from Profile
+  - signup for a new user
+  - private empty wardrobe summary for a new user
+  - direct unauthenticated `/profile` access redirect
+- confirmed no dev-user data leak for a newly signed-up user
+
+### Important boundary
+
+- no backend changes
+- no auth-logic changes
+- no feature expansion into social/settings/product-profile systems
+
 ## 2026-05-22 - Align auth screens with the final app visual system
 
 Commit: latest Phase 3G.8 checkpoint on `main`

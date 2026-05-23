@@ -15,6 +15,7 @@ DigiCloset currently includes:
   - welcome screen
   - login
   - signup
+  - private profile page
   - protected routes
   - session persistence
   - logout
@@ -319,6 +320,7 @@ The current Piece Detail visual direction also pushes the page toward:
 - `/login` -> Login
 - `/signup` -> Signup
 - `/` -> Home
+- `/profile` -> Profile
 - `/outfit-memory` -> Outfit Memory
 - `/wardrobe` -> Wardrobe
 - `/suggestions` -> Suggestions
@@ -561,6 +563,7 @@ Expected auth behavior now:
 - `/welcome` acts as the first-entry auth screen
 - successful login restores access to:
   - Home
+  - Profile
   - Outfit Memory
   - Wardrobe
   - Suggestions
@@ -571,6 +574,8 @@ Expected auth behavior now:
 - signup is reachable from both:
   - `/welcome`
   - `/login`
+- the local dev login helper is development-only and is removed from the production build
+- the backfilled dev user is for local development only and must not be seeded into production
 
 ### Shared state browser verification
 
@@ -628,6 +633,7 @@ Oversize message:
 - working frontend auth flow for protected wardrobe APIs
 - private user-scoped wardrobe loading after login
 - separate mobile-style auth entry screens that match the calmer DigiCloset editorial mood more closely
+- a protected Profile page that shows only the current account and its wardrobe summary
 - verified user-scoped upload isolation across authenticated users
 - verified logout/login switching without stale wardrobe leakage
 - stronger mixed-wardrobe category support with readable labels and safer grouping
