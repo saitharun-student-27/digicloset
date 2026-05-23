@@ -25,7 +25,6 @@ export default function Login() {
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formError, setFormError] = useState("");
-  const [showDevFill, setShowDevFill] = useState(false);
 
   const redirectTarget = location.state?.from || "/";
   const helperMessage = location.state?.message || "";
@@ -47,11 +46,6 @@ export default function Login() {
     } finally {
       setIsSubmitting(false);
     }
-  }
-
-  function fillDevLogin() {
-    setEmail("dev@digicloset.local");
-    setPassword("devpassword123");
   }
 
   return (
@@ -133,24 +127,6 @@ export default function Login() {
           {isSubmitting ? "Opening..." : "Open My Closet"}
         </button>
       </form>
-
-      {import.meta.env.DEV ? (
-        <div className="mt-4 text-center text-xs leading-5 text-stone/75">
-          <p>Local dev account available.</p>
-          <button
-            type="button"
-            onClick={() => {
-              setShowDevFill((current) => !current);
-              if (!showDevFill) {
-                fillDevLogin();
-              }
-            }}
-            className="mt-1 text-[0.76rem] font-medium text-stone underline-offset-4 hover:text-charcoal hover:underline"
-          >
-            {showDevFill ? "Hide dev helper" : "Fill dev login"}
-          </button>
-        </div>
-      ) : null}
     </AuthShell>
   );
 }

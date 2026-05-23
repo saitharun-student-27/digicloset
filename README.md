@@ -576,6 +576,7 @@ Expected auth behavior now:
   - `/login`
 - the local dev login helper is development-only and is removed from the production build
 - the backfilled dev user is for local development only and must not be seeded into production
+- the login UI does not expose dev-account credentials or autofill helpers
 
 ### Shared state browser verification
 

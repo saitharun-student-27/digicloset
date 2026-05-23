@@ -4,6 +4,50 @@ All notable changes to DigiCloset are documented here in chronological order.
 
 This changelog tracks the product from the original full-stack scaffold to the current outfit-memory-first, mobile-first wardrobe experience.
 
+## 2026-05-23 - Remove the visible dev login helper from the login screen
+
+Commit: latest Phase 3H.0B checkpoint on `main`
+
+### Phase 3H.0B scope
+
+- removed the visible local dev-helper UI from the frontend login page
+- kept the local dev user account intact for manual testing
+- kept backend auth, route protection, and token handling unchanged
+
+### What changed
+
+- removed the visible login-page helper UI for:
+  - `Local dev account available.`
+  - `Fill dev login`
+- removed the now-unused frontend helper state and autofill function from `Login.jsx`
+- kept login visually clean and production-like while preserving manual local login with the dev user
+
+### Verification
+
+- frontend production build passed
+- browser QA passed for:
+  - no visible dev-helper UI on `/login`
+  - manual local login with:
+    - `dev@digicloset.local`
+    - `devpassword123`
+  - invalid login error
+  - signup for a new user
+  - logout back to `/welcome`
+  - direct protected-route redirect back to auth entry
+  - protected Profile still showing the current logged-in user normally
+- production build output search confirmed no matches for:
+  - `dev@digicloset.local`
+  - `devpassword123`
+  - `Fill dev login`
+  - `Local dev account available`
+
+### Important boundary
+
+- no backend auth changes
+- no dev-user deletion
+- no utility-script removal
+- no feature expansion
+
 ## 2026-05-23 - Add a protected Profile page and verify dev helpers stay development-only
 
 Commit: latest Phase 3H.0 checkpoint on `main`
