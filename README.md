@@ -672,6 +672,26 @@ The highest-impact next refinement would be:
 
 - refreshing the stored docs screenshots so the repository visuals match the fully polished 3G.7A app state
 
+## Deployment Readiness
+
+DigiCloset is still local-first today:
+
+- SQLite remains the active development database
+- local `server/uploads` remains the active development image store
+- the local dev account remains a development-only utility path
+- production deployment work has not started yet
+
+Deployment planning now lives in [docs/DEPLOYMENT_PLAN.md](docs/DEPLOYMENT_PLAN.md).
+
+That plan is the source of truth for:
+
+- hosting recommendation
+- environment-variable checklist
+- PostgreSQL migration preparation
+- cloud image storage planning
+- production security review
+- staged rollout and rollback sequencing
+
 ## Documentation Maintenance
 
 When the product changes meaningfully, update:
@@ -711,4 +731,6 @@ Repeat the same pattern for:
 Release history lives in [CHANGELOG.md](CHANGELOG.md).
 
 Visual refresh planning and reference rules live in [docs/VISUAL_SYSTEM.md](docs/VISUAL_SYSTEM.md).
+
+Deployment readiness planning lives in [docs/DEPLOYMENT_PLAN.md](docs/DEPLOYMENT_PLAN.md).
 

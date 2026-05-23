@@ -4,6 +4,65 @@ All notable changes to DigiCloset are documented here in chronological order.
 
 This changelog tracks the product from the original full-stack scaffold to the current outfit-memory-first, mobile-first wardrobe experience.
 
+## 2026-05-23 - Add deployment readiness plan and hosted-architecture roadmap
+
+Commit: latest Phase 3H.1 checkpoint on `main`
+
+### Phase 3H.1 scope
+
+- audited DigiCloset's current local-first deployment assumptions
+- documented a recommended beginner-friendly hosting stack
+- documented migration and risk planning for PostgreSQL and cloud image storage
+- kept this phase documentation-only with no deployment or infrastructure changes
+
+### Deployment audit findings
+
+- frontend still falls back to a localhost API origin
+- backend still contains development-oriented defaults for:
+  - `SECRET_KEY`
+  - `CORS_ORIGINS`
+  - startup table creation / ownership bootstrap
+  - local upload mounting
+- local development utilities still exist and must remain local-only:
+  - dev-user reset
+  - local ownership backfill
+  - orphaned local upload audit
+- hosted-readiness still needs explicit planning before infrastructure changes begin
+
+### Documentation added
+
+- added:
+  - `docs/DEPLOYMENT_PLAN.md`
+- documented:
+  - recommended hosting stack
+  - deployment blockers
+  - environment-variable checklist
+  - PostgreSQL migration preparation
+  - Cloudinary migration preparation
+  - production auth/security checklist
+  - frontend production checklist
+  - staged deployment roadmap
+  - rollout risks and rollback notes
+
+### Recommended architecture direction
+
+- frontend:
+  - Vercel
+- backend:
+  - Render Web Service
+- database:
+  - Neon PostgreSQL
+- image storage:
+  - Cloudinary
+
+### Important boundary
+
+- no app code changed
+- no deployment happened
+- no database migration happened
+- no storage migration happened
+- no auth logic changed
+
 ## 2026-05-23 - Remove the visible dev login helper from the login screen
 
 Commit: latest Phase 3H.0B checkpoint on `main`

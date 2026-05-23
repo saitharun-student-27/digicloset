@@ -733,6 +733,26 @@ Never hardcode secrets or credentials.
 
 Use environment variables only.
 
+### 15.5 Deployment-readiness rule
+Deployment work must stay staged and reversible.
+
+Do:
+- separate local-development defaults from production-required configuration
+- require explicit production environment variables for secrets, database access, CORS, and storage providers
+- keep the local dev user and reset utilities development-only
+- move infrastructure in phases:
+  - config cleanup
+  - database migration prep
+  - cloud storage integration
+  - staging deploy
+  - production QA
+
+Do not:
+- treat local SQLite or local uploads as production-safe defaults
+- auto-seed the local dev user in production
+- combine database migration, storage migration, and first hosted deploy in one checkpoint
+- expose development helpers or secrets in frontend production output
+
 ---
 
 ## 16. Code Organization Rules
