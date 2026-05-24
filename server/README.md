@@ -103,6 +103,11 @@ Important values in `.env` / `.env.example`:
 - `CORS_ORIGINS`
 - `UPLOAD_DIR`
 - `UPLOAD_URL_PREFIX`
+- `IMAGE_STORAGE_BACKEND`
+- `CLOUDINARY_CLOUD_NAME`
+- `CLOUDINARY_API_KEY`
+- `CLOUDINARY_API_SECRET`
+- `CLOUDINARY_FOLDER`
 - `MAX_UPLOAD_SIZE_BYTES`
 - `SECRET_KEY`
 - `ACCESS_TOKEN_EXPIRE_MINUTES`
@@ -117,6 +122,8 @@ Current environment behavior:
 - FastAPI docs are enabled by default in development and disabled by default in production
 - local SQLite bootstrap and default dev-user backfill are development-only and must not run in production
 - production schema creation must be explicit through Alembic
+- local development defaults to `IMAGE_STORAGE_BACKEND=local`
+- Cloudinary credentials are required only when `IMAGE_STORAGE_BACKEND=cloudinary`
 
 PostgreSQL notes:
 
@@ -126,6 +133,16 @@ PostgreSQL notes:
   - `postgresql://...`
   are normalized for SQLAlchemy/psycopg use
 - production should use Alembic migrations instead of startup `create_all()`
+
+Image storage notes:
+
+- local development keeps using `server/uploads`
+- production can use `IMAGE_STORAGE_BACKEND=cloudinary`
+- Cloudinary uploads are grouped under user-scoped folders like:
+  - `digicloset/u_{user_id}/outfits/...`
+  - `digicloset/u_{user_id}/clothing/...`
+- app-owned Cloudinary deletes use stored `image_public_id`
+- old local image URLs remain compatible in local development
 
 ## Alembic
 
@@ -190,6 +207,9 @@ Current verified behavior:
 - old top-level local upload URLs still work
 - local delete cleanup still removes safe app-owned files
 - external URLs remain untouched by local cleanup
+- Cloudinary-ready records can also store:
+  - `image_url`
+  - nullable `image_public_id`
 
 ## Orphaned Upload Audit
 

@@ -499,6 +499,7 @@ Production note:
 - production must set explicit non-local `CORS_ORIGINS`
 - production must not rely on local SQLite bootstrap or dev-user seeding
 - production schema creation must run through Alembic, not startup `create_all()`
+- production image storage can now be switched explicitly with `IMAGE_STORAGE_BACKEND`
 
 ### Frontend
 
@@ -520,6 +521,14 @@ Hosted database note:
   - `postgresql+psycopg://USER:PASSWORD@HOST/DBNAME`
   - `postgresql://USER:PASSWORD@HOST/DBNAME`
 - Alembic is now the intended production schema path
+
+Hosted image-storage note:
+
+- local development still uses `server/uploads`
+- production-ready image storage now supports:
+  - `IMAGE_STORAGE_BACKEND=local`
+  - `IMAGE_STORAGE_BACKEND=cloudinary`
+- Cloudinary credentials are only required when the Cloudinary backend is enabled
 
 Open:
 
@@ -646,6 +655,8 @@ Current upload policy:
 - local uploaded files are deleted safely when a persisted outfit/piece image is removed or the owning record is deleted
 - new authenticated uploads can be stored under user-scoped local folders like `uploads/u_{user_id}/...`
 - old pre-user-scope upload URLs remain compatible
+- Cloudinary-ready records can also keep a nullable `image_public_id` for safe app-owned deletion
+- arbitrary external image URLs are never deleted by backend cleanup
 
 Oversize message:
 
@@ -735,6 +746,7 @@ Current environment hardening status:
 - local SQLite bootstrap and dev-user seeding are blocked when `APP_ENV=production`
 - API docs are enabled by default in development and disabled by default in production
 - Alembic is now configured for explicit schema creation before hosted rollout
+- image storage is now explicitly backend-switched between local and Cloudinary-ready modes
 
 ## Documentation Maintenance
 

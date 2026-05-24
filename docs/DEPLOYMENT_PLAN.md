@@ -75,6 +75,7 @@
 - `CORS_ORIGINS`
 - `UPLOAD_DIR` (development/local only)
 - `UPLOAD_URL_PREFIX`
+- `IMAGE_STORAGE_BACKEND`
 - `MAX_UPLOAD_SIZE_BYTES`
 - `SECRET_KEY`
 - `ACCESS_TOKEN_EXPIRE_MINUTES`
@@ -84,6 +85,7 @@
 
 ### Cloudinary (planned)
 
+- `IMAGE_STORAGE_BACKEND`
 - `CLOUDINARY_CLOUD_NAME`
 - `CLOUDINARY_API_KEY`
 - `CLOUDINARY_API_SECRET`
@@ -171,6 +173,14 @@
   - store Cloudinary secure URLs (and public IDs if needed for deletes)
   - delete only app-owned Cloudinary assets when records are removed
 
+### Current status
+
+- backend now supports:
+  - `IMAGE_STORAGE_BACKEND=local`
+  - `IMAGE_STORAGE_BACKEND=cloudinary`
+- Cloudinary credentials are required only when the Cloudinary backend is enabled
+- nullable `image_public_id` fields are available on outfits and clothing items for safe delete behavior
+
 ### Files likely changed
 
 - `server/app/utils/upload.py`
@@ -184,6 +194,7 @@
 - Preserve local upload behavior for development.
 - Do not try to delete arbitrary external URLs.
 - Keep path-traversal protection for local mode.
+- Prefer stored `image_public_id` for app-owned Cloudinary deletes.
 - Update orphan-audit tooling so it understands:
   - local filesystem mode
   - cloud-backed mode
@@ -193,6 +204,7 @@
 - deleting external non-Cloudinary URLs accidentally
 - losing the ability to remove old local dev images safely
 - mixing local and cloud cleanup assumptions in the same code path
+- forgetting to persist `image_public_id` for newly uploaded cloud assets
 
 ## Auth and Security Checklist
 

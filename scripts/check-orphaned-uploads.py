@@ -40,6 +40,10 @@ def main() -> int:
         raise RuntimeError(
             "scripts/check-orphaned-uploads.py is a local-only utility and must not run with APP_ENV=production."
         )
+    if not settings.uses_local_storage:
+        raise RuntimeError(
+            "scripts/check-orphaned-uploads.py only checks local filesystem uploads and should not run when IMAGE_STORAGE_BACKEND is not 'local'."
+        )
 
     upload_dir = ensure_upload_dir()
     disk_files = {

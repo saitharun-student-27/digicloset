@@ -19,6 +19,11 @@ class Settings(BaseSettings):
     )
     UPLOAD_DIR: str = "uploads"
     UPLOAD_URL_PREFIX: str = "/uploads"
+    IMAGE_STORAGE_BACKEND: str = "local"
+    CLOUDINARY_CLOUD_NAME: str | None = None
+    CLOUDINARY_API_KEY: str | None = None
+    CLOUDINARY_API_SECRET: str | None = None
+    CLOUDINARY_FOLDER: str = "digicloset"
     MAX_UPLOAD_SIZE_BYTES: int = 10 * 1024 * 1024
     GEMINI_API_KEY: str | None = None
     SECRET_KEY: str | None = None
@@ -33,6 +38,11 @@ class Settings(BaseSettings):
         if self.APP_ENV not in {"development", "production"}:
             raise ValueError("APP_ENV must be either 'development' or 'production'.")
 
+        if self.IMAGE_STORAGE_BACKEND not in {"local", "cloudinary"}:
+            raise ValueError(
+                "IMAGE_STORAGE_BACKEND must be either 'local' or 'cloudinary'."
+            )
+
         if self.is_production:
             if (
                 not self.SECRET_KEY
@@ -45,6 +55,26 @@ class Settings(BaseSettings):
                 raise ValueError(
                     "CORS_ORIGINS must be explicitly configured with non-local frontend origins when APP_ENV=production."
                 )
+
+        if self.uses_cloudinary_storage:
+            if not (
+                self.CLOUDINARY_CLOUD_NAME
+                and self.CLOUDINARY_API_KEY
+                and self.CLOUDINARY_API_SECRET
+            ):
+                raise ValueError(
+                    "Cloudinary credentials must be configured when IMAGE_STORAGE_BACKEND=cloudinary."
+                )
+            if not self.cloudinary_folder_prefix:
+                raise ValueError(
+                    "CLOUDINARY_FOLDER must be set to a non-empty value when IMAGE_STORAGE_BACKEND=cloudinary."
+                )
+            try:
+                import cloudinary  # noqa: F401
+            except ImportError as error:
+                raise ValueError(
+                    "The 'cloudinary' package must be installed when IMAGE_STORAGE_BACKEND=cloudinary."
+                ) from error
 
         return self
 
@@ -105,7 +135,19 @@ class Settings(BaseSettings):
 
     @property
     def should_mount_local_uploads(self) -> bool:
-        return True
+        return self.uses_local_storage
+
+    @property
+    def uses_local_storage(self) -> bool:
+        return self.IMAGE_STORAGE_BACKEND == "local"
+
+    @property
+    def uses_cloudinary_storage(self) -> bool:
+        return self.IMAGE_STORAGE_BACKEND == "cloudinary"
+
+    @property
+    def cloudinary_folder_prefix(self) -> str:
+        return self.CLOUDINARY_FOLDER.strip("/ ")
 
     @property
     def base_dir(self) -> Path:

@@ -27,10 +27,10 @@ def _safe_filename_stem(filename: str) -> str:
 
 
 async def save_clothing_image(upload_file: UploadFile) -> str:
-    return await save_clothing_image_for_user(upload_file)
+    return await save_local_image_for_user(upload_file)
 
 
-async def save_clothing_image_for_user(
+async def save_local_image_for_user(
     upload_file: UploadFile,
     user_id: int | None = None,
 ) -> str:
@@ -99,11 +99,15 @@ def resolve_local_upload_path(image_url: str | None) -> Path | None:
     return candidate
 
 
-def is_safe_upload_path(image_url: str | None) -> bool:
+def is_local_upload_url(image_url: str | None) -> bool:
     return resolve_local_upload_path(image_url) is not None
 
 
-def delete_uploaded_file(image_url: str | None) -> bool:
+def is_safe_upload_path(image_url: str | None) -> bool:
+    return is_local_upload_url(image_url)
+
+
+def delete_local_uploaded_file(image_url: str | None) -> bool:
     file_path = resolve_local_upload_path(image_url)
     if file_path is None:
         return False
@@ -115,3 +119,14 @@ def delete_uploaded_file(image_url: str | None) -> bool:
         return False
 
     return True
+
+
+async def save_clothing_image_for_user(
+    upload_file: UploadFile,
+    user_id: int | None = None,
+) -> str:
+    return await save_local_image_for_user(upload_file, user_id=user_id)
+
+
+def delete_uploaded_file(image_url: str | None) -> bool:
+    return delete_local_uploaded_file(image_url)

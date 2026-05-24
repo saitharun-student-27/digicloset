@@ -7,7 +7,7 @@ from starlette.datastructures import UploadFile as StarletteUploadFile
 from app.models.clothing_item import ClothingItem
 from app.models.outfit import Outfit, OutfitItem
 from app.schemas.outfit import OutfitCreate, OutfitPieceCreate, OutfitUpdate
-from app.utils.upload import delete_uploaded_file, save_clothing_image_for_user
+from app.services.storage_service import delete_image, save_upload
 
 
 FORM_FIELDS = ["title", "description", "occasion", "season", "style", "source_type"]
@@ -129,8 +129,13 @@ async def build_outfit_from_request(
 
         image = form.get("image")
         if isinstance(image, StarletteUploadFile) and image.filename:
-            image_url = await save_clothing_image_for_user(image, user_id=user_id)
-            outfit_in = outfit_in.model_copy(update={"image_url": image_url})
+            image_info = await save_upload(image, user_id=user_id, context="outfits")
+            outfit_in = outfit_in.model_copy(
+                update={
+                    "image_url": image_info.image_url,
+                    "image_public_id": image_info.image_public_id,
+                }
+            )
 
         return outfit_in
 
@@ -186,6 +191,7 @@ def create_outfit(db: Session, outfit_in: OutfitCreate, user_id: int) -> Outfit:
         season=outfit_in.season,
         style=outfit_in.style,
         image_url=outfit_in.image_url,
+        image_public_id=outfit_in.image_public_id,
         source_type=source_type,
     )
     db.add(outfit)
@@ -259,14 +265,18 @@ def update_outfit(
         return None
 
     previous_image_url = outfit.image_url
+    previous_image_public_id = outfit.image_public_id
     update_data = outfit_in.model_dump(exclude_unset=True)
     for field, value in update_data.items():
         setattr(outfit, field, value)
 
+    if "image_url" in update_data and update_data.get("image_url") != previous_image_url:
+        outfit.image_public_id = None
+
     db.commit()
     next_image_url = outfit.image_url
     if previous_image_url != next_image_url:
-        delete_uploaded_file(previous_image_url)
+        delete_image(previous_image_url, previous_image_public_id)
     return get_outfit(db, outfit.id, user_id)
 
 
@@ -276,9 +286,10 @@ def delete_outfit(db: Session, outfit_id: int, user_id: int) -> bool:
         return False
 
     image_url = outfit.image_url
+    image_public_id = outfit.image_public_id
     db.delete(outfit)
     db.commit()
-    delete_uploaded_file(image_url)
+    delete_image(image_url, image_public_id)
     return True
 
 

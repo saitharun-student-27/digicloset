@@ -4,6 +4,66 @@ All notable changes to DigiCloset are documented here in chronological order.
 
 This changelog tracks the product from the original full-stack scaffold to the current outfit-memory-first, mobile-first wardrobe experience.
 
+## 2026-05-24 - Add Cloudinary-ready image storage backend
+
+Commit: latest Phase 3H.4 checkpoint on `main`
+
+### Phase 3H.4 scope
+
+- added Cloudinary-ready backend storage support
+- preserved local filesystem uploads for development
+- kept frontend UI unchanged
+- avoided deployment and hosted database work
+
+### Storage backend changes
+
+- added explicit image storage backend config:
+  - `IMAGE_STORAGE_BACKEND=local`
+  - `IMAGE_STORAGE_BACKEND=cloudinary`
+- added Cloudinary env support:
+  - `CLOUDINARY_CLOUD_NAME`
+  - `CLOUDINARY_API_KEY`
+  - `CLOUDINARY_API_SECRET`
+  - `CLOUDINARY_FOLDER`
+- kept local development defaulting to local uploads
+
+### Upload and delete behavior
+
+- added a storage abstraction for:
+  - upload save
+  - local/cloud URL detection
+  - safe delete behavior
+- local mode still stores files under:
+  - `uploads/u_{user_id}/...`
+- Cloudinary mode now prepares user-scoped public IDs under:
+  - `digicloset/u_{user_id}/outfits/...`
+  - `digicloset/u_{user_id}/clothing/...`
+- external URLs are still never deleted
+
+### Schema support
+
+- added nullable `image_public_id` support to:
+  - `outfits`
+  - `clothing_items`
+- added Alembic migration for those fields
+- kept old local records compatible with null public IDs
+
+### Verification
+
+- backend compile passed
+- Alembic heads passed
+- local backend health passed
+- manual dev login passed
+- production-mode Cloudinary config failure without credentials passed
+- local storage mode continued working without Cloudinary credentials
+
+### Important boundary
+
+- no deployment happened
+- no Neon connection happened
+- no local data migration happened
+- no frontend redesign happened
+
 ## 2026-05-23 - Prepare the database layer for PostgreSQL migrations
 
 Commit: latest Phase 3H.3 checkpoint on `main`

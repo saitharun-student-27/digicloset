@@ -22,7 +22,8 @@ async def lifespan(app: FastAPI):
 
 
 def create_app() -> FastAPI:
-    ensure_upload_dir()
+    if settings.should_mount_local_uploads:
+        ensure_upload_dir()
     docs_url = "/docs" if settings.enable_api_docs else None
     redoc_url = "/redoc" if settings.enable_api_docs else None
     openapi_url = "/openapi.json" if settings.enable_api_docs else None

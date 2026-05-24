@@ -722,12 +722,25 @@ Uploads must:
 ### 15.3 Storage rule
 Current local storage is acceptable for development, but architecture should remain migration-friendly for future object storage.
 
+Production image storage should prefer an explicit cloud-backed backend instead of depending on local disk.
+
 ### 15.3A Upload cleanup rule
 If a local uploaded image is removed or its owning persisted record is deleted:
 - the database state must be updated
 - safe local file cleanup should run for app-owned uploads only
 - external URLs must never be deleted as local files
 - missing files must not make the main mutation falsely fail after the DB commit
+
+### 15.3C Cloud storage safety rule
+When cloud image storage is introduced:
+- app-owned cloud assets should be deleted only through trusted identifiers such as stored `image_public_id`
+- cloud-backed deletion must not guess ownership from arbitrary external URLs
+- local development must remain able to use filesystem uploads without Cloudinary credentials
+
+Do not:
+- delete unknown third-party URLs
+- make Cloudinary required for local development
+- remove local upload compatibility before hosted rollout is stable
 
 ### 15.3B Upload audit rule
 Developer upload-audit tooling must understand both:

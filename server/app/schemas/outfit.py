@@ -36,6 +36,7 @@ class OutfitCreate(BaseModel):
     season: ClothingSeason
     style: str | None = Field(default=None, max_length=80)
     image_url: str | None = Field(default=None, max_length=500)
+    image_public_id: str | None = Field(default=None, max_length=255, exclude=True)
     source_type: OutfitSourceType | None = None
     pieces: list[OutfitPieceCreate] = Field(default_factory=list)
     clothing_item_ids: list[int] = Field(default_factory=list)

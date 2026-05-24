@@ -26,6 +26,7 @@ class Outfit(Base):
     season: Mapped[str] = mapped_column(String(50), nullable=False)
     style: Mapped[str | None] = mapped_column(String(80), nullable=True)
     image_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    image_public_id: Mapped[str | None] = mapped_column(String(255), nullable=True)
     source_type: Mapped[str] = mapped_column(String(50), nullable=False)
     is_favorite: Mapped[bool] = mapped_column(default=False, nullable=False)
     last_worn_date: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)

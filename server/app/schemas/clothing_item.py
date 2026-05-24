@@ -24,6 +24,7 @@ class ClothingItemBase(BaseModel):
     style: str | None = Field(default=None, max_length=80)
     formality_level: str | None = Field(default=None, max_length=50)
     image_url: str | None = Field(default=None, max_length=500)
+    image_public_id: str | None = Field(default=None, max_length=255, exclude=True)
     source_type: ClothingSourceType = "manual_piece"
 
 

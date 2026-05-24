@@ -63,6 +63,13 @@ def _sync_sqlite_schema() -> None:
                         "ADD COLUMN user_id INTEGER REFERENCES users(id)"
                     ),
                 )
+            if "image_public_id" not in outfit_columns:
+                connection.execute(
+                    text(
+                        "ALTER TABLE outfits "
+                        "ADD COLUMN image_public_id VARCHAR(255)"
+                    ),
+                )
             connection.execute(
                 text(
                     "CREATE INDEX IF NOT EXISTS ix_outfits_user_id "
@@ -92,6 +99,13 @@ def _sync_sqlite_schema() -> None:
                     text(
                         "ALTER TABLE clothing_items "
                         "ADD COLUMN user_id INTEGER REFERENCES users(id)"
+                    ),
+                )
+            if "image_public_id" not in clothing_columns:
+                connection.execute(
+                    text(
+                        "ALTER TABLE clothing_items "
+                        "ADD COLUMN image_public_id VARCHAR(255)"
                     ),
                 )
             connection.execute(

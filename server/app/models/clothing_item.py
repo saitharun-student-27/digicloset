@@ -28,6 +28,7 @@ class ClothingItem(Base):
     style: Mapped[str | None] = mapped_column(String(80), nullable=True)
     formality_level: Mapped[str | None] = mapped_column(String(50), nullable=True)
     image_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    image_public_id: Mapped[str | None] = mapped_column(String(255), nullable=True)
     source_type: Mapped[str] = mapped_column(
         String(50),
         nullable=False,
